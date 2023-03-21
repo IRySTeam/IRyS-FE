@@ -5,7 +5,7 @@ export default function Home() {
     <>
       <main>
         <div>
-          <Typography variant={"h1"} sx={{ color: "black.main" }}>
+          <Typography variant={"heading_h1"} sx={{ color: "black.main" }}>
             IRyS
           </Typography>
         </div>
