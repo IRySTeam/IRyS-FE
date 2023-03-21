@@ -1,52 +1,52 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
+import { black, white, primary, secondary, info, warning, success, danger } from './color';
 
 const base = createTheme({
   palette: {
     primary: {
-      main: '#2C81C9',
-      light: '#D4F2FC',
-      darker: '#2064AC',
+      main: primary[50],
+      light: primary[10],
+      darker: primary[60],
     },
     secondary:{
-      main: '#5BC0F8',
-      light: '#DEFBFE',
-      darker: '#4297D5',
+      main: secondary[50],
+      light: secondary[10],
+      darker: secondary[60],
     },
     error: {
-      // danger
-      main: '#FF3A51',
-      light: '#FFE1D7',
-      darker: '#B71D4B',
+      main: danger[50],
+      light: danger[10],
+      darker: danger[70],
     },
     warning:{
-      main: '#FAC93C',
-      light: '#FEF8D8',
-      darker: '#D7A62B',
+      main: warning[50],
+      light: warning[10],
+      darker: warning[60],
     },
     info: {
-      main: '#2C81C9',
-      light: '#D4F2FC',
-      darker: '#2064AC',
+      main: info[50],
+      light: info[10],
+      darker: info[60],
     },
     success:{
-      main: '#25A338',
-      light: '#DCFAD3',
-      darker: '#127533',
+      main: success[50],
+      light: success[10],
+      darker: success[70],
     },
     black:{
-      main: '#1A1A1A', //black-90
+      main: black[90],
     },
     white:{
-      main: '#FFFFFF', //white-00
+      main: white[0],
     },
     dark_gray:{
-      main: '#6B6B6B', //black-10
-      light: '#757575', //black-00
-      darker: '#424242', //black-50
+      main: black[10],
+      light: black[0],
+      darker: black[50],
     },
     light_gray:{
-      main: '#CCCCCC', //white-50
-      light: '#F5F5F5', //white-10
+      main: white[50],
+      light: white[10],
     }
   },
   breakpoints: {
