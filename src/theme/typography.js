@@ -114,4 +114,10 @@ export const typography = {
     fontSize: 10,
     fontWeight: 400,
   },
+  button: {
+    fontFamily: 'Poppins, sans-serif',
+    fontSize: 23.4,
+    fontWeight: 700,
+    textTransform: 'none',
+  }
 }

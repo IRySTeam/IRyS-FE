@@ -7,12 +7,22 @@ const base = createTheme({
   breakpoints: {
     values: {
       mobile: 0,
-      tablet: 640,
+      tablet: 768,
       laptop: 1024,
-      desktop: 1200,
+      desktop: 1440,
+      large: 1900
     },
   },
   typography: typography,
+  overrides: {
+    MuiInputBase: {
+      input: {
+        fontFamily: 'Inter, sans-serif',
+        fontSize: 20,
+        fontWeight: 400,
+      }
+    }
+  },
 });
 
 const theme = responsiveFontSizes(base)
