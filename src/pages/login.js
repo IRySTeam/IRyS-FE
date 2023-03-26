@@ -1,18 +1,19 @@
 import { useState } from "react";
-import { Container, Box, Typography, Button, OutlinedInput, Link, InputAdornment, IconButton } from "@mui/material";
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
-import { useFormik } from 'formik';
+import { Alert, Container, Box, Typography, Button, OutlinedInput, Link, InputAdornment, IconButton } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useTheme } from "@mui/material/styles";
+import { useFormik } from "formik";
 import Logo from "@/component/logo";
-import { loginValidation } from "@/schema/loginValidation";
+import CustomAlert from "@/component/custom-alert";
+import { loginValidation } from "@/schema/login-validation";
 
 export default function Login() {
   const theme = useTheme();
   
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
     validationSchema: loginValidation,
     onSubmit: (values) => {
@@ -21,33 +22,61 @@ export default function Login() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showAlertCredential, setShowAlertCredential] = useState(false);
+  const [showAlertRegistration, setShowAlertRegistration] = useState(false);
+  const [showAlertResetPassword, setShowAlertResetPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowAlertCredential= () => setShowAlertCredential((show) => !show);
+  const handleClickShowAlertRegistration= () => setShowAlertRegistration((show) => !show);
+  const handleClickShowAlertResetPassword= () => setShowAlertResetPassword((show) => !show);
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
   return (
+    <>
+    { showAlertCredential &&
+      <CustomAlert
+        severity="error"
+        label="The email address or password you entered is incorrect. Please try again"
+        onClose={handleClickShowAlertCredential}
+      /> 
+    }
+    { showAlertRegistration &&
+      <CustomAlert
+        severity="success"
+        label="Congratulations! Your registration was successful"
+        onClose={handleClickShowAlertRegistration}
+      /> 
+    }
+    { showAlertResetPassword &&
+      <CustomAlert
+        severity="success"
+        label="Your password has been successfully reset. Please check your email for a new password"
+        onClose={handleClickShowAlertResetPassword}
+      /> 
+    }
     <Container 
       maxWidth="large" 
       sx={{
         padding: "0", 
-        height:"100vh",
-        display: 'flex',
-        flexDirection: 'row'
+        minHeight:"100vh",
+        display: "flex",
+        flexDirection: "row"
       }} 
     >
       <Box sx={{
         width: "50%",
-        height: "100%",
+        minHeight: "100%",
         padding: "40px",
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
         backgroundImage: "linear-gradient(90deg, #2064AC 0%, #7EC7EE 100%)",
-        [theme.breakpoints.down('laptop')]: {
+        [theme.breakpoints.down("laptop")]: {
           display: "none"
         },
       }} 
@@ -58,19 +87,19 @@ export default function Login() {
       <Box 
         sx={{
         width: "100%",
-        height: "100%",
+        minHeight: "100%",
         padding: "40px",
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        [theme.breakpoints.up('laptop')]: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "flex-start",
+        [theme.breakpoints.up("laptop")]: {
           width: "50%",
           padding: "0 120px"
         },
-        [theme.breakpoints.only('laptop')]: {
+        [theme.breakpoints.only("laptop")]: {
           width: "50%",
-          padding: "0 80px"
+          padding: "80px"
         },
       }} 
       >
@@ -95,7 +124,7 @@ export default function Login() {
             value={formik.values.email}
             onChange={formik.handleChange}
             error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
+            helpertext={formik.touched.email && formik.errors.email}
           />
           <Typography variant={"form_label"} sx={{ color: "black.main" }}>Password <span style={{color: theme.palette.error.main}}>*</span></Typography>
           <OutlinedInput
@@ -106,9 +135,9 @@ export default function Login() {
             value={formik.values.password}
             onChange={formik.handleChange}
             error={formik.touched.password && Boolean(formik.errors.password)}
-            helperText={formik.touched.password && formik.errors.password}
+            helpertext={formik.touched.password && formik.errors.password}
             sx={{ marginBottom: "8px",}}
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -137,18 +166,18 @@ export default function Login() {
             sx={{ 
               height: "56px", 
               marginTop: "8px",
-              '&.Mui-disabled': {
+              "&.Mui-disabled": {
                 backgroundColor: theme.palette.dark_gray.light,
                 color: theme.palette.light_gray.light,
               },}}
             fullWidth 
             type="submit"
-            disabled={formik.values.email === '' || formik.values.password === ''}
+            disabled={formik.values.email === "" || formik.values.password === ""}
 
           >
             Login
           </Button> 
-          <Typography variant={"paragpraph_h5"} sx={{ color: "black.main", alignSelf: "center" }}>Don&apos;t have an account yet?&nbsp;
+          <Typography variant={"paragraph_h5"} sx={{ color: "black.main", alignSelf: "center", textAlign: "center" }}>Don&apos;t have an account yet?&nbsp;
             <Link
               variant="heading_h5"
               underline="none"
@@ -162,5 +191,6 @@ export default function Login() {
         </form>
       </Box>
     </Container>
+    </>
   )
 }

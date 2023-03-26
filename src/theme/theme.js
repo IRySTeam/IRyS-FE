@@ -14,15 +14,6 @@ const base = createTheme({
     },
   },
   typography: typography,
-  overrides: {
-    MuiInputBase: {
-      input: {
-        fontFamily: 'Inter, sans-serif',
-        fontSize: 20,
-        fontWeight: 400,
-      }
-    }
-  },
 });
 
 const theme = responsiveFontSizes(base)
