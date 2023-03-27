@@ -1,14 +1,27 @@
 import { useState } from "react";
-import { Alert, Container, Box, Typography, Button, OutlinedInput, Link, InputAdornment, IconButton } from "@mui/material";
+import { useDispatch } from 'react-redux';
+import axios from "axios";
+import { useRouter } from "next/router";
+import { Container, Box, Typography, Button, OutlinedInput, Link, InputAdornment, IconButton, CircularProgress } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
 import { loginValidation } from "@/schema/login-validation";
+import Cookies from 'js-cookie'
+import { NEXT_PUBLIC_API_URL } from "@/constants/api";
 
 export default function Login() {
+  const router = useRouter();
   const theme = useTheme();
+
+  const config = {
+    headers: { 
+        'content-type': 'application/json',
+        'Access-Control-Allow-Origin': "*"
+    }
+  }
   
   const formik = useFormik({
     initialValues: {
@@ -16,20 +29,47 @@ export default function Login() {
       password: "",
     },
     validationSchema: loginValidation,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: async (values,) => {
+      setIsLoading(true);
+      try {
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/login`, values, config);
+        Cookies.set('access_token', result.data.token, { expires: 1/24 });
+        Cookies.set('refresh_token', result.data.refresh_token, { expires: 1 });
+        router.push({ pathname: "/" })
+        setIsLoading(false);
+      } catch (error) {
+        if(error.response){
+          setAlertSeverity("error");
+          switch (error.response.data.error_code){
+            case "USER__NOT_FOUND" :
+              setAlertLabel("Email doesn't exist. Try again or create a new account if you don't have one yet");
+              break;
+            case "USER__PASSWORD_DOES_NOT_MATCH":
+              setAlertLabel("The password you entered is incorrect. Please try again");
+              break;
+            default :
+              setAlertLabel("Network Error, Please Try Again.");
+              break;
+          }
+          setIsLoading(false);
+          setShowAlert(true);
+        } else{
+          setAlertLabel("Network Error, Please Try Again.");
+          setIsLoading(false);
+          setShowAlert(true);
+        }
+      }
     },
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showAlertCredential, setShowAlertCredential] = useState(false);
-  const [showAlertRegistration, setShowAlertRegistration] = useState(false);
-  const [showAlertResetPassword, setShowAlertResetPassword] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState("error");
+  const [alertLabel, setAlertLabel] = useState("The email address or password you entered is incorrect. Please try again");
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowAlertCredential= () => setShowAlertCredential((show) => !show);
-  const handleClickShowAlertRegistration= () => setShowAlertRegistration((show) => !show);
-  const handleClickShowAlertResetPassword= () => setShowAlertResetPassword((show) => !show);
+  const handleClickShowAlert= () => setShowAlert((show) => !show);
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -37,29 +77,32 @@ export default function Login() {
 
   return (
     <>
-    { showAlertCredential &&
+    { showAlert &&
       <CustomAlert
-        severity="error"
-        label="The email address or password you entered is incorrect. Please try again"
-        onClose={handleClickShowAlertCredential}
+        severity={alertSeverity}
+        label={alertLabel}
+        onClose={handleClickShowAlert}
       /> 
     }
-    { showAlertRegistration &&
-      <CustomAlert
-        severity="success"
-        label="Congratulations! Your registration was successful"
-        onClose={handleClickShowAlertRegistration}
-      /> 
-    }
-    { showAlertResetPassword &&
-      <CustomAlert
-        severity="success"
-        label="Your password has been successfully reset. Please check your email for a new password"
-        onClose={handleClickShowAlertResetPassword}
-      /> 
+    { isLoading &&
+      <Box 
+        sx={{
+          backgroundColor: "backdrop.main",
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 2,
+        }}>
+        <CircularProgress
+          size={60}
+          thickness={4}
+        />
+      </Box>
     }
     <Container 
-      maxWidth="large" 
       sx={{
         padding: "0", 
         minHeight:"100vh",
