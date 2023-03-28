@@ -4,17 +4,18 @@ import { useTheme } from "@mui/material/styles";
 import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
-import { loginValidation } from "@/schema/login-validation";
 import Loading from "@/component/loading";
+import FormInput from "@/component/form-input";
+import { forgotPasswordValidation } from "@/schema/forgot-password-validation";
 
-export default function Login() {
+export default function ForgotPassword() {
   const theme = useTheme();
   
   const formik = useFormik({
     initialValues: {
       email: "",
     },
-    validationSchema: loginValidation,
+    validationSchema: forgotPasswordValidation,
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
     },
@@ -94,16 +95,16 @@ export default function Login() {
             gap: "16px"
           }}
         >
-          <Typography variant={"form_label"} sx={{ color: "black.main" }}>Email <span style={{color: theme.palette.error.main}}>*</span></Typography>
-          <OutlinedInput
-            fullWidth
-            id="email"
+          <FormInput
+            id="email"            
             name="email"
+            label="Email"
             placeholder="example@email.com"
             value={formik.values.email}
             onChange={formik.handleChange}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helpertext={formik.touched.email && formik.errors.email}
+            required={true}
           />
           <Button 
             color="primary" 

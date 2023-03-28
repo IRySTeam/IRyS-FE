@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { useDispatch } from 'react-redux';
 import axios from "axios";
 import { useRouter } from "next/router";
-import { Container, Box, Typography, Button, OutlinedInput, Link, InputAdornment, IconButton, CircularProgress } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Container, Box, Typography, Button, Link } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useFormik } from "formik";
 import Logo from "@/component/logo";
@@ -12,6 +10,7 @@ import { loginValidation } from "@/schema/login-validation";
 import Cookies from 'js-cookie'
 import { NEXT_PUBLIC_API_URL } from "@/constants/api";
 import Loading from "@/component/loading";
+import FormInput from "@/component/form-input";
 
 export default function Login() {
   const router = useRouter();
@@ -19,8 +18,8 @@ export default function Login() {
 
   const config = {
     headers: { 
-        'content-type': 'application/json',
-        'Access-Control-Allow-Origin': "*"
+      'content-type': 'application/json',
+      'Access-Control-Allow-Origin': "*"
     }
   }
   
@@ -142,41 +141,31 @@ export default function Login() {
             gap: "16px"
           }}
         >
-          <Typography variant={"form_label"} sx={{ color: "black.main" }}>Email <span style={{color: theme.palette.error.main}}>*</span></Typography>
-          <OutlinedInput
-            fullWidth
-            id="email"
+          <FormInput 
+            id="email"            
             name="email"
+            label="Email"
             placeholder="example@email.com"
             value={formik.values.email}
             onChange={formik.handleChange}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helpertext={formik.touched.email && formik.errors.email}
+            required={true}
           />
-          <Typography variant={"form_label"} sx={{ color: "black.main" }}>Password <span style={{color: theme.palette.error.main}}>*</span></Typography>
-          <OutlinedInput
-            fullWidth
-            id="password"
+          <FormInput 
+            id="password"            
             name="password"
+            label="Password"
             placeholder="Password"
             value={formik.values.password}
             onChange={formik.handleChange}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            helpertext={formik.touched.password && formik.errors.password}
-            sx={{ marginBottom: "8px",}}
-            type={showPassword ? "text" : "password"}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff sx={{color: "black.main"}}/> : <Visibility sx={{color: "black.main"}}/>}
-                </IconButton>
-              </InputAdornment>
-              }
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helpertext={formik.touched.email && formik.errors.email}
+            showPassword={showPassword}
+            onClick={handleClickShowPassword}
+            onMouseDown={handleMouseDownPassword}
+            required={true}
+            isPasswordInput={true}
           />
           <Link
             variant="heading_h5"
