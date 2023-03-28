@@ -11,6 +11,7 @@ import CustomAlert from "@/component/custom-alert";
 import { loginValidation } from "@/schema/login-validation";
 import Cookies from 'js-cookie'
 import { NEXT_PUBLIC_API_URL } from "@/constants/api";
+import Loading from "@/component/loading";
 
 export default function Login() {
   const router = useRouter();
@@ -84,24 +85,7 @@ export default function Login() {
         onClose={handleClickShowAlert}
       /> 
     }
-    { isLoading &&
-      <Box 
-        sx={{
-          backgroundColor: "backdrop.main",
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 2,
-        }}>
-        <CircularProgress
-          size={60}
-          thickness={4}
-        />
-      </Box>
-    }
+    { isLoading && <Loading /> }
     <Container 
       sx={{
         padding: "0", 
