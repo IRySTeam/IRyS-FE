@@ -5,25 +5,35 @@ import { useTheme } from "@mui/material/styles";
 export default function FormInput(props) {
   const theme = useTheme();
   return (
-    <FormControl error={props.error} variant="standard">
-      <Typography variant={"form_label"} sx={{ color: "black.main", marginBottom: "16px" }}>{props.label} {props.required ? <span style={{color: theme.palette.error.main}}>*</span> : <></>}</Typography>
+    <FormControl error={props.error} variant="standard" sx={props.sx}>
+      <Typography 
+        sx={{ 
+          color: "black.main", 
+          marginBottom: "16px",
+          typography: "form_label",
+          [theme.breakpoints.down("tablet")]: {
+            typography: "heading_h5",
+          }, 
+        }}
+      >
+        {props.label} {props.required ? <span style={{color: theme.palette.error.main}}>*</span> : <></>}
+      </Typography>
       {props.isPasswordInput ?
         <OutlinedInput
-          fullWidth
-          id="password"
-          name="password"
-          placeholder="Password"
+          id={props.id}
+          name={props.name}
+          placeholder={props.placeholder}
           value={props.value}
           onChange={props.onChange}
           error={props.error}
-          sx={{ marginBottom: "8px",}}
+          sx={{ marginBottom: "8px", width: "100%"}}
           type={props.showPassword ? "text" : "password"}
           endAdornment={
             <InputAdornment position="end">
               <IconButton
                 aria-label="toggle password visibility"
-                onClick={props.handleClickShowPassword}
-                onMouseDown={props.handleMouseDownPassword}
+                onClick={props.onClick}
+                onMouseDown={props.onMouseDown}
                 edge="end"
               >
                 {props.showPassword ? <VisibilityOff sx={{color: "black.main"}}/> : <Visibility sx={{color: "black.main"}}/>}
@@ -32,15 +42,13 @@ export default function FormInput(props) {
             }
         /> :
         <OutlinedInput
-          fullWidth
           id={props.id}
-          name={props.email}
+          name={props.name}
           placeholder={props.placeholder}
           value={props.value}
           onChange={props.onChange}
           error={props.error}
-          helpertext={props.helpertext}
-          sx={props.sx? props.sx : null}
+          sx={{ width: "100%"}}
         />
       }
       <FormHelperText 

@@ -110,13 +110,13 @@ export default function ForgotPassword() {
             color="primary" 
             variant="contained" 
             sx={{ 
-              height: "56px", 
+              height: "56px",
+              width: "100%", 
               marginTop: "8px",
               "&.Mui-disabled": {
                 backgroundColor: theme.palette.dark_gray.light,
                 color: theme.palette.light_gray.light,
               },}}
-            fullWidth 
             type="submit"
             disabled={formik.values.email === ""}
           >

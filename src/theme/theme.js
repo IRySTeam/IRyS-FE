@@ -8,7 +8,8 @@ const base = createTheme({
     values: {
       mobile: 0,
       tablet: 768,
-      laptop: 1024,
+      small: 1024,
+      laptop: 1280,
       desktop: 1440,
       large: 1900
     },

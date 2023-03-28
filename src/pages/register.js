@@ -6,13 +6,13 @@ import { useTheme } from "@mui/material/styles";
 import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
-import { loginValidation } from "@/schema/login-validation";
+import { registerValidation } from "@/schema/register-validation";
 import Cookies from 'js-cookie'
 import { NEXT_PUBLIC_API_URL } from "@/constants/api";
 import Loading from "@/component/loading";
 import FormInput from "@/component/form-input";
 
-export default function Login() {
+export default function Register() {
   const router = useRouter();
   const theme = useTheme();
 
@@ -26,16 +26,18 @@ export default function Login() {
   const formik = useFormik({
     initialValues: {
       email: "",
+      firstName: "",
+      lastName: "",
       password: "",
+      passwordConfirmation:"",
     },
-    validationSchema: loginValidation,
+    validationSchema: registerValidation,
     onSubmit: async (values,) => {
       setIsLoading(true);
       try {
-        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/login`, values, config);
-        Cookies.set('access_token', result.data.token, { expires: 1/24 });
-        Cookies.set('refresh_token', result.data.refresh_token, { expires: 1 });
-        router.push({ pathname: "/" })
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/register`, values, config);
+        console.log(result.data)
+        router.push({ pathname: "/login" })
         setIsLoading(false);
       } catch (error) {
         if(error.response){
@@ -64,11 +66,13 @@ export default function Login() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState("error");
-  const [alertLabel, setAlertLabel] = useState("The email address or password you entered is incorrect. Please try again");
+  const [alertLabel, setAlertLabel] = useState("Registration Failed. Please try again");
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPasswordConfirmation = () => setShowPasswordConfirmation((show) => !show);
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
   const handleMouseDownPassword = (event) => {
@@ -102,7 +106,7 @@ export default function Login() {
         justifyContent: "space-between",
         alignItems: "flex-start",
         backgroundImage: "linear-gradient(90deg, #2064AC 0%, #7EC7EE 100%)",
-        [theme.breakpoints.down("laptop")]: {
+        [theme.breakpoints.down("small")]: {
           display: "none"
         },
       }} 
@@ -119,18 +123,18 @@ export default function Login() {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "flex-start",
-        [theme.breakpoints.up("laptop")]: {
+        [theme.breakpoints.up("small")]: {
           width: "50%",
           padding: "0 120px"
         },
-        [theme.breakpoints.only("laptop")]: {
+        [theme.breakpoints.only("small")]: {
           width: "50%",
           padding: "80px"
         },
       }} 
       >
-        <Typography variant={"heading_h1"} sx={{ color: "black.main" }} mb={"16px"}>Login</Typography>
-        <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Kindly provide your registered email and password to access your account.</Typography>
+        <Typography variant={"heading_h1"} sx={{ color: "black.main" }} mb={"16px"}>Register</Typography>
+        <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Create a new account by filling out the registration form below.</Typography>
         <form 
           onSubmit={formik.handleSubmit} 
           style={{
@@ -152,6 +156,61 @@ export default function Login() {
             helpertext={formik.touched.email && formik.errors.email}
             required={true}
           />
+          <Box
+            sx={{
+              display: "flex",
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              [theme.breakpoints.down("tablet")]: {
+                flexDirection: "column",
+                gap: "16px",
+              }, 
+              [theme.breakpoints.only("small")]: {
+                flexDirection: "column",
+                gap: "16px",
+              },  
+            }}
+          >
+            <FormInput 
+              id="firstName"            
+              name="firstName"
+              label="First Name"
+              placeholder="Name"
+              value={formik.values.firstName}
+              onChange={formik.handleChange}
+              error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+              helpertext={formik.touched.firstName && formik.errors.firstName}
+              required={true}
+              sx={{
+                [theme.breakpoints.up("tablet")]: {
+                  width: "calc(50% - 8px)",
+                },
+                [theme.breakpoints.only("small")]: {
+                  width: "100%",
+                },  
+              }}
+            />
+            <FormInput 
+              id="lastName"            
+              name="lastName"
+              label="Last Name"
+              placeholder="Name"
+              value={formik.values.lastName}
+              onChange={formik.handleChange}
+              error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+              helpertext={formik.touched.lastName && formik.errors.lastName}
+              required={true}
+              sx={{
+                [theme.breakpoints.up("tablet")]: {
+                  width: "calc(50% - 8px)",
+                }, 
+                [theme.breakpoints.only("small")]: {
+                  width: "100%",
+                },  
+              }}
+            />
+          </Box>
           <FormInput 
             id="password"            
             name="password"
@@ -167,15 +226,21 @@ export default function Login() {
             required={true}
             isPasswordInput={true}
           />
-          <Link
-            variant="heading_h5"
-            underline="none"
-            alignSelf={"flex-end"}
-            href={"/forgot-password"}
-            color={"secondary.main"}
-          >
-            Forgot Password
-          </Link>
+          <FormInput 
+            id="passwordConfirmation"            
+            name="passwordConfirmation"
+            label="Password Confirmation"
+            placeholder="Re-enter your password"
+            value={formik.values.passwordConfirmation}
+            onChange={formik.handleChange}
+            error={formik.touched.passwordConfirmation && Boolean(formik.errors.passwordConfirmation)}
+            helpertext={formik.touched.passwordConfirmation && formik.errors.passwordConfirmation}
+            showPassword={showPasswordConfirmation}
+            onClick={handleClickShowPasswordConfirmation}
+            onMouseDown={handleMouseDownPassword}
+            required={true}
+            isPasswordInput={true}
+          />
           <Button 
             color="primary" 
             variant="contained" 
@@ -190,9 +255,9 @@ export default function Login() {
             type="submit"
             disabled={formik.values.email === "" || formik.values.password === ""}
           >
-            Login
+            Register
           </Button> 
-          <Typography variant={"paragraph_h5"} sx={{ color: "black.main", alignSelf: "center", textAlign: "center" }}>Don&apos;t have an account yet?&nbsp;
+          <Typography variant={"paragraph_h5"} sx={{ color: "black.main", alignSelf: "center", textAlign: "center" }}>Already have an account?&nbsp;
             <Link
               variant="heading_h5"
               underline="none"
@@ -200,7 +265,7 @@ export default function Login() {
               href={"/register"}
               color={"secondary.main"}
             >
-              Register
+              Login
             </Link>
           </Typography>
         </form>
