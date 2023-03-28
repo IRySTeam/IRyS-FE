@@ -266,8 +266,7 @@ export default function Register() {
             <Link
               variant="heading_h5"
               underline="none"
-              alignSelf={"flex-end"}
-              href={"/register"}
+              href={"/login"}
               color={"secondary.main"}
             >
               Login

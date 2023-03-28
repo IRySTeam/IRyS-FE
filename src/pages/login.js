@@ -102,7 +102,7 @@ export default function Login() {
         justifyContent: "space-between",
         alignItems: "flex-start",
         backgroundImage: "linear-gradient(90deg, #2064AC 0%, #7EC7EE 100%)",
-        [theme.breakpoints.down("laptop")]: {
+        [theme.breakpoints.down("small")]: {
           display: "none"
         },
       }} 
@@ -119,11 +119,11 @@ export default function Login() {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "flex-start",
-        [theme.breakpoints.up("laptop")]: {
+        [theme.breakpoints.up("small")]: {
           width: "50%",
           padding: "0 120px"
         },
-        [theme.breakpoints.only("laptop")]: {
+        [theme.breakpoints.only("small")]: {
           width: "50%",
           padding: "80px"
         },
@@ -198,7 +198,6 @@ export default function Login() {
             <Link
               variant="heading_h5"
               underline="none"
-              alignSelf={"flex-end"}
               href={"/register"}
               color={"secondary.main"}
             >

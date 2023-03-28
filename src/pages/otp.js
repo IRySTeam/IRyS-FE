@@ -1,34 +1,22 @@
 import { useState } from "react";
 import { Container, Box, Typography, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
 import Loading from "@/component/loading";
-import FormInput from "@/component/form-input";
-import { forgotPasswordValidation } from "@/schema/forgot-password-validation";
+import OtpInput from 'react-otp-input';
 
-export default function ForgotPassword() {
+export default function Otp() {
   const theme = useTheme();
-  
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-    },
-    validationSchema: forgotPasswordValidation,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
-  });
 
+  const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState("error");
-  const [alertLabel, setAlertLabel] = useState("The email address you entered is not found. Please try again");
+  const [alertLabel, setAlertLabel] = useState("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
-
-
+  const handleChangeOtp = (newValue) => {setOtp(newValue)};
   return (
     <>
     { showAlert &&
@@ -83,47 +71,55 @@ export default function ForgotPassword() {
         },
       }} 
       >
-        <Typography variant={"heading_h1"} sx={{ color: "black.main" }} mb={"16px"}>Reset Password</Typography>
-        <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Enter your email to reset your password</Typography>
-        <form 
-          onSubmit={formik.handleSubmit} 
-          style={{
-            marginTop: "40px",
-            display: "flex",
-            flexDirection: "column",
+        <Typography variant={"heading_h1"} sx={{ color: "black.main" }} mb={"16px"}>Verify Account</Typography>
+        <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Your registration is almost complete! Please enter the OTP (One-Time Password) sent to your email address to verify your account.Note that the OTP will expire in 5 minutes. </Typography>
+        <OtpInput
+          value={otp}
+          onChange={setOtp}
+          numInputs={4}
+          renderInput={(props) => <input {...props} id="otp"/>}
+          containerStyle={{
             width: "100%",
-            gap: "16px"
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "30px",
+            margin: "50px 0 80px"
           }}
+          inputStyle={{
+            fontFamily: 'Poppins, sans-serif',
+          }}
+        />
+        <Button 
+          color="primary" 
+          variant="contained" 
+          sx={{ 
+            height: "56px",
+            width: "100%", 
+            margin: "8px 0px 16px",
+            "&.Mui-disabled": {
+              backgroundColor: theme.palette.dark_gray.light,
+              color: theme.palette.light_gray.light,
+            },}}
+          type="submit"
+          disabled={otp.length < 4}
         >
-          <FormInput
-            id="email"            
-            name="email"
-            label="Email"
-            placeholder="example@email.com"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helpertext={formik.touched.email && formik.errors.email}
-            required={true}
-          />
+          Verify Account
+        </Button>
+        <Typography variant={"paragraph_h5"} sx={{ color: "black.main", alignSelf: "center", textAlign: "center" }}>Didn&apos;t receive the OTP?&nbsp;
           <Button 
-            color="primary" 
-            variant="contained" 
-            sx={{ 
-              height: "56px",
-              width: "100%", 
-              marginTop: "8px",
-              "&.Mui-disabled": {
-                backgroundColor: theme.palette.dark_gray.light,
-                color: theme.palette.light_gray.light,
-              },}}
-            type="submit"
-            disabled={formik.values.email === ""}
+            variant="text"
+            color="secondary"
+            sx={{
+              typography: theme.typography.heading_h5,
+              margin: 0,
+              padding: 0,
+            }}
           >
-            Reset Password
+            Resend Code
           </Button>
-        </form>
+        </Typography> 
       </Box>
     </Container>
     </>
