@@ -3,6 +3,8 @@ import Head from 'next/head'
 import { ThemeProvider } from '@mui/material/styles'
 import theme from '@/theme/theme'
 import CssBaseline from '@mui/material/CssBaseline'
+import { Provider } from 'react-redux'; 
+import { store } from "@/state/store/store";
 
 export default function App({ Component, pageProps }) {
   return (
@@ -11,10 +13,12 @@ export default function App({ Component, pageProps }) {
         <title>Intelligent Repository System</title>
         <meta name='viewport' content='initial-scale=1, width=device-width'></meta>
       </Head>
-      <ThemeProvider theme={theme}>
-        <CssBaseline/>
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline/>
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </Provider>
     </>
   )
 }
