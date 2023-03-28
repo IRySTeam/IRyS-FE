@@ -102,6 +102,7 @@ export default function ForgotPassword() {
             placeholder="example@email.com"
             value={formik.values.email}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helpertext={formik.touched.email && formik.errors.email}
             required={true}

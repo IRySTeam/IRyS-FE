@@ -148,6 +148,7 @@ export default function Login() {
             placeholder="example@email.com"
             value={formik.values.email}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helpertext={formik.touched.email && formik.errors.email}
             required={true}
@@ -159,6 +160,7 @@ export default function Login() {
             placeholder="Password"
             value={formik.values.password}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helpertext={formik.touched.password && formik.errors.password}
             showPassword={showPassword}

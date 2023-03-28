@@ -7,7 +7,6 @@ import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
 import { registerValidation } from "@/schema/register-validation";
-import Cookies from 'js-cookie'
 import { NEXT_PUBLIC_API_URL } from "@/constants/api";
 import Loading from "@/component/loading";
 import FormInput from "@/component/form-input";
@@ -152,6 +151,7 @@ export default function Register() {
             placeholder="example@email.com"
             value={formik.values.email}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helpertext={formik.touched.email && formik.errors.email}
             required={true}
@@ -179,6 +179,7 @@ export default function Register() {
               placeholder="Name"
               value={formik.values.firstName}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               error={formik.touched.firstName && Boolean(formik.errors.firstName)}
               helpertext={formik.touched.firstName && formik.errors.firstName}
               required={true}
@@ -198,6 +199,7 @@ export default function Register() {
               placeholder="Name"
               value={formik.values.lastName}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               error={formik.touched.lastName && Boolean(formik.errors.lastName)}
               helpertext={formik.touched.lastName && formik.errors.lastName}
               required={true}
@@ -218,8 +220,10 @@ export default function Register() {
             placeholder="Password"
             value={formik.values.password}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helpertext={formik.touched.password && formik.errors.password}
+            info={"Your password must be at least 8 characters characters and should include a combinations of numbers, letters, and special characters (!@$%)."}
             showPassword={showPassword}
             onClick={handleClickShowPassword}
             onMouseDown={handleMouseDownPassword}
@@ -233,6 +237,7 @@ export default function Register() {
             placeholder="Re-enter your password"
             value={formik.values.passwordConfirmation}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             error={formik.touched.passwordConfirmation && Boolean(formik.errors.passwordConfirmation)}
             helpertext={formik.touched.passwordConfirmation && formik.errors.passwordConfirmation}
             showPassword={showPasswordConfirmation}

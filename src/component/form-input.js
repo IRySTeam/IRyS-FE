@@ -25,6 +25,7 @@ export default function FormInput(props) {
           placeholder={props.placeholder}
           value={props.value}
           onChange={props.onChange}
+          onBlur={props.onBlur}
           error={props.error}
           sx={{ marginBottom: "8px", width: "100%"}}
           type={props.showPassword ? "text" : "password"}
@@ -47,17 +48,18 @@ export default function FormInput(props) {
           placeholder={props.placeholder}
           value={props.value}
           onChange={props.onChange}
+          onBlur={props.onBlur}
           error={props.error}
           sx={{ width: "100%"}}
         />
       }
-      <FormHelperText 
+      <FormHelperText
         sx={{
-          typography: theme.typography.paragraph_h6,
+          typography: theme.typography.form_sublabel,
           margin: 0,
         }}
       >
-        {props.helpertext}
+        {props.error? props.helpertext : props.info? props.info : ''}
       </FormHelperText>
     </FormControl>
   )

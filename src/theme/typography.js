@@ -109,7 +109,7 @@ export const typography = {
     fontSize: 10,
     fontWeight: 600,
   },
-  form_sublabel: {
+  advanced_value: {
     fontFamily: 'Inter, sans-serif',
     fontSize: 10,
     fontWeight: 400,
