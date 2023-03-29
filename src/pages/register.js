@@ -33,20 +33,23 @@ export default function Register() {
     validationSchema: registerValidation,
     onSubmit: async (values,) => {
       setIsLoading(true);
+      const registerData = {
+        email: values.email,
+        first_name: values.firstName,
+        last_name: values.lastName,
+        password: values.password,
+      }
       try {
-        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/register`, values, config);
-        console.log(result.data)
-        router.push({ pathname: "/login" })
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/register`, registerData, config);
+        console.log(result);
+        router.push({ pathname: "/otp" })
         setIsLoading(false);
       } catch (error) {
         if(error.response){
           setAlertSeverity("error");
           switch (error.response.data.error_code){
-            case "USER__NOT_FOUND" :
-              setAlertLabel("Email doesn't exist. Try again or create a new account if you don't have one yet");
-              break;
-            case "USER__PASSWORD_DOES_NOT_MATCH":
-              setAlertLabel("The password you entered is incorrect. Please try again");
+            case "USER__DUPLICATE_EMAIL_OR_NICKNAME" :
+              setAlertLabel("Email already exist for another user. Log in or register with another email.");
               break;
             default :
               setAlertLabel("Network Error, Please Try Again.");
@@ -124,11 +127,11 @@ export default function Register() {
         alignItems: "flex-start",
         [theme.breakpoints.up("small")]: {
           width: "50%",
-          padding: "0 120px"
+          padding: "80px",
         },
-        [theme.breakpoints.only("small")]: {
+        [theme.breakpoints.up("desktop")]: {
           width: "50%",
-          padding: "80px"
+          padding: "120px"
         },
       }} 
       >
@@ -258,7 +261,7 @@ export default function Register() {
                 color: theme.palette.light_gray.light,
               },}}
             type="submit"
-            disabled={formik.values.email === "" || formik.values.password === ""}
+            disabled={formik.values.email === "" || formik.values.password === "" || formik.values.firstName === "" || formik.values.lastName === "" || formik.values.passwordConfirmation === ""}
           >
             Register
           </Button> 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { Container, Box, Typography, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import Logo from "@/component/logo";
@@ -8,15 +9,36 @@ import OtpInput from 'react-otp-input';
 
 export default function Otp() {
   const theme = useTheme();
+  const router = useRouter();
 
   const [otp, setOtp] = useState('')
+  const isOtpExpired = false
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState("error");
   const [alertLabel, setAlertLabel] = useState("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
-  const handleChangeOtp = (newValue) => {setOtp(newValue)};
+  const handleOtpSubmit = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      if(otp !== '1234'){
+        console.log("masuk dah");
+        setAlertSeverity("error");
+        setAlertLabel("Sorry, the OTP you entered wrong. Please try again")
+        setShowAlert(true);
+      } 
+      else if (isOtpExpired) {
+        setAlertSeverity("error");
+        setAlertLabel("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
+        setShowAlert(true);
+      } else{
+        router.push({ pathname: "/login", query: { isSuccessRegistration : true} })
+      }
+      setIsLoading(false)
+    }, "1000");
+  };
+
   return (
     <>
     { showAlert &&
@@ -72,7 +94,7 @@ export default function Otp() {
       }} 
       >
         <Typography variant={"heading_h1"} sx={{ color: "black.main" }} mb={"16px"}>Verify Account</Typography>
-        <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Your registration is almost complete! Please enter the OTP (One-Time Password) sent to your email address to verify your account.Note that the OTP will expire in 5 minutes. </Typography>
+        <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Your registration is almost complete! Please enter the OTP (One-Time Password) sent to your email address to verify your account. Note that the OTP will expire in 5 minutes. </Typography>
         <OtpInput
           value={otp}
           onChange={setOtp}
@@ -102,8 +124,9 @@ export default function Otp() {
               backgroundColor: theme.palette.dark_gray.light,
               color: theme.palette.light_gray.light,
             },}}
-          type="submit"
           disabled={otp.length < 4}
+          type="submit"
+          onClick={handleOtpSubmit}
         >
           Verify Account
         </Button>

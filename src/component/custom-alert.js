@@ -15,7 +15,7 @@ export default function CustomAlert(props) {
         alignItems: "center",
         typography: theme.typography.heading_h6 ,
         zIndex: 2,
-        position: "absolute",
+        position: "fixed",
         top: '10%',
         left: '50%',
         transform: 'translate(-50%, -50%)',

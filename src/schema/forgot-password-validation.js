@@ -4,5 +4,5 @@ export const forgotPasswordValidation = yup.object({
   email: yup
     .string('Enter your email')
     .email('Enter a valid email')
-    .required('Email is required'),
+    .required('Please fill in the required field'),
 });

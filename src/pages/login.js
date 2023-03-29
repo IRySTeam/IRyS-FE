@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { Container, Box, Typography, Button, Link } from "@mui/material";
@@ -14,6 +14,8 @@ import FormInput from "@/component/form-input";
 
 export default function Login() {
   const router = useRouter();
+  const { isSuccessRegistration, isSuccessForgotPassword } = router.query;
+
   const theme = useTheme();
 
   const config = {
@@ -74,6 +76,19 @@ export default function Login() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+  useEffect(() => {
+    if(isSuccessRegistration){
+      setAlertSeverity("success");
+      setAlertLabel("Congratulations! Your registration was successful ");
+      setShowAlert(true);
+    }
+    if(isSuccessForgotPassword){
+      setAlertSeverity("success");
+      setAlertLabel("Your password has been successfully reset. Please check your email for a new password");
+      setShowAlert(true);
+    }
+  }, [isSuccessRegistration, isSuccessForgotPassword]);
 
   return (
     <>

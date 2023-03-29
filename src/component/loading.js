@@ -5,7 +5,7 @@ export default function Loading() {
     <Box 
     sx={{
         backgroundColor: "backdrop.main",
-        position: "absolute",
+        position: "fixed",
         width: "100%",
         height: "100%",
         display: "flex",

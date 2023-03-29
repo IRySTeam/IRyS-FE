@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { Container, Box, Typography, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useFormik } from "formik";
@@ -10,24 +11,35 @@ import { forgotPasswordValidation } from "@/schema/forgot-password-validation";
 
 export default function ForgotPassword() {
   const theme = useTheme();
-  
+  const router = useRouter();
+
   const formik = useFormik({
     initialValues: {
       email: "",
     },
     validationSchema: forgotPasswordValidation,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: () => {
+      setIsLoading(true);
+      setTimeout(() => {
+        if(!isEmailExist) {
+          setAlertSeverity("error");
+          setAlertLabel("The email address you entered is not found. Please try again");
+          setShowAlert(true);
+        } else{
+          router.push({ pathname: "/login", query: { isSuccessForgotPassword : true} })
+        }
+        setIsLoading(false)
+      }, "1000");
     },
   });
 
+  const isEmailExist = false;
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState("error");
   const [alertLabel, setAlertLabel] = useState("The email address you entered is not found. Please try again");
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
-
 
   return (
     <>
