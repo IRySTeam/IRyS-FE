@@ -40,8 +40,8 @@ export default function Login() {
         router.push({ pathname: "/" })
         setIsLoading(false);
       } catch (error) {
+        setAlertSeverity("error")
         if(error.response){
-          setAlertSeverity("error");
           switch (error.response.data.error_code){
             case "USER__NOT_FOUND" :
               setAlertLabel("Email doesn't exist. Try again or create a new account if you don't have one yet");
@@ -53,13 +53,11 @@ export default function Login() {
               setAlertLabel("Network Error, Please Try Again.");
               break;
           }
-          setIsLoading(false);
-          setShowAlert(true);
         } else{
           setAlertLabel("Network Error, Please Try Again.");
-          setIsLoading(false);
-          setShowAlert(true);
         }
+        setIsLoading(false);
+        setShowAlert(true);
       }
     },
   });
