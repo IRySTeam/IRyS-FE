@@ -1,32 +1,45 @@
 import { useState } from "react";
-import { Container, Box, Typography, Button, OutlinedInput } from "@mui/material";
+import { useRouter } from "next/router";
+import { Container, Box, Typography, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
-import { loginValidation } from "@/schema/login-validation";
 import Loading from "@/component/loading";
+import FormInput from "@/component/form-input";
+import { forgotPasswordValidation } from "@/schema/forgot-password-validation";
 
-export default function Login() {
+export default function ForgotPassword() {
   const theme = useTheme();
-  
+  const router = useRouter();
+
   const formik = useFormik({
     initialValues: {
       email: "",
     },
-    validationSchema: loginValidation,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    validationSchema: forgotPasswordValidation,
+    onSubmit: () => {
+      setIsLoading(true);
+      setTimeout(() => {
+        if(!isEmailExist) {
+          setAlertSeverity("error");
+          setAlertLabel("The email address you entered is not found. Please try again");
+          setShowAlert(true);
+        } else{
+          router.push({ pathname: "/login", query: { isSuccessForgotPassword : true} })
+        }
+        setIsLoading(false)
+      }, "1000");
     },
   });
 
+  const isEmailExist = false;
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState("error");
   const [alertLabel, setAlertLabel] = useState("The email address you entered is not found. Please try again");
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
-
 
   return (
     <>
@@ -55,7 +68,7 @@ export default function Login() {
         justifyContent: "space-between",
         alignItems: "flex-start",
         backgroundImage: "linear-gradient(90deg, #2064AC 0%, #7EC7EE 100%)",
-        [theme.breakpoints.down("laptop")]: {
+        [theme.breakpoints.down("small")]: {
           display: "none"
         },
       }} 
@@ -72,11 +85,11 @@ export default function Login() {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "flex-start",
-        [theme.breakpoints.up("laptop")]: {
+        [theme.breakpoints.up("small")]: {
           width: "50%",
           padding: "0 120px"
         },
-        [theme.breakpoints.only("laptop")]: {
+        [theme.breakpoints.only("small")]: {
           width: "50%",
           padding: "80px"
         },
@@ -94,33 +107,34 @@ export default function Login() {
             gap: "16px"
           }}
         >
-          <Typography variant={"form_label"} sx={{ color: "black.main" }}>Email <span style={{color: theme.palette.error.main}}>*</span></Typography>
-          <OutlinedInput
-            fullWidth
-            id="email"
+          <FormInput
+            id="email"            
             name="email"
+            label="Email"
             placeholder="example@email.com"
             value={formik.values.email}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helpertext={formik.touched.email && formik.errors.email}
+            required={true}
           />
           <Button 
             color="primary" 
             variant="contained" 
             sx={{ 
-              height: "56px", 
+              height: "56px",
+              width: "100%", 
               marginTop: "8px",
               "&.Mui-disabled": {
                 backgroundColor: theme.palette.dark_gray.light,
                 color: theme.palette.light_gray.light,
               },}}
-            fullWidth 
             type="submit"
             disabled={formik.values.email === ""}
           >
             Reset Password
-          </Button> 
+          </Button>
         </form>
       </Box>
     </Container>

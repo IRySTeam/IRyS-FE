@@ -14,3 +14,59 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+
+input#otp{
+  font-family: 'Poppins, sans-serif';
+  font-size: 40px;
+  font-weight: 700;
+  color: #1A1A1A;
+  border:0;
+  border-bottom: 10px solid #5BC0F8;
+  border-radius: 5px;
+  width: 90px !important;
+  background: transparent;
+  outline: none;
+}
+
+@media only screen and (min-width: 1024px) and (max-width: 1279px){
+  input#otp{
+    font-size: 30px;
+    font-weight: 700;
+    color: #1A1A1A;
+    border:0;
+    border-bottom: 9px solid #5BC0F8;
+    border-radius: 5px;
+    width: 65px !important;
+    background: transparent;
+    outline: none;
+  }
+}
+
+@media only screen and (min-width: 425px) and (max-width: 539px){
+  input#otp{
+    font-size: 30px;
+    font-weight: 700;
+    color: #1A1A1A;
+    border:0;
+    border-bottom: 9px solid #5BC0F8;
+    border-radius: 5px;
+    width: 65px !important;
+    background: transparent;
+    outline: none;
+  }
+}
+
+@media only screen and (max-width: 424px) {
+  input#otp{
+    font-size: 23.4px;
+    font-weight: 700;
+    color: #1A1A1A;
+    border:0;
+    border-bottom: 8px solid #5BC0F8;
+    border-radius: 5px;
+    width: 50px !important;
+    background: transparent;
+    outline: none;
+  }
+}
