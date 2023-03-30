@@ -142,5 +142,8 @@ export const palette = {
   light_gray:{
     main: white[50],
     light: white[10],
+  },
+  backdrop:{
+    main: "rgba(0, 0, 0, 0.5)",
   }
 }

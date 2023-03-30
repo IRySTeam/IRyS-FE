@@ -1,5 +1,10 @@
 ## Getting Started
 
+Create an environment variable
+```bash
+NEXT_PUBLIC_API_URL = {API_URL}
+```
+
 First, run the development server:
 
 ```bash

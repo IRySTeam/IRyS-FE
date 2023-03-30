@@ -109,9 +109,15 @@ export const typography = {
     fontSize: 10,
     fontWeight: 600,
   },
-  form_sublabel: {
+  advanced_value: {
     fontFamily: 'Inter, sans-serif',
     fontSize: 10,
     fontWeight: 400,
   },
+  button: {
+    fontFamily: 'Poppins, sans-serif',
+    fontSize: 23.4,
+    fontWeight: 700,
+    textTransform: 'none',
+  }
 }
