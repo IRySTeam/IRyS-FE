@@ -1,18 +1,19 @@
 import { Box, Typography } from "@mui/material";
 
-export default function Logo() {
+export default function Logo(props) {
   return (
     <Box sx={{
-      width: "150px",
-      height: "150px",
+      width: props.width,
+      height: props.height,
       borderRadius: "50%",
       backgroundColor: "white.main",
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
+      display: props.display? props.display : 'flex',
     }} 
     >
-      <Typography variant={"heading_h2"} sx={{ color: "black.main" }}>
+      <Typography variant={props.variant} sx={{ color: "black.main" }}>
         IRyS
       </Typography>
     </Box>

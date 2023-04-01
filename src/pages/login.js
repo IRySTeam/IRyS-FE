@@ -120,7 +120,11 @@ export default function Login() {
         },
       }} 
       >
-        <Logo/>
+        <Logo
+          width="150px"
+          height="150px"
+          variant="heading_h2"
+        />
         <Typography variant={"paragraph_h4"} sx={{ color: "light_gray.light" }}>© Intelligent Repository System</Typography>
       </Box>
       <Box 
