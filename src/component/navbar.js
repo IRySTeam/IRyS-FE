@@ -65,7 +65,7 @@ function NavBar(props) {
       props.setIsLoading(false)
     }else{
       props.setIsLoading(false)
-      // router.replace({ pathname: "/login" })
+      router.replace({ pathname: "/login" })
     }
   }, [userDetail, dispatch, router, props]);
 
