@@ -7,6 +7,7 @@ const base = createTheme({
   breakpoints: {
     values: {
       mobile: 0,
+      mobile_l: 425,
       tablet: 768,
       small: 1024,
       laptop: 1280,

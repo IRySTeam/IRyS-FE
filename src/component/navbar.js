@@ -65,7 +65,7 @@ function NavBar(props) {
       props.setIsLoading(false)
     }else{
       props.setIsLoading(false)
-      router.replace({ pathname: "/login" })
+      // router.replace({ pathname: "/login" })
     }
   }, [userDetail, dispatch, router, props]);
 
@@ -81,7 +81,7 @@ function NavBar(props) {
         maxWidth="large"
         sx={{
         padding: "4px 0px",
-        [theme.breakpoints.up("desktop")]: {
+        [theme.breakpoints.up("small")]: {
           padding: "4px 24px"
         },
         }}
@@ -100,7 +100,10 @@ function NavBar(props) {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
-              color="inherit"
+              color="white"
+              sx={{
+                padding: 0,
+              }}
             >
               <MenuIcon />
             </IconButton>
