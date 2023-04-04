@@ -16,17 +16,10 @@ import LeftContainer from "@/component/left-container";
 
 export default function Login() {
   const router = useRouter();
-  const { isSuccessRegistration, isSuccessForgotPassword } = router.query;
+  const { isSuccessRegistration, isSuccessForgotPassword, isAccountVerified } = router.query;
 
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
-
-  const config = {
-    headers: { 
-      'content-type': 'application/json',
-      'Access-Control-Allow-Origin': "*"
-    }
-  }
   
   const formik = useFormik({
     initialValues: {
@@ -37,20 +30,34 @@ export default function Login() {
     onSubmit: async (values,) => {
       setIsLoading(true);
       try {
-        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/login`, values, config);
-        Cookies.set('access_token', result.data.token, { expires: 1/24 });
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/login`, values);
+        Cookies.set('access_token', result.data.token, { expires: 1 });
         Cookies.set('refresh_token', result.data.refresh_token, { expires: 1 });
         router.push({ pathname: "/" })
         setIsLoading(false);
       } catch (error) {
+        console.log(error.response.status);
         setAlertSeverity("error")
         if(error.response){
           switch (error.response.data.error_code){
-            case "USER__NOT_FOUND" :
-              setAlertLabel("Email doesn't exist. Try again or create a new account if you don't have one yet");
-              break;
             case "USER__PASSWORD_DOES_NOT_MATCH":
               setAlertLabel("The password you entered is incorrect. Please try again");
+              break;
+            case "USER__EMAIL_NOT_VERIFIED":
+              const emailData = {
+                email : values.email
+              }
+              try {
+                const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/verify-email`, emailData);
+                Cookies.set('register_access_token', result.data.token, { expires: 1 });
+                Cookies.set('register_refresh_token', result.data.refresh_token, { expires: 1 });
+                router.push({ pathname: "/otp" })
+              } catch (error) {
+                setAlertLabel("Network Error, Please Try Again.");
+              }
+              break;
+            case "USER__NOT_FOUND" :
+              setAlertLabel("Email doesn't exist. Try again or create a new account if you don't have one yet");
               break;
             default :
               setAlertLabel("Network Error, Please Try Again.");
@@ -89,7 +96,12 @@ export default function Login() {
       setAlertLabel("Your password has been successfully reset. Please check your email for a new password");
       setShowAlert(true);
     }
-  }, [isSuccessRegistration, isSuccessForgotPassword]);
+    if(isAccountVerified){
+      setAlertSeverity("success");
+      setAlertLabel("Your account has been verified. Please log in");
+      setShowAlert(true);
+    }
+  }, [isSuccessRegistration, isSuccessForgotPassword, isAccountVerified]);
 
   return (
     <>

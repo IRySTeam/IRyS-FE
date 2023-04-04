@@ -248,9 +248,9 @@ function NavBar(props) {
             }}
           >
             <Logo
-              width="32px"
-              height="32px"
-              variant="form_sublabel_small_bold"
+              width={56}
+              height={56}
+              withText={false}
             />
             <OutlinedInput
               id="public"

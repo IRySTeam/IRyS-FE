@@ -5,10 +5,11 @@ import { Container, Box, Typography, Button, Link } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useFormik } from "formik";
+import Cookies from 'js-cookie';
+import { NEXT_PUBLIC_API_URL } from "@/constants/api";
+import { registerValidation } from "@/schema/register-validation";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
-import { registerValidation } from "@/schema/register-validation";
-import { NEXT_PUBLIC_API_URL } from "@/constants/api";
 import Loading from "@/component/loading";
 import FormInput from "@/component/form-input";
 import LeftContainer from "@/component/left-container";
@@ -17,13 +18,6 @@ export default function Register() {
   const router = useRouter();
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
-
-  const config = {
-    headers: { 
-      'content-type': 'application/json',
-      'Access-Control-Allow-Origin': "*"
-    }
-  }
   
   const formik = useFormik({
     initialValues: {
@@ -43,8 +37,9 @@ export default function Register() {
         password: values.password,
       }
       try {
-        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/register`, registerData, config);
-        console.log(result);
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/register`, registerData);
+        Cookies.set('register_access_token', result.data.token, { expires: 1 });
+        Cookies.set('register_refresh_token', result.data.refresh_token, { expires: 1 });
         router.push({ pathname: "/otp" })
         setIsLoading(false);
       } catch (error) {
