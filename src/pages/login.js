@@ -3,6 +3,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { Container, Box, Typography, Button, Link } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
@@ -11,12 +12,14 @@ import Cookies from 'js-cookie'
 import { NEXT_PUBLIC_API_URL } from "@/constants/api";
 import Loading from "@/component/loading";
 import FormInput from "@/component/form-input";
+import LeftContainer from "@/component/left-container";
 
 export default function Login() {
   const router = useRouter();
   const { isSuccessRegistration, isSuccessForgotPassword } = router.query;
 
   const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
 
   const config = {
     headers: { 
@@ -106,27 +109,7 @@ export default function Login() {
         flexDirection: "row"
       }} 
     >
-      <Box sx={{
-        width: "50%",
-        minHeight: "100%",
-        padding: "40px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        backgroundImage: "linear-gradient(90deg, #2064AC 0%, #7EC7EE 100%)",
-        [theme.breakpoints.down("small")]: {
-          display: "none"
-        },
-      }} 
-      >
-        <Logo
-          width="150px"
-          height="150px"
-          variant="heading_h2"
-        />
-        <Typography variant={"paragraph_h4"} sx={{ color: "light_gray.light" }}>© Intelligent Repository System</Typography>
-      </Box>
+      <LeftContainer />
       <Box 
         sx={{
         width: "100%",
@@ -146,6 +129,22 @@ export default function Login() {
         },
       }} 
       >
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "center",
+            justifyContent: "center",
+            marginBottom: "16px"
+          }}
+        >
+          <Logo
+            width={mobile? 120: 150}
+            height={mobile? 120: 150}
+            variant={mobile? "logo_small": "logo_large"}
+            withText={true}
+          />
+        </Box>
         <Typography variant={"heading_h1"} sx={{ color: "black.main" }} mb={"16px"}>Login</Typography>
         <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Kindly provide your registered email and password to access your account.</Typography>
         <form 
@@ -222,6 +221,17 @@ export default function Login() {
             </Link>
           </Typography>
         </form>
+        <Typography 
+          variant={"paragraph_h5"} 
+          sx={{ 
+            color: "black.main",
+            textAlign: "center",
+            width: "100%",
+            marginTop: "40px"
+          }}
+        >
+          © Intelligent Repository System
+        </Typography>
       </Box>
     </Container>
     </>
