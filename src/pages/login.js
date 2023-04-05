@@ -36,12 +36,12 @@ export default function Login() {
         router.push({ pathname: "/" })
         setIsLoading(false);
       } catch (error) {
-        console.log(error.response.status);
         setAlertSeverity("error")
         if(error.response){
           switch (error.response.data.error_code){
             case "USER__PASSWORD_DOES_NOT_MATCH":
               setAlertLabel("The password you entered is incorrect. Please try again");
+              setShowAlert(true);
               break;
             case "USER__EMAIL_NOT_VERIFIED":
               const emailData = {
@@ -54,20 +54,23 @@ export default function Login() {
                 router.push({ pathname: "/otp" })
               } catch (error) {
                 setAlertLabel("Network Error, Please Try Again.");
+                setShowAlert(true);
               }
               break;
             case "USER__NOT_FOUND" :
               setAlertLabel("Email doesn't exist. Try again or create a new account if you don't have one yet");
+              setShowAlert(true);
               break;
             default :
               setAlertLabel("Network Error, Please Try Again.");
+              setShowAlert(true);
               break;
           }
         } else{
           setAlertLabel("Network Error, Please Try Again.");
+          setShowAlert(true);
         }
         setIsLoading(false);
-        setShowAlert(true);
       }
     },
   });
@@ -90,13 +93,11 @@ export default function Login() {
       setAlertSeverity("success");
       setAlertLabel("Congratulations! Your registration was successful ");
       setShowAlert(true);
-    }
-    if(isSuccessForgotPassword){
+    }else if(isSuccessForgotPassword){
       setAlertSeverity("success");
       setAlertLabel("Your password has been successfully reset. Please check your email for a new password");
       setShowAlert(true);
-    }
-    if(isAccountVerified){
+    }else if(isAccountVerified){
       setAlertSeverity("success");
       setAlertLabel("Your account has been verified. Please log in");
       setShowAlert(true);
@@ -105,7 +106,7 @@ export default function Login() {
 
   return (
     <>
-    { showAlert &&
+    { !isLoading && showAlert &&
       <CustomAlert
         severity={alertSeverity}
         label={alertLabel}

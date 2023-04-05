@@ -19,6 +19,8 @@ export default function Otp() {
   const router = useRouter();
 
   const [otp, setOtp] = useState('')
+  const [timeLeft, setTimeLeft] = useState(0);
+  const isResendDisabled = timeLeft > 0;
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState("error");
@@ -52,6 +54,7 @@ export default function Otp() {
           switch (error.response.data.error_code){
             case "USER__WRONG_OTP" :
               setAlertLabel("Sorry, the OTP you entered wrong. Please try again")
+              setShowAlert(true);
               break;
             case 401:
               const refreshData = {
@@ -61,10 +64,13 @@ export default function Otp() {
               try {
                 const new_token = await axios.post(`${NEXT_PUBLIC_API_URL}/auth/refresh`, refreshData);
                 Cookies.set('register_access_token', new_token.data.token, { expires: 1 });
-                Cookies.set('register_access_token', new_token.refresh_token, { expires: 1 });
-                setAlertLabel("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
+                Cookies.set('register_refresh_token', new_token.refresh_token, { expires: 1 });
+                setAlertSeverity("success");
+                setAlertLabel("Your session has been restored. Please reinput your OTP");
+                setShowAlert(true);
               }catch (error){
                 setAlertLabel("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
+                setShowAlert(true);
               }
               break;
             case "USER__EMAIL_ALREADY_VERIFIED" :
@@ -75,22 +81,21 @@ export default function Otp() {
               break;
             default :
               setAlertLabel("Network Error, Please Try Again.");
+              setShowAlert(true);
               break;
           }
-          setIsLoading(false);
-          setShowAlert(true);
         } else{
           setAlertLabel("Network Error, Please Try Again.");
-          setIsLoading(false);
           setShowAlert(true);
         }
+        setIsLoading(false);
       }
     }
   }
   
   const resendOtp = async () => {
+    setTimeLeft(60);
     setIsLoading(true);
-
     const register_access_token = Cookies.get('register_access_token');
     const register_refresh_token = Cookies.get('register_refresh_token');
 
@@ -106,7 +111,6 @@ export default function Otp() {
         setShowAlert(true)
         setIsLoading(false);
       } catch (error) {
-        console.log(error);
         if(error.response){
           setAlertSeverity("error");
           switch (error.response.data.error_code){
@@ -118,7 +122,7 @@ export default function Otp() {
               try {
                 const new_token = await axios.post(`${NEXT_PUBLIC_API_URL}/auth/refresh`, refreshData);
                 Cookies.set('register_access_token', new_token.data.token, { expires: 1 });
-                Cookies.set('register_access_token', new_token.refresh_token, { expires: 1 });
+                Cookies.set('register_refresh_token', new_token.refresh_token, { expires: 1 });
                 setAlertLabel("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
               }catch (error){
                 setAlertLabel("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
@@ -145,6 +149,7 @@ export default function Otp() {
     }
   }
 
+  // First Time Loaded
   useEffect(() => {
     setIsLoading(true)
     const register_access_token = Cookies.get('register_access_token');
@@ -154,6 +159,15 @@ export default function Otp() {
     }
     setIsLoading(false)
   }, [router]);
+
+  // For OTP Timer
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [timeLeft]);
 
   return (
     <>
@@ -256,8 +270,9 @@ export default function Otp() {
               padding: 0,
             }}
             onClick={resendOtp}
+            disabled={isResendDisabled}
           >
-            Resend Code
+            { isResendDisabled? `Resend Code in ${timeLeft} seconds` : "Resend Code"}
           </Button>
         </Typography> 
         <Typography 
