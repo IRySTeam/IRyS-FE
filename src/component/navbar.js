@@ -60,11 +60,10 @@ function NavBar(props) {
     props.setIsLoading(true)
     if(token){
       if(!userDetail.id){
-        getUserDetail(token, dispatch);
+        getUserDetail(token, dispatch, router);
       }
-      props.setIsLoading(false)
+      props.setIsLoading(false);
     }else{
-      props.setIsLoading(false)
       router.replace({ pathname: "/login" })
     }
   }, [userDetail, dispatch, router, props]);

@@ -30,7 +30,7 @@ export default function Login() {
     onSubmit: async (values,) => {
       setIsLoading(true);
       try {
-        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/login`, values);
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/login`, values);
         Cookies.set('access_token', result.data.token, { expires: 1 });
         Cookies.set('refresh_token', result.data.refresh_token, { expires: 1 });
         router.push({ pathname: "/" })
@@ -48,7 +48,7 @@ export default function Login() {
                 email : values.email
               }
               try {
-                const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/verify-email`, emailData);
+                const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/verify-email`, emailData);
                 Cookies.set('register_access_token', result.data.token, { expires: 1 });
                 Cookies.set('register_refresh_token', result.data.refresh_token, { expires: 1 });
                 router.push({ pathname: "/otp" })

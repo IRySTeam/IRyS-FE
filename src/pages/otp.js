@@ -39,7 +39,7 @@ export default function Otp() {
 
     if(register_access_token && register_refresh_token){
       try {
-        await axios.post(`${NEXT_PUBLIC_API_URL}/users/verify-otp`, otpData, {
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/verify-otp`, otpData, {
           headers: {
             Authorization: `Bearer ${register_access_token}`
           }
@@ -69,8 +69,9 @@ export default function Otp() {
                 setAlertLabel("Your session has been restored. Please reinput your OTP");
                 setShowAlert(true);
               }catch (error){
-                setAlertLabel("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
-                setShowAlert(true);
+                Cookies.remove('register_access_token');
+                Cookies.remove('register_refresh_token');
+                router.replace({ pathname: "/login" });
               }
               break;
             case "USER__EMAIL_ALREADY_VERIFIED" :
@@ -101,7 +102,7 @@ export default function Otp() {
 
     if(register_access_token && register_refresh_token){
       try {
-        await axios.post(`${NEXT_PUBLIC_API_URL}/users/resend-otp`, null, {
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/resend-otp`, null, {
           headers: {
             Authorization: `Bearer ${register_access_token}`
           }
@@ -120,9 +121,9 @@ export default function Otp() {
                 refresh_token: register_refresh_token
               }
               try {
-                const new_token = await axios.post(`${NEXT_PUBLIC_API_URL}/auth/refresh`, refreshData);
+                const new_token = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/auth/refresh`, refreshData);
                 Cookies.set('register_access_token', new_token.data.token, { expires: 1 });
-                Cookies.set('register_refresh_token', new_token.refresh_token, { expires: 1 });
+                Cookies.set('register_refresh_token', new_token.data.refresh_token, { expires: 1 });
                 setAlertLabel("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
               }catch (error){
                 setAlertLabel("Sorry, the OTP you entered has already expired. Please request a new OTP and try again");
