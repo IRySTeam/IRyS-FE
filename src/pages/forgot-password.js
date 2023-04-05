@@ -2,15 +2,18 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { Container, Box, Typography, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
 import Loading from "@/component/loading";
 import FormInput from "@/component/form-input";
+import LeftContainer from "@/component/left-container";
 import { forgotPasswordValidation } from "@/schema/forgot-password-validation";
 
 export default function ForgotPassword() {
   const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
   const router = useRouter();
 
   const formik = useFormik({
@@ -59,23 +62,7 @@ export default function ForgotPassword() {
         flexDirection: "row"
       }} 
     >
-      <Box sx={{
-        width: "50%",
-        minHeight: "100%",
-        padding: "40px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        backgroundImage: "linear-gradient(90deg, #2064AC 0%, #7EC7EE 100%)",
-        [theme.breakpoints.down("small")]: {
-          display: "none"
-        },
-      }} 
-      >
-        <Logo/>
-        <Typography variant={"paragraph_h4"} sx={{ color: "light_gray.light" }}>© Intelligent Repository System</Typography>
-      </Box>
+      <LeftContainer />
       <Box 
         sx={{
         width: "100%",
@@ -95,6 +82,22 @@ export default function ForgotPassword() {
         },
       }} 
       >
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "center",
+            justifyContent: "center",
+            marginBottom: "16px"
+          }}
+        >
+          <Logo
+            width={mobile? 120: 150}
+            height={mobile? 120: 150}
+            variant={mobile? "logo_small": "logo_large"}
+            withText={true}
+          />
+        </Box>
         <Typography variant={"heading_h1"} sx={{ color: "black.main" }} mb={"16px"}>Reset Password</Typography>
         <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Enter your email to reset your password</Typography>
         <form 
@@ -136,6 +139,17 @@ export default function ForgotPassword() {
             Reset Password
           </Button>
         </form>
+        <Typography 
+          variant={"paragraph_h5"} 
+          sx={{ 
+            color: "black.main",
+            textAlign: "center",
+            width: "100%",
+            marginTop: "40px"
+          }}
+        >
+          © Intelligent Repository System
+        </Typography>
       </Box>
     </Container>
     </>

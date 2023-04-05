@@ -119,5 +119,31 @@ export const typography = {
     fontSize: 23.4,
     fontWeight: 700,
     textTransform: 'none',
+  },
+  logo_large: {
+    fontFamily: 'Poppins, sans-serif',
+    fontSize: 60,
+    fontWeight: 700,
+    textTransform: 'none',
+    fontStyle: 'italic',
+  },
+  logo_small: {
+    fontFamily: 'Poppins, sans-serif',
+    fontSize: 40,
+    fontWeight: 700,
+    textTransform: 'none',
+    fontStyle: 'italic',
+  },
+  motto_heading:{
+    fontFamily: 'Poppins, sans-serif',
+    fontSize: 54,
+    fontWeight: 700,
+    textTransform: 'none',
+    fontStyle: 'italic',
+  },
+  motto_subheading:{
+    fontFamily: 'Poppins, sans-serif',
+    fontSize: 23.4,
+    fontWeight: 400,
   }
 }
