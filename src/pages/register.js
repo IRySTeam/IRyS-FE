@@ -37,7 +37,7 @@ export default function Register() {
         password: values.password,
       }
       try {
-        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/register`, registerData);
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/register`, registerData);
         Cookies.set('register_access_token', result.data.token, { expires: 1 });
         Cookies.set('register_refresh_token', result.data.refresh_token, { expires: 1 });
         router.push({ pathname: "/otp" })
