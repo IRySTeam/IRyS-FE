@@ -10,13 +10,15 @@ export default function FormInput(props) {
         sx={{ 
           color: "black.main", 
           marginBottom: "16px",
-          typography: "form_label",
+          typography: props.small? "form_label_small" : "form_label",
           [theme.breakpoints.down("tablet")]: {
             typography: "heading_h5",
           }, 
         }}
       >
-        {props.label} {props.required ? <span style={{color: theme.palette.error.main}}>*</span> : <></>}
+        {props.label} 
+        {props.required ? <span style={{color: theme.palette.error.main}}>*</span> : <></>}
+        {props.small && props.optional ? <span style={{color: theme.palette.light_gray.main}}>`(Optional)`</span> : <></>}
       </Typography>
       {props.isPasswordInput ?
         <OutlinedInput
@@ -51,11 +53,14 @@ export default function FormInput(props) {
           onBlur={props.onBlur}
           error={props.error}
           sx={{ width: "100%"}}
+          size={props.small? "small" : "medium"}
+          multiline={props.multiline? props.multiline : false}
+          minRows={props.multiline? 4 : 1}
         />
       }
       <FormHelperText
         sx={{
-          typography: theme.typography.form_sublabel,
+          typography: props.small? theme.typography.form_sublabel_small : theme.typography.form_sublabel,
           margin: 0,
         }}
       >

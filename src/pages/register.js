@@ -88,7 +88,7 @@ export default function Register() {
         onClose={handleClickShowAlert}
       /> 
     }
-    { isLoading && <Loading centered={false} /> }
+    { isLoading && <Loading centered={true} /> }
     <Container 
       sx={{
         padding: "0", 

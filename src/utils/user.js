@@ -26,12 +26,13 @@ export const getUserDetail = async (token, dispatch, router) => {
         Cookies.set('refresh_token', new_token.data.refresh_token, { expires: 1 });
         getUserDetail(new_token.data.token, dispatch)
       }catch (error){
+        console.log(error)
         dispatch(getUserDetailFailed(error.response.data))
         Cookies.remove('access_token');
         Cookies.remove('refresh_token');
         router.replace({ pathname: "/login" });
       }
-    }
-    dispatch(getUserDetailFailed(error.response.data))
+      dispatch(getUserDetailFailed(error.response.data))
+    } 
   }
 }

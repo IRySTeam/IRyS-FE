@@ -5,6 +5,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import Loading from "@/component/loading";
+import CustomAlert from "@/component/custom-alert";
 import NavBar from "@/component/navbar";
 import SearchIcon from '@mui/icons-material/Search';
 import Dropdown from "@/component/dropdown";
@@ -15,7 +16,7 @@ import { getRepoListSuccess } from "@/state/actions/repositoryActions";
 export default function Home() {
   const theme = useTheme();
   const router = useRouter();
-  const { search, type, sort} = router.query;
+  const { search, type, sort, newRepository} = router.query;
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +24,9 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState(search? search : '');
   const [typeQuery, setTypeQuery] = useState(type? type : 'all');
   const [sortQuery, setSortQuery] = useState(sort? sort : 'none');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const [alertLabel, setAlertLabel] = useState("Repository successfully created!");
   const repositoryData = useSelector(state => state.repository);
   const isEmptyRepo = false;
 
@@ -46,6 +50,8 @@ export default function Home() {
   const handleSearch = (searchFilter = searchQuery, typeFilter = typeQuery, sortFilter = sortQuery) => {
     router.push({ pathname: "/", query: { search : searchFilter, type: typeFilter, sort: sortFilter} })
   }
+
+  const handleClickShowAlert= () => setShowAlert((show) => !show);
 
   const typeOption = [
     { value: 'all', label: 'All'},
@@ -84,15 +90,29 @@ export default function Home() {
     }, 1000);
   }, [dispatch, isEmptyRepo, search, sortQuery, typeQuery]);
 
+  useEffect(() => {
+    if(newRepository){
+      setAlertSeverity("success");
+      setAlertLabel(`Congratulations! Your new repository (${newRepository}) was successful created`);
+      setShowAlert(true);
+    }
+  }, [newRepository]);
 
   return (
     <>
-      { isLoading && <Loading/> }
+      { isLoading && <Loading centered={true}/> }
       {!isLoading &&
         <>
           <NavBar 
             setIsLoading={setIsLoading}
           />
+          { !isLoading && showAlert &&
+            <CustomAlert
+              severity={alertSeverity}
+              label={alertLabel}
+              onClose={handleClickShowAlert}
+            /> 
+          }
           <Container 
             sx={{
               padding: "40px", 
