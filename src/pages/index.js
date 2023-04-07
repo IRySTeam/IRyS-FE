@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Button, Typography, Box, OutlinedInput } from "@mui/material";
+import { useSelector, useDispatch } from 'react-redux';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/router";
@@ -7,26 +8,44 @@ import Loading from "@/component/loading";
 import NavBar from "@/component/navbar";
 import SearchIcon from '@mui/icons-material/Search';
 import Dropdown from "@/component/dropdown";
-import { repositories } from "@/data/repositories";
+import { repositoryList } from "@/data/repositories";
 import RepositoryCard from "@/component/repository-card";
+import { getRepoListSuccess } from "@/state/actions/repositoryActions";
 
 export default function Home() {
   const theme = useTheme();
   const router = useRouter();
   const { search, type, sort} = router.query;
+  const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingRepo, setIsLoadingRepo] = useState(false);
   const [searchQuery, setSearchQuery] = useState(search? search : '');
   const [typeQuery, setTypeQuery] = useState(type? type : 'all');
   const [sortQuery, setSortQuery] = useState(sort? sort : 'none');
+  const repositoryData = useSelector(state => state.repository);
+  const isEmptyRepo = false;
 
   const handleChangeTypeQuery = (event) => {
     setTypeQuery(event.target.value);
+    handleSearch(searchQuery, event.target.value, sortQuery);
   };
 
   const handleChangeSortQuery = (event) => {
     setSortQuery(event.target.value);
+    handleSearch(searchQuery, typeQuery, event.target.value);
   };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      handleSearch();
+    }
+  };
+
+  const handleSearch = (searchFilter = searchQuery, typeFilter = typeQuery, sortFilter = sortQuery) => {
+    router.push({ pathname: "/", query: { search : searchFilter, type: typeFilter, sort: sortFilter} })
+  }
 
   const typeOption = [
     { value: 'all', label: 'All'},
@@ -39,6 +58,32 @@ export default function Home() {
     { value: 'last_updated', label: 'Last Updated'},
     { value: 'alphabet', label: 'Name (A-Z)'},
   ]
+
+  useEffect(() => {
+    setIsLoadingRepo(true);
+    const filterArrayRepo = (array) => {
+      const searchFilter = !search ? array : array.filter((repo) => repo.name.toLowerCase().includes(search.toLowerCase()))
+      const typeFilter = typeQuery === 'all' ? searchFilter : searchFilter.filter((repo) => (repo.type === typeQuery))
+      const sortFilter = sortQuery === 'none'? typeFilter : typeFilter.sort((a, b) => {
+        if (sortQuery === 'last_updated') {
+          return b.last_updated - a.last_updated;
+        } else if (sortQuery === 'alphabet') {
+          return a.name.localeCompare(b.name);
+        }
+      });
+      return sortFilter
+    }
+  
+    setTimeout(() => {
+      const result = {
+        repositories : isEmptyRepo? [] : filterArrayRepo(repositoryList),
+        isEmpty : isEmptyRepo,
+      }
+      dispatch(getRepoListSuccess(result))
+      setIsLoadingRepo(false);
+    }, 1000);
+  }, [dispatch, isEmptyRepo, search, sortQuery, typeQuery]);
+
 
   return (
     <>
@@ -117,6 +162,7 @@ export default function Home() {
                   placeholder="Find a repository..."
                   value={searchQuery}
                   onChange={(e)=>setSearchQuery(e.target.value)}
+                  onKeyPress={handleKeyPress}
                   sx={{
                     width: "720px",
                     "& .MuiInputBase-input": {
@@ -162,6 +208,7 @@ export default function Home() {
                     backgroundColor: theme.palette.primary.main,
                     borderRadius: "5px"
                   }}
+                  onClick={handleSearch}
                 >
                   <SearchIcon />
                 </Button>
@@ -213,15 +260,21 @@ export default function Home() {
             </Button>
           </Box>
           <Box sx={{flexGrow:1, width: "100%", maxWidth:"large"}}>
-            <Grid container columns={{ mobile: 4, tablet: 6, small: 12 }} rowSpacing={5} columnSpacing={{ mobile: 5, tablet: 6, small: 7 }}>
-              { repositories.length > 0 && repositories.map((repo, index) => (
+            { isLoadingRepo &&
+              <Loading transparent={true} centered={false}/>
+            }
+            { !isLoadingRepo && !repositoryData.isEmpty && repositoryData.repositories.length > 0 && 
+              <Grid container columns={{ mobile: 4, tablet: 6, small: 12 }} rowSpacing={5} columnSpacing={{ mobile: 5, tablet: 6, small: 7 }}>
+              { repositoryData.repositories.map((repo, index) => (
                 <Grid mobile={4} tablet={3} small={4} desktop={3} large={2}  key={index}>
                   <RepositoryCard 
                     item={repo}
                   />
                 </Grid>
               ))}
-            </Grid>
+              </Grid>
+            }
+
           </Box>
           </Container>
         </> 

@@ -12,7 +12,7 @@ export const getUserDetail = async (token, dispatch, router) => {
     })
     dispatch(getUserDetailSuccess(response.data))
   } catch (error) {
-    if(error.response.status === 401){
+    if(error.response && error.response.status === 401){
       const token = Cookies.get('access_token');
       const refresh_token = Cookies.get('refresh_token');
       const refreshData = {

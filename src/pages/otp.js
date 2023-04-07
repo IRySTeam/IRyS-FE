@@ -179,7 +179,7 @@ export default function Otp() {
         onClose={handleClickShowAlert}
       /> 
     }
-    { isLoading && <Loading /> }
+    { isLoading && <Loading centered={false} /> }
     <Container 
       sx={{
         padding: "0", 

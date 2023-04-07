@@ -40,7 +40,8 @@ export default function RepositoryCard(props) {
         borderRadius: "50px",
         display: "flex",
         flexDirection: "column",
-        gap: "8px"
+        gap: "8px",
+        cursor: "pointer"
       }}
       onClick={()=> handleClickBox(props.item.id)}
     >

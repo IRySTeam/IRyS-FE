@@ -1,4 +1,4 @@
-export const repositories = [
+export const repositoryList = [
   {
     id: 1,
     type: "public",
