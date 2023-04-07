@@ -4,7 +4,6 @@ import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import Cookies from 'js-cookie';
 
 export const getUserDetail = async (token, dispatch, router) => {
-  
   try {
     const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/users/me`, {
       headers: {
@@ -13,7 +12,7 @@ export const getUserDetail = async (token, dispatch, router) => {
     })
     dispatch(getUserDetailSuccess(response.data))
   } catch (error) {
-    if(error.response.status === 401){
+    if(error.response && error.response.status === 401){
       const token = Cookies.get('access_token');
       const refresh_token = Cookies.get('refresh_token');
       const refreshData = {

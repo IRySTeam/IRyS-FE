@@ -53,7 +53,7 @@ export default function ForgotPassword() {
         onClose={handleClickShowAlert}
       /> 
     }
-    { isLoading && <Loading /> }
+    { isLoading && <Loading centered={false} /> }
     <Container 
       sx={{
         padding: "0", 
