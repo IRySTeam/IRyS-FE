@@ -27,6 +27,7 @@ export default function CreateRepository() {
     },
     validationSchema: createRepositoryValidation,
     onSubmit: (values) => {
+      setIsLoading(true);
       console.log(values);
       router.push({ pathname: "/", query: { newRepository : values.name }})
     },
