@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Button, Typography, Box, OutlinedInput } from "@mui/material";
+import { Container, Button, Typography, Box, OutlinedInput, Link } from "@mui/material";
 import { useSelector, useDispatch } from 'react-redux';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useTheme } from "@mui/material/styles";
@@ -255,6 +255,7 @@ export default function Home() {
                   width:'100%', 
                 },
               }}
+              onClick={() => router.push({ pathname: "/create-repository" })}
             >
               New Repository
             </Button>
@@ -262,6 +263,35 @@ export default function Home() {
           <Box sx={{flexGrow:1, width: "100%", maxWidth:"large"}}>
             { isLoadingRepo &&
               <Loading transparent={true} centered={false}/>
+            }
+            { !isLoadingRepo && (repositoryData.isEmpty || repositoryData.repositories.length === 0) &&
+              <Box
+                sx={{
+                  width: "100%", 
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  alignItem: "center"
+                }}
+              >
+                <Typography variant="paragraph_h2" color="dark_gray.main" sx={{textAlign: "center"}}>{repositoryData.isEmpty ? 'No repository.' : 'No repositories found.'}</Typography>
+                <Typography variant="paragraph_h4" color="dark_gray.main" sx={{textAlign: "center"}}>
+                  {repositoryData.isEmpty ? 
+                  <>
+                  <Link
+                    variant="Paragraph h4"
+                    underline="none"
+                    href={"/create-repository"}
+                    color={"primary.main"}
+                  >
+                    Create a repository&nbsp;
+                  </Link>
+                  to get started
+                  </>
+                  : 
+                  'Please check for typos, or use fewer terms or fields.'}
+                </Typography>
+              </Box>
             }
             { !isLoadingRepo && !repositoryData.isEmpty && repositoryData.repositories.length > 0 && 
               <Grid container columns={{ mobile: 4, tablet: 6, small: 12 }} rowSpacing={5} columnSpacing={{ mobile: 5, tablet: 6, small: 7 }}>
