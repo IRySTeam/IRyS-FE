@@ -33,7 +33,8 @@ export default function Login() {
         const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/login`, values);
         Cookies.set('access_token', result.data.token, { expires: 1 });
         Cookies.set('refresh_token', result.data.refresh_token, { expires: 1 });
-        router.push({ pathname: "/" })
+        router.push({ pathname: "/" });
+        setShowAlert(false);
         setIsLoading(false);
       } catch (error) {
         setAlertSeverity("error")

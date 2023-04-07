@@ -13,6 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LogoutIcon from '@mui/icons-material/Logout';
+import SettingsIcon from '@mui/icons-material/Settings';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
@@ -69,6 +70,7 @@ function NavBar(props) {
   }, [userDetail, dispatch, router, props]);
 
   const logout =  () => {
+    props.setIsLoading(true)
     Cookies.remove('access_token');
     Cookies.remove('refresh_token');
     router.replace({ pathname: "/login" })
@@ -210,6 +212,21 @@ function NavBar(props) {
                   </Badge>
                 </IconButton>
                 <Typography variant="paragraph_h5" color="black.main">Notifications</Typography>
+              </MenuItem>
+              {/* TODO: Routing to setting */}
+              <MenuItem>
+                <IconButton
+                  sx={{ padding: "0 16px 0 0"}}
+                >
+                  <SettingsIcon
+                    sx={{
+                      width: "24px",
+                      height: "24px",
+                      color: theme.palette.black.main
+                    }}
+                  />
+                </IconButton>
+                <Typography variant="paragraph_h5" color="black.main">Settings</Typography>
               </MenuItem>
               <MenuItem
                 onClick={logout}
@@ -353,6 +370,20 @@ function NavBar(props) {
                   <Typography variant="heading_h5" color="black.main">Logged in as</Typography>
                   <Typography variant="paragraph_h5" color="black.main" noWrap sx={{width: "220px"}}>{userDetail? `${userDetail.first_name} ${userDetail.last_name}` : ''}</Typography>
                 </Box>
+              </MenuItem>
+              <MenuItem>
+                <IconButton
+                  sx={{ padding: "0 16px 0 0"}}
+                >
+                  <SettingsIcon
+                    sx={{
+                      width: "24px",
+                      height: "24px",
+                      color: theme.palette.black.main
+                    }}
+                  />
+                </IconButton>
+                <Typography variant="paragraph_h5" color="black.main">Settings</Typography>
               </MenuItem>
               <MenuItem
                 onClick={logout}

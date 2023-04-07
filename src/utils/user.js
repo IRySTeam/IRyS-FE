@@ -4,7 +4,6 @@ import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import Cookies from 'js-cookie';
 
 export const getUserDetail = async (token, dispatch, router) => {
-  
   try {
     const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/users/me`, {
       headers: {

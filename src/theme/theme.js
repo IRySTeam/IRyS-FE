@@ -16,6 +16,7 @@ const base = createTheme({
     },
   },
   typography: typography,
+  spacing: [0, 4, 8, 16, 24, 32, 40, 54, 64],
 });
 
 const theme = responsiveFontSizes(base)

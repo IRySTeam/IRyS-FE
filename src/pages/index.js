@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Container, Button, Typography, Box, OutlinedInput } from "@mui/material";
+import Grid from '@mui/material/Unstable_Grid2';
+import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import Loading from "@/component/loading";
 import NavBar from "@/component/navbar";
-import { useTheme } from "@mui/material/styles";
 import SearchIcon from '@mui/icons-material/Search';
 import Dropdown from "@/component/dropdown";
+import { repositories } from "@/data/repositories";
+import RepositoryCard from "@/component/repository-card";
 
 export default function Home() {
   const theme = useTheme();
@@ -49,6 +52,7 @@ export default function Home() {
             sx={{
               padding: "40px", 
               minHeight:"100vh",
+              maxWidth:"large",
               display: "flex",
               flexDirection: "column", 
               gap: "40px",
@@ -207,6 +211,17 @@ export default function Home() {
             >
               New Repository
             </Button>
+          </Box>
+          <Box sx={{flexGrow:1, width: "100%", maxWidth:"large"}}>
+            <Grid container columns={{ mobile: 4, tablet: 6, small: 12 }} rowSpacing={5} columnSpacing={{ mobile: 5, tablet: 6, small: 7 }}>
+              { repositories.length > 0 && repositories.map((repo, index) => (
+                <Grid mobile={4} tablet={3} small={4} desktop={3} large={2}  key={index}>
+                  <RepositoryCard 
+                    item={repo}
+                  />
+                </Grid>
+              ))}
+            </Grid>
           </Box>
           </Container>
         </> 
