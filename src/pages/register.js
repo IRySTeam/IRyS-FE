@@ -224,7 +224,7 @@ export default function Register() {
             onBlur={formik.handleBlur}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helpertext={formik.touched.password && formik.errors.password}
-            info={"Your password must be at least 8 characters characters and should include a combinations of numbers, letters, and special characters (!@$%)."}
+            info={"Your password must be at least 8 characters that contain at least one uppercase letter, one lowercase letter, one special character (! @ $ % ^ & * ( ) \ - _ = + { } ; : , < . >), and one number."}
             showPassword={showPassword}
             onClick={handleClickShowPassword}
             onMouseDown={handleMouseDownPassword}

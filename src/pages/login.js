@@ -41,7 +41,7 @@ export default function Login() {
         if(error.response){
           switch (error.response.data.error_code){
             case "USER__PASSWORD_DOES_NOT_MATCH":
-              setAlertLabel("The password you entered is incorrect. Please try again");
+              setAlertLabel("Incorrect username or password. Please try again.");
               setShowAlert(true);
               break;
             case "USER__EMAIL_NOT_VERIFIED":
