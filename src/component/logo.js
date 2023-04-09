@@ -10,7 +10,7 @@ export default function Logo(props) {
       alignItems: 'center',
     }} 
     >
-      <Image src="/irys.png" alt="logo" width={props.width} height={props.height} />
+      <Image src={props.withText? "/irys.png" : "/irys_white.png"} alt="logo" width={props.width} height={props.height} />
       {props.withText
       &&
         <Typography variant={props.variant} sx={{ color: "black.main" }}>
