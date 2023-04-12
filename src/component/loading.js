@@ -1,15 +1,15 @@
 import { Box, CircularProgress} from "@mui/material";
 
-export default function Loading() {
+export default function Loading(props) {
   return (
     <Box 
     sx={{
-        backgroundColor: "backdrop.main",
+        backgroundColor: props.transparent? "transparent": "backdrop.main",
         position: "fixed",
         width: "100%",
         height: "100%",
         display: "flex",
-        alignItems: "center",
+        alignItems: props.centered? "center" : "flex-start",
         justifyContent: "center",
         zIndex: 2,
       }}>

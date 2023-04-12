@@ -7,6 +7,7 @@ const base = createTheme({
   breakpoints: {
     values: {
       mobile: 0,
+      mobile_l: 425,
       tablet: 768,
       small: 1024,
       laptop: 1280,
@@ -15,6 +16,7 @@ const base = createTheme({
     },
   },
   typography: typography,
+  spacing: [0, 4, 8, 16, 24, 32, 40, 54, 64],
 });
 
 const theme = responsiveFontSizes(base)

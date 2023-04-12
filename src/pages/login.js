@@ -3,6 +3,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { Container, Box, Typography, Button, Link } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useFormik } from "formik";
 import Logo from "@/component/logo";
 import CustomAlert from "@/component/custom-alert";
@@ -11,19 +12,14 @@ import Cookies from 'js-cookie'
 import { NEXT_PUBLIC_API_URL } from "@/constants/api";
 import Loading from "@/component/loading";
 import FormInput from "@/component/form-input";
+import LeftContainer from "@/component/left-container";
 
 export default function Login() {
   const router = useRouter();
-  const { isSuccessRegistration, isSuccessForgotPassword } = router.query;
+  const { isSuccessRegistration, isSuccessForgotPassword, isAccountVerified } = router.query;
 
   const theme = useTheme();
-
-  const config = {
-    headers: { 
-      'content-type': 'application/json',
-      'Access-Control-Allow-Origin': "*"
-    }
-  }
+  const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
   
   const formik = useFormik({
     initialValues: {
@@ -34,30 +30,48 @@ export default function Login() {
     onSubmit: async (values,) => {
       setIsLoading(true);
       try {
-        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/users/login`, values, config);
-        Cookies.set('access_token', result.data.token, { expires: 1/24 });
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/login`, values);
+        Cookies.set('access_token', result.data.token, { expires: 1 });
         Cookies.set('refresh_token', result.data.refresh_token, { expires: 1 });
-        router.push({ pathname: "/" })
+        router.push({ pathname: "/" });
+        setShowAlert(false);
         setIsLoading(false);
       } catch (error) {
         setAlertSeverity("error")
         if(error.response){
           switch (error.response.data.error_code){
+            case "USER__PASSWORD_DOES_NOT_MATCH":
+              setAlertLabel("Incorrect username or password. Please try again.");
+              setShowAlert(true);
+              break;
+            case "USER__EMAIL_NOT_VERIFIED":
+              const emailData = {
+                email : values.email
+              }
+              try {
+                const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/verify-email`, emailData);
+                Cookies.set('register_access_token', result.data.token, { expires: 1 });
+                Cookies.set('register_refresh_token', result.data.refresh_token, { expires: 1 });
+                router.push({ pathname: "/otp" })
+              } catch (error) {
+                setAlertLabel("Network Error, Please Try Again.");
+                setShowAlert(true);
+              }
+              break;
             case "USER__NOT_FOUND" :
               setAlertLabel("Email doesn't exist. Try again or create a new account if you don't have one yet");
-              break;
-            case "USER__PASSWORD_DOES_NOT_MATCH":
-              setAlertLabel("The password you entered is incorrect. Please try again");
+              setShowAlert(true);
               break;
             default :
               setAlertLabel("Network Error, Please Try Again.");
+              setShowAlert(true);
               break;
           }
         } else{
           setAlertLabel("Network Error, Please Try Again.");
+          setShowAlert(true);
         }
         setIsLoading(false);
-        setShowAlert(true);
       }
     },
   });
@@ -80,24 +94,27 @@ export default function Login() {
       setAlertSeverity("success");
       setAlertLabel("Congratulations! Your registration was successful ");
       setShowAlert(true);
-    }
-    if(isSuccessForgotPassword){
+    }else if(isSuccessForgotPassword){
       setAlertSeverity("success");
       setAlertLabel("Your password has been successfully reset. Please check your email for a new password");
       setShowAlert(true);
+    }else if(isAccountVerified){
+      setAlertSeverity("success");
+      setAlertLabel("Your account has been verified. Please log in");
+      setShowAlert(true);
     }
-  }, [isSuccessRegistration, isSuccessForgotPassword]);
+  }, [isSuccessRegistration, isSuccessForgotPassword, isAccountVerified]);
 
   return (
     <>
-    { showAlert &&
+    { !isLoading && showAlert &&
       <CustomAlert
         severity={alertSeverity}
         label={alertLabel}
         onClose={handleClickShowAlert}
       /> 
     }
-    { isLoading && <Loading /> }
+    { isLoading && <Loading centered={true} /> }
     <Container 
       sx={{
         padding: "0", 
@@ -106,23 +123,7 @@ export default function Login() {
         flexDirection: "row"
       }} 
     >
-      <Box sx={{
-        width: "50%",
-        minHeight: "100%",
-        padding: "40px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        backgroundImage: "linear-gradient(90deg, #2064AC 0%, #7EC7EE 100%)",
-        [theme.breakpoints.down("small")]: {
-          display: "none"
-        },
-      }} 
-      >
-        <Logo/>
-        <Typography variant={"paragraph_h4"} sx={{ color: "light_gray.light" }}>© Intelligent Repository System</Typography>
-      </Box>
+      <LeftContainer />
       <Box 
         sx={{
         width: "100%",
@@ -142,6 +143,22 @@ export default function Login() {
         },
       }} 
       >
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "center",
+            justifyContent: "center",
+            marginBottom: "16px"
+          }}
+        >
+          <Logo
+            width={mobile? 120: 150}
+            height={mobile? 120: 150}
+            variant={mobile? "logo_small": "logo_large"}
+            withText={true}
+          />
+        </Box>
         <Typography variant={"heading_h1"} sx={{ color: "black.main" }} mb={"16px"}>Login</Typography>
         <Typography variant={"paragraph_h4"} sx={{ color: "black.main" }}>Kindly provide your registered email and password to access your account.</Typography>
         <form 
@@ -218,6 +235,17 @@ export default function Login() {
             </Link>
           </Typography>
         </form>
+        <Typography 
+          variant={"paragraph_h5"} 
+          sx={{ 
+            color: "black.main",
+            textAlign: "center",
+            width: "100%",
+            marginTop: "40px"
+          }}
+        >
+          © Intelligent Repository System
+        </Typography>
       </Box>
     </Container>
     </>

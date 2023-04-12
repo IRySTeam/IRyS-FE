@@ -1,20 +1,22 @@
 import { Box, Typography } from "@mui/material";
+import Image from 'next/image'
 
-export default function Logo() {
+export default function Logo(props) {
   return (
     <Box sx={{
-      width: "150px",
-      height: "150px",
-      borderRadius: "50%",
-      backgroundColor: "white.main",
       display: 'flex',
+      flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
     }} 
     >
-      <Typography variant={"heading_h2"} sx={{ color: "black.main" }}>
-        IRyS
-      </Typography>
+      <Image src={props.withText? "/irys.png" : "/irys_white.png"} alt="logo" width={props.width} height={props.height} />
+      {props.withText
+      &&
+        <Typography variant={props.variant} sx={{ color: "black.main" }}>
+          IRyS
+        </Typography>
+      }
     </Box>
   )
 }
