@@ -8,7 +8,7 @@ const initialState = {
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "userSuccess":
+    case 'userSuccess':
       return {
         ...state,
         id: action.payload.id ,
@@ -17,7 +17,7 @@ const userReducer = (state = initialState, action) => {
         last_name: action.payload.last_name,
         error: null, 
       }; 
-    case "userFailed": 
+    case 'userFailed': 
       return { 
         ...state, 
         id: null,

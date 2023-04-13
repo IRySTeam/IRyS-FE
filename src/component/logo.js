@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from '@mui/material';
 import Image from 'next/image'
 
 export default function Logo(props) {
@@ -10,10 +10,10 @@ export default function Logo(props) {
       alignItems: 'center',
     }} 
     >
-      <Image src={props.withText? "/irys.png" : "/irys_white.png"} alt="logo" width={props.width} height={props.height} />
+      <Image src={props.withText? '/irys.png' : '/irys_white.png'} alt='logo' width={props.width} height={props.height} />
       {props.withText
       &&
-        <Typography variant={props.variant} sx={{ color: "black.main" }}>
+        <Typography variant={props.variant} sx={{ color: 'black.main' }}>
           IRyS
         </Typography>
       }

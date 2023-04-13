@@ -1,22 +1,22 @@
 const initialState = {
-  repositories: [],
+  documents: [],
   isEmpty: false,
   error: null,
 }
 
-const repositoryReducer = (state = initialState, action) => {
+const singleRepositoryReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'repoListSuccess':
+    case 'singleRepoSuccess':
       return {
         ...state,
-        repositories: action.payload.repositories ,
+        documents: action.payload.documents ,
         isEmpty: action.payload.isEmpty,
         error: null, 
       }; 
-    case 'repoListFailed': 
+    case 'singleRepoFailed': 
       return { 
         ...state, 
-        repositories: [],
+        documents: [],
         isEmpty: false,
         error: action.payload.error, 
       };
@@ -25,4 +25,4 @@ const repositoryReducer = (state = initialState, action) => {
   }
 }
 
-export default repositoryReducer;
+export default singleRepositoryReducer;

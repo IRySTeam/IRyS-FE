@@ -1,18 +1,18 @@
-import { FormControl, FormHelperText, OutlinedInput, Typography, InputAdornment, IconButton } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
+import { FormControl, FormHelperText, OutlinedInput, Typography, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 
 export default function FormInput(props) {
   const theme = useTheme();
   return (
-    <FormControl error={props.error} variant="standard" sx={props.sx}>
+    <FormControl error={props.error} variant='standard' sx={props.sx}>
       <Typography 
         sx={{ 
-          color: "black.main", 
-          marginBottom: "16px",
-          typography: props.small? "form_label_small" : "form_label",
-          [theme.breakpoints.down("tablet")]: {
-            typography: "heading_h5",
+          color: 'black.main', 
+          marginBottom: '16px',
+          typography: props.small? 'form_label_small' : 'form_label',
+          [theme.breakpoints.down('tablet')]: {
+            typography: 'heading_h5',
           }, 
         }}
       >
@@ -28,18 +28,19 @@ export default function FormInput(props) {
           value={props.value}
           onChange={props.onChange}
           onBlur={props.onBlur}
+          onKeyPress={props.onKeyPress}
           error={props.error}
-          sx={{ marginBottom: "8px", width: "100%"}}
-          type={props.showPassword ? "text" : "password"}
+          sx={{ marginBottom: '8px', width: '100%'}}
+          type={props.showPassword ? 'text' : 'password'}
           endAdornment={
-            <InputAdornment position="end">
+            <InputAdornment position='end'>
               <IconButton
-                aria-label="toggle password visibility"
+                aria-label='toggle password visibility'
                 onClick={props.onClick}
                 onMouseDown={props.onMouseDown}
-                edge="end"
+                edge='end'
               >
-                {props.showPassword ? <VisibilityOff sx={{color: "black.main"}}/> : <Visibility sx={{color: "black.main"}}/>}
+                {props.showPassword ? <VisibilityOff sx={{color: 'black.main'}}/> : <Visibility sx={{color: 'black.main'}}/>}
               </IconButton>
             </InputAdornment>
             }
@@ -51,9 +52,10 @@ export default function FormInput(props) {
           value={props.value}
           onChange={props.onChange}
           onBlur={props.onBlur}
+          onKeyPress={props.onKeyPress}
           error={props.error}
-          sx={{ width: "100%"}}
-          size={props.small? "small" : "medium"}
+          sx={{ width: '100%'}}
+          size={props.small? 'small' : 'medium'}
           multiline={props.multiline? props.multiline : false}
           minRows={props.multiline? 4 : 1}
         />
