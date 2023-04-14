@@ -59,6 +59,7 @@ function NavBar(props) {
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
+      props.setIsLoading(true)
       event.preventDefault();
       handleSearch();
     }

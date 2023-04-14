@@ -146,7 +146,7 @@ export default function DocumentCard(props) {
       >
         <Box
           sx={{
-            width: '100%',
+            width: {mobile:'100%', laptop: '30%'},
             display: 'flex',
             flexDirection: 'row',
             justifyContent: {mobile: 'flex-end', laptop:'flex-start'},
