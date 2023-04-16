@@ -1,13 +1,13 @@
 export const getUserDetailSuccess = (data) => {
   return {
-    type: "userSuccess",
+    type: 'userSuccess',
     payload: data,
   }
 }
 
 export const getUserDetailFailed = (data) => {
   return {
-    type: "userFailed",
+    type: 'userFailed',
     payload: data,
   }
 }

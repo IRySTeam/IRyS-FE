@@ -21,18 +21,18 @@ export const getUserDetail = async (token, dispatch, router) => {
       }
       try {
         const new_token = await axios.post(`${NEXT_PUBLIC_API_URL}/auth/refresh`, refreshData);
-        console.log(new_token);
         Cookies.set('access_token', new_token.data.token, { expires: 1 });
         Cookies.set('refresh_token', new_token.data.refresh_token, { expires: 1 });
         getUserDetail(new_token.data.token, dispatch)
       }catch (error){
-        console.log(error)
-        dispatch(getUserDetailFailed(error.response.data))
+        if(error.response && error.response.status !== 500){
+          dispatch(getUserDetailFailed(error.response.data))
+        }  
         Cookies.remove('access_token');
         Cookies.remove('refresh_token');
-        router.replace({ pathname: "/login" });
-      }
-      dispatch(getUserDetailFailed(error.response.data))
-    } 
+        router.replace({ pathname: '/login' });
+      } 
+    }
+    dispatch(getUserDetailFailed('Network Error')) 
   }
 }
