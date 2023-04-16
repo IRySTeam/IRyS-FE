@@ -11,12 +11,13 @@ import LeftContainer from '@/component/left-container';
 import OtpInput from 'react-otp-input';
 import Cookies from 'js-cookie'
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
+import { refresh } from '@/utils/token';
 
 export default function Otp() {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
-
   const router = useRouter();
+  const { from } = router.query;
 
   const [otp, setOtp] = useState('')
   const [timeLeft, setTimeLeft] = useState(0);
@@ -30,23 +31,28 @@ export default function Otp() {
 
   const handleOtpSubmit = async () => {
     setIsLoading(true);
-
-    const register_access_token = Cookies.get('register_access_token');
-    const register_refresh_token = Cookies.get('register_refresh_token');
+    const token = from ==='forgot-password'? Cookies.get('change_password_access_token') : Cookies.get('register_access_token');
+    const refresh_token = from ==='forgot-password'? Cookies.get('change_password_refresh_token') : Cookies.get('register_access_token');
     const otpData = {
       otp: otp,
     }
 
-    if(register_access_token && register_refresh_token){
+    if(token && refresh_token){
       try {
-        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/verify-otp`, otpData, {
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users${from ==='forgot-password'? '/forgot-password' : ''}/verify-otp`, otpData, {
           headers: {
-            Authorization: `Bearer ${register_access_token}`
+            Authorization: `Bearer ${token}`
           }
         })
-        Cookies.remove('register_access_token')
-        Cookies.remove('register_refresh_token')
-        router.replace({ pathname: '/login', query: { isSuccessRegistration : true} })
+        if(from==='forgot-password'){
+          Cookies.set('change_password_access_token', result.data.token, { expires: 1 });
+          Cookies.set('change_password_refresh_token', result.data.refresh_token, { expires: 1 });
+          router.replace({ pathname: '/change-password' })
+        }else{
+          Cookies.remove('register_access_token')
+          Cookies.remove('register_refresh_token')
+          router.replace({ pathname: '/login', query: { isSuccessRegistration : true} })
+        }
         setIsLoading(false);
       } catch (error) {
         if(error.response){
@@ -56,23 +62,17 @@ export default function Otp() {
               setAlertLabel('Sorry, the OTP you entered wrong. Please try again')
               setShowAlert(true);
               break;
+            case 'USER__EXPIRED_OTP' :
+              setAlertLabel('Your OTP is already expired. Please resend code and try again')
+              setShowAlert(true);
+              break;
             case 401:
-              const refreshData = {
-                token: register_access_token,
-                refresh_token: register_refresh_token
+              if(from==='forgot-password'){
+                refresh('change_password_access_token', 'change_password_refresh_token', router);
+              }else{
+                refresh('register_access_token', 'register_refresh_token', router);
               }
-              try {
-                const new_token = await axios.post(`${NEXT_PUBLIC_API_URL}/auth/refresh`, refreshData);
-                Cookies.set('register_access_token', new_token.data.token, { expires: 1 });
-                Cookies.set('register_refresh_token', new_token.refresh_token, { expires: 1 });
-                setAlertSeverity('success');
-                setAlertLabel('Your session has been restored. Please reinput your OTP');
-                setShowAlert(true);
-              }catch (error){
-                Cookies.remove('register_access_token');
-                Cookies.remove('register_refresh_token');
-                router.replace({ pathname: '/login' });
-              }
+              setIsLoading(false);
               break;
             case 'USER__EMAIL_ALREADY_VERIFIED' :
               router.replace({ pathname: '/login', query: { isAccountVerified : true} })
@@ -97,37 +97,34 @@ export default function Otp() {
   const resendOtp = async () => {
     setTimeLeft(60);
     setIsLoading(true);
-    const register_access_token = Cookies.get('register_access_token');
-    const register_refresh_token = Cookies.get('register_refresh_token');
+    const token = from ==='forgot-password'? Cookies.get('change_password_access_token') : Cookies.get('register_access_token');
+    const refresh_token = from ==='forgot-password'? Cookies.get('change_password_refresh_token') : Cookies.get('register_access_token');
 
-    if(register_access_token && register_refresh_token){
+    if(token && refresh_token){
       try {
-        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/resend-otp`, null, {
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users${from ==='forgot-password'? '/forgot-password' : ''}/resend-otp`, null, {
           headers: {
-            Authorization: `Bearer ${register_access_token}`
+            Authorization: `Bearer ${token}`
           }
         })
+        if(from==='forgot-password'){
+
+        }
         setAlertSeverity('success')
         setAlertLabel('Your new OTP has been sent to your email.')
         setShowAlert(true)
-        setIsLoading(false);
+        setIsLoading(false)
       } catch (error) {
         if(error.response){
           setAlertSeverity('error');
           switch (error.response.data.error_code){
             case 401:
-              const refreshData = {
-                token: register_access_token,
-                refresh_token: register_refresh_token
+              if(from==='forgot-password'){
+                refresh('change_password_access_token', 'change_password_refresh_token', router);
+              }else{
+                refresh('register_access_token', 'register_refresh_token', router);
               }
-              try {
-                const new_token = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/auth/refresh`, refreshData);
-                Cookies.set('register_access_token', new_token.data.token, { expires: 1 });
-                Cookies.set('register_refresh_token', new_token.data.refresh_token, { expires: 1 });
-                setAlertLabel('Sorry, the OTP you entered has already expired. Please request a new OTP and try again');
-              }catch (error){
-                setAlertLabel('Sorry, the OTP you entered has already expired. Please request a new OTP and try again');
-              }
+              setAlertLabel('Sorry, the OTP you entered has already expired. Please request a new OTP and try again');
               break;
             case 'USER__EMAIL_ALREADY_VERIFIED' :
               router.replace({ pathname: '/login', query: { isAccountVerified : true} })
@@ -153,9 +150,20 @@ export default function Otp() {
   // First Time Loaded
   useEffect(() => {
     setIsLoading(true)
-    const register_access_token = Cookies.get('register_access_token');
-    const register_refresh_token = Cookies.get('register_refresh_token');
-    if(!register_access_token || !register_refresh_token){
+    const { from } = router.query;
+    if( from === 'register' || from === 'login'){
+      const register_access_token = Cookies.get('register_access_token');
+      const register_refresh_token = Cookies.get('register_refresh_token');
+      if(!register_access_token || !register_refresh_token){
+        router.replace({ pathname: '/login' })
+      }
+    } else if ( from === 'forgot-password'){
+      const change_password_access_token = Cookies.get('change_password_access_token');
+      const change_password_refresh_token = Cookies.get('change_password_refresh_token');
+      if(!change_password_access_token || !change_password_refresh_token ){
+        router.replace({ pathname: '/forgot-password' })
+      }
+    } else{
       router.replace({ pathname: '/login' })
     }
     setIsLoading(false)
@@ -224,8 +232,8 @@ export default function Otp() {
             withText={true}
           />
         </Box>
-        <Typography variant={'heading_h1'} sx={{ color: 'black.main' }} mb={'16px'}>Verify Account</Typography>
-        <Typography variant={'paragraph_h4'} sx={{ color: 'black.main' }}>Your registration is almost complete! Please enter the OTP (One-Time Password) sent to your email address to verify your account. Note that the OTP will expire in 5 minutes. </Typography>
+        <Typography variant={'heading_h1'} sx={{ color: 'black.main' }} mb={'16px'}>{ from==='forgot-password'? 'Verify Forgot Password' : 'Verify Account'}</Typography>
+        <Typography variant={'paragraph_h4'} sx={{ color: 'black.main' }}>{ from==='forgot-password'?  'Please enter the OTP (One-Time Password) sent to your email address so that you can change your password. Note that the OTP will expire in 5 minutes.' : 'Your registration is almost complete! Please enter the OTP (One-Time Password) sent to your email address to verify your account. Note that the OTP will expire in 5 minutes.'} </Typography>
         <OtpInput
           value={otp}
           onChange={setOtp}
@@ -259,7 +267,7 @@ export default function Otp() {
           type='submit'
           onClick={handleOtpSubmit}
         >
-          Verify Account
+          Verify
         </Button>
         <Typography variant={'paragraph_h5'} sx={{ color: 'black.main', alignSelf: 'center', textAlign: 'center' }}>Didn&apos;t receive the OTP?&nbsp;
           <Button 
