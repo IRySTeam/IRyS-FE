@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { Container, Box, Typography, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -10,6 +12,7 @@ import Loading from '@/component/loading';
 import FormInput from '@/component/form-input';
 import LeftContainer from '@/component/left-container';
 import { forgotPasswordValidation } from '@/schema/forgot-password-validation';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 
 export default function ForgotPassword() {
   const theme = useTheme();
@@ -21,22 +24,50 @@ export default function ForgotPassword() {
       email: '',
     },
     validationSchema: forgotPasswordValidation,
-    onSubmit: () => {
+    onSubmit: async (values) => {
       setIsLoading(true);
-      setTimeout(() => {
-        if(!isEmailExist) {
-          setAlertSeverity('error');
-          setAlertLabel('The email address you entered is not found. Please try again');
-          setShowAlert(true);
+      try {
+        const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/forgot-password/send-otp`, values);
+        Cookies.set('change_password_access_token', result.data.token, { expires: 1 });
+        Cookies.set('change_password_refresh_token', result.data.refresh_token, { expires: 1 });
+        router.push({ pathname: '/otp',  query: { from : 'forgot-password' }  })
+        setShowAlert(false);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error)
+        setAlertSeverity('error')
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 'USER__EMAIL_NOT_VERIFIED':
+              try {
+                const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/users/verify-email`, values);
+                Cookies.set('register_access_token', result.data.token, { expires: 1 });
+                Cookies.set('register_refresh_token', result.data.refresh_token, { expires: 1 });
+                router.push({ pathname: '/otp',  query: { from : 'login' }  })
+              } catch (error) {
+                console.log(error)
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+              }
+              break;
+            case 'USER__NOT_FOUND' :
+              setAlertLabel("Email doesn't exist. Try again or create a new account if you don't have one yet");
+              setShowAlert(true);
+              break;
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
         } else{
-          router.push({ pathname: '/login', query: { isSuccessForgotPassword : true} })
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
         }
-        setIsLoading(false)
-      }, '1000');
+        setIsLoading(false);
+      }
     },
   });
 
-  const isEmailExist = false;
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('error');

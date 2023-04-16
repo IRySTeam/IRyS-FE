@@ -8,7 +8,10 @@ export const loginValidation = yup.object({
     .max(255, 'Email is too long'),
   password: yup
     .string('Enter your password')
-    .min(8, 'Password should be of minimum 8 characters length')
+    .matches(
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()\-=+{};:,<.>.])(?=.*\d).{8,}$/,
+      'Your password must be at least 8 characters that contain at least one uppercase letter, one lowercase letter, one special character (! @ $ % ^ & * ( ) \ - _ = + { } ; : , < . >), and one number.'
+    )
     .required('Please fill in the required field')
     .max(255, 'Password is too long'),
 });
