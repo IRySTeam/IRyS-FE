@@ -51,7 +51,7 @@ export default function DocumentCard(props) {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
-            maxWidth: {mobile: '100%', tablet: '540px', laptop: 'calc(100% - 200px)'},
+            maxWidth: {mobile: '100%', laptop: 'calc(100% - 200px)'},
             gap: '8px',
           }}
         >
@@ -97,8 +97,9 @@ export default function DocumentCard(props) {
         </Box>
         <Box
           sx={{
-            display: 'flex',
-            alignItem: 'center',
+            display: {mobile: 'flex', tablet: 'none', laptop: 'flex'},
+            flexDirection: 'row',
+            alignItems: 'flex-start',
             justifyContent: 'flex-start',
             gap: '8px'
           }}
@@ -108,7 +109,7 @@ export default function DocumentCard(props) {
               width: '100px',
               height: '20px',
               display: 'flex',
-              alignItem: 'center',
+              alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: theme.palette.primary.main,
               borderRadius: '10px'
@@ -116,11 +117,11 @@ export default function DocumentCard(props) {
           >
             <Typography variant='heading_h6' color='white.main' sx={{ textTransform: 'capitalize' }}>{props.item.visibility}</Typography>
           </Box>
-          <Box
-            sx={{
-              height: '20px',
-              display:{mobile: 'block', laptop:'none'}
-            }}
+          <Box 
+            sx={{ height: '20px',
+                display: {mobile: 'flex', tablet: 'none'},
+              }}
+          
           >
             { props.item.type === 'pdf' &&
               <Image src={'/pdf-icon.svg'} alt='pdf-icon' width={20} height={20}/>
@@ -149,26 +150,44 @@ export default function DocumentCard(props) {
             width: {mobile:'100%', laptop: '30%'},
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: {mobile: 'flex-end', laptop:'flex-start'},
+            justifyContent: {mobile: 'space-between', laptop:'flex-start'},
             alignItems: 'center',
             gap: '16px'
           }}
         >
           <Box
             sx={{
-              height:'32px',
-              display:{mobile: 'none', laptop:'block'}
+              display: {mobile: 'none', tablet: 'flex'},
+              justifyContent: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              gap: '8px'
             }}
           >
-            { props.item.type === 'pdf' &&
-              <Image src={'/pdf-icon.svg'} alt='pdf-icon' width={32} height={32}/>
-            }
-            { props.item.type === 'txt' &&
-              <Image src={'/txt-icon.svg'} alt='txt-icon' width={32} height={32}/>
-            }
-            { props.item.type === 'docx' &&
-              <Image src={'/doc-icon.svg'} alt='doc-icon' width={32} height={32}/>
-            }
+            <Box
+              sx={{
+                width: '100px',
+                height: '20px',
+                display: {mobile: 'none', tablet: 'flex', laptop: 'none'},
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: theme.palette.primary.main,
+                borderRadius: '10px'
+              }}
+            >
+              <Typography variant='heading_h6' color='white.main' sx={{ textTransform: 'capitalize' }}>{props.item.visibility}</Typography>
+            </Box>
+            <Box sx={{ height: '32px' }}>
+              { props.item.type === 'pdf' &&
+                <Image src={'/pdf-icon.svg'} alt='pdf-icon' width={32} height={32}/>
+              }
+              { props.item.type === 'txt' &&
+                <Image src={'/txt-icon.svg'} alt='txt-icon' width={32} height={32}/>
+              }
+              { props.item.type === 'docx' &&
+                <Image src={'/doc-icon.svg'} alt='doc-icon' width={32} height={32}/>
+              }
+            </Box>
           </Box>
 
           <Button 
