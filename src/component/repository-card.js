@@ -205,7 +205,7 @@ export default function RepositoryCard(props) {
             WebkitBoxOrient: 'vertical',
           }}
         >
-          {`Updated on ${props.item.updated_at ?? formatDate(props.item.updated_at)}`}
+          { props.item.updated_at ? `Updated on ${formatDate(props.item.updated_at)}` : '' }
         </Typography>
       </Box>
     </Box> 
