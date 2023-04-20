@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import { Container, Box, Typography, Button,} from '@mui/material';
+import Pagination from '@mui/material/Pagination';
 import Grid from '@mui/material/Unstable_Grid2';
 import KeyboardDoubleArrowDownOutlinedIcon from '@mui/icons-material/KeyboardDoubleArrowDownOutlined';
 import SearchTabs from '../tabs/search';
@@ -114,6 +115,7 @@ export default function SuccessSearch(props) {
           }}  
         >
           { props.category === 'repo' && 
+            <>
             <Grid container columns={{ mobile: 4, tablet: 6, small: 12 }} rowSpacing={5} columnSpacing={{ mobile: 5, tablet: 6, small: 7 }}>
             { props.data.map((repo, index) => (
               <Grid mobile={4} tablet={3} small={6} desktop={4} large={3}  key={index}>
@@ -123,6 +125,21 @@ export default function SuccessSearch(props) {
               </Grid>
             ))}
             </Grid>
+            {
+              props.total_page > 1 && 
+              <Box
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: '40px',
+                }}
+              >
+                <Pagination count={props.total_page} page={parseInt(props.page)} onChange={props.onChangePage} shape="rounded" color='primary'/>
+              </Box>
+            }
+            </>
           }
           { props.category === 'docs' &&
             <Box
