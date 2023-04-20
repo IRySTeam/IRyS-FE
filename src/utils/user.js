@@ -17,7 +17,7 @@ export const getUserDetail = async (token, dispatch, router) => {
       try {
         refresh('access_token', 'refresh_token', router);
         const token = Cookies.get('access_token');
-        getUserDetail(token, dispatch)
+        getUserDetail(token, dispatch, router)
       }catch (error){
         if(error.response && error.response.status !== 500){
           dispatch(getUserDetailFailed(error.response.data))

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
+import { Box, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -15,10 +16,11 @@ import { formatDate } from '@/utils/date';
 
 export default function RepositoryCard(props) {
   const theme = useTheme();
+  const router = useRouter();
   const [anchorElOption, setAnchorElOption] = useState(null);
   
   const handleClickBox = (id) => {
-    console.log(`Open Repo with Index ${id}`)
+    router.push({ pathname: '/repository', query: { id : id} });
   };
 
   const handleOpenElOption = (event) => {
