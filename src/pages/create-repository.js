@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useFormik } from 'formik';
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 import { Container, Button, Typography, Box } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -13,11 +14,18 @@ import FormInput from '@/component/form-input';
 import FolderSharedOutlinedIcon from '@mui/icons-material/FolderSharedOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createRepositoryValidation } from '@/schema/create-repository';
+import Cookies from 'js-cookie'
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
+import { refresh } from '@/utils/token';
+import CustomAlert from '@/component/custom-alert';
 
 export default function CreateRepository() {
   const theme = useTheme();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState('error');
+  const [alertLabel, setAlertLabel] = useState('Network Error, Please Try Again.');
 
   const formik = useFormik({
     initialValues: {
@@ -26,20 +34,64 @@ export default function CreateRepository() {
       type: 'public'
     },
     validationSchema: createRepositoryValidation,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       setIsLoading(true);
-      router.push({ pathname: '/', query: { newRepository : values.name }})
+      const data = {
+        name: values.name,
+        description: values.description,
+        is_public: values.type==='public'
+      }
+      const token =  Cookies.get('access_token');
+      const refresh_token =  Cookies.get('refresh_token');
+  
+      if(token && refresh_token){
+        try {
+          const result = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/create`, data, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          router.push({ pathname: '/', query: { newRepository : result.data.name }})
+        } catch (error) {
+          if(error.response){
+            setAlertSeverity('error');
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setIsLoading(false);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+          setIsLoading(false);
+        }
+      }  
     },
   });
 
+  const handleClickShowAlert= () => setShowAlert((show) => !show);
+  
   return (
     <>
       { isLoading && <Loading centered={true}/> }
-      {!isLoading &&
+      {
         <>
           <NavBar 
             setIsLoading={setIsLoading}
           />
+          { !isLoading && showAlert &&
+            <CustomAlert
+              severity={alertSeverity}
+              label={alertLabel}
+              onClose={handleClickShowAlert}
+            /> 
+          }
           <Container 
             sx={{
               padding: '40px 24px', 
