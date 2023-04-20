@@ -65,12 +65,6 @@ export default function Home() {
     router.push({ pathname: '/', query: { search : searchQuery, type: typeQuery, sort: sortQuery, page: value} })
   };
 
-  const isNoFilter = () => (
-    searchQuery === '' &&
-    typeQuery === '' &&
-    sortQuery === ''
-  );
-
   const typeOption = [
     { value: '', label: 'All'},
     { value: 'public', label: 'Public'},
@@ -316,22 +310,23 @@ export default function Home() {
                   alignItem: 'center'
                 }}
               >
-                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>{isNoFilter() ? 'No repository.' : 'No repositories found.'}</Typography>
+                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>{repositoryData.does_user_have_any_repos ? 'No repositories found.' : 'No repository.'}</Typography>
                 <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>
-                  {isNoFilter() ? 
+                  {repositoryData.does_user_have_any_repos ?
+                  'Please check for typos, or use fewer terms or fields.'
+                  :
                   <>
-                  <Link
-                    variant='paragraph_h4'
-                    underline='none'
-                    href={'/create-repository'}
-                    color={'primary.main'}
-                  >
-                    Create a repository&nbsp;
-                  </Link>
-                  to get started
+                    <Link
+                      variant='paragraph_h4'
+                      underline='none'
+                      href={'/create-repository'}
+                      color={'primary.main'}
+                    >
+                      Create a repository&nbsp;
+                    </Link>
+                    to get started
                   </>
-                  : 
-                  'Please check for typos, or use fewer terms or fields.'}
+                  }
                 </Typography>
               </Box>
             }
