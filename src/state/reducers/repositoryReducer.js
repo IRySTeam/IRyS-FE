@@ -1,6 +1,7 @@
 const initialState = {
   repositories: [],
-  isEmpty: false,
+  total_page: null,
+  total_items: null,
   error: null,
 }
 
@@ -9,16 +10,18 @@ const repositoryReducer = (state = initialState, action) => {
     case 'repoListSuccess':
       return {
         ...state,
-        repositories: action.payload.repositories ,
-        isEmpty: action.payload.isEmpty,
+        repositories: action.payload.results,
+        total_page: action.payload.total_page,
+        total_items: action.payload.total_items,
         error: null, 
       }; 
     case 'repoListFailed': 
       return { 
         ...state, 
         repositories: [],
-        isEmpty: false,
-        error: action.payload.error, 
+        total_page: null,
+        total_items: null,
+        error: action.payload.error_code, 
       };
     default: 
       return state    
