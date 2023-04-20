@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Container, Button, Typography, Box, OutlinedInput, Link } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import Cookies from 'js-cookie'
+import { Container, Button, Typography, Box, OutlinedInput, Link } from '@mui/material';
+import Pagination from '@mui/material/Pagination';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
@@ -9,26 +14,28 @@ import CustomAlert from '@/component/custom-alert';
 import NavBar from '@/component/navbar';
 import SearchIcon from '@mui/icons-material/Search';
 import Dropdown from '@/component/dropdown';
-import { repositoryList } from '@/data/repositories';
 import RepositoryCard from '@/component/repository-card';
 import { getRepoListSuccess } from '@/state/actions/repositoryActions';
 
 export default function Home() {
   const theme = useTheme();
   const router = useRouter();
-  const { search, type, sort, newRepository} = router.query;
+  const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
+  const tablet = useMediaQuery(theme.breakpoints.down('small'));
+  const small = useMediaQuery(theme.breakpoints.down('desktop'));
+  const { search, type, sort, page, newRepository} = router.query;
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingRepo, setIsLoadingRepo] = useState(false);
+  const [pagination, setPagination] = useState(page? page : 1);
   const [searchQuery, setSearchQuery] = useState(search? search : '');
-  const [typeQuery, setTypeQuery] = useState(type? type : 'all');
-  const [sortQuery, setSortQuery] = useState(sort? sort : 'none');
+  const [typeQuery, setTypeQuery] = useState(type? type : '');
+  const [sortQuery, setSortQuery] = useState(sort? sort : '');
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
   const repositoryData = useSelector(state => state.repository);
-  const isEmptyRepo = false;
 
   const handleChangeTypeQuery = (event) => {
     setTypeQuery(event.target.value);
@@ -48,47 +55,56 @@ export default function Home() {
   };
 
   const handleSearch = (searchFilter = searchQuery, typeFilter = typeQuery, sortFilter = sortQuery) => {
-    router.push({ pathname: '/', query: { search : searchFilter, type: typeFilter, sort: sortFilter} })
+    router.push({ pathname: '/', query: { search : searchFilter, type: typeFilter, sort: sortFilter, page: 1} })
   }
 
-  const handleClickShowAlert= () => setShowAlert((show) => !show);
+  const handleClickShowAlert = () => setShowAlert((show) => !show);
+
+  const handleChangePage = (event, value) => {
+    setPagination(value);
+    router.push({ pathname: '/', query: { search : searchQuery, type: typeQuery, sort: sortQuery, page: value} })
+  };
 
   const typeOption = [
-    { value: 'all', label: 'All'},
+    { value: '', label: 'All'},
     { value: 'public', label: 'Public'},
     { value: 'private', label: 'Private'},
   ]
 
   const sortOption = [
-    { value: 'none', label: 'None'},
-    { value: 'last_updated', label: 'Last Updated'},
-    { value: 'alphabet', label: 'Name (A-Z)'},
+    { value: '', label: 'None'},
+    { value: 'updated_at', label: 'Last Updated'},
+    { value: 'name', label: 'Name (A-Z)'},
   ]
 
   useEffect(() => {
     setIsLoadingRepo(true);
-    const filterArrayRepo = (array) => {
-      const searchFilter = !search ? array : array.filter((repo) => repo.name.toLowerCase().includes(search.toLowerCase()))
-      const visibilityFilter = typeQuery === 'all' ? searchFilter : searchFilter.filter((repo) => (repo.visibility === typeQuery))
-      const sortFilter = sortQuery === 'none'? visibilityFilter : visibilityFilter.sort((a, b) => {
-        if (sortQuery === 'last_updated') {
-          return b.last_updated - a.last_updated;
-        } else if (sortQuery === 'alphabet') {
-          return a.name.localeCompare(b.name);
-        }
-      });
-      return sortFilter
-    }
-  
-    setTimeout(() => {
-      const result = {
-        repositories : isEmptyRepo? [] : filterArrayRepo(repositoryList),
-        isEmpty : isEmptyRepo,
+    const fetchRepo = async () =>  {
+      const token =  Cookies.get('access_token');
+      const data = {
+        name: search,
+        type: typeQuery,
+        sort_by: sortQuery,
+        page_no: page? page : 1,
+        page_size: mobile ? 5 : tablet? 6: small? 9: 12,
       }
-      dispatch(getRepoListSuccess(result))
-      setIsLoadingRepo(false);
-    }, 1000);
-  }, [dispatch, isEmptyRepo, search, sortQuery, typeQuery]);
+      try {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/joined`, {
+          params : data,
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        dispatch(getRepoListSuccess(response.data))
+      } catch (error){
+        setAlertSeverity('error');
+        setAlertLabel(`Network Error, Please try again`);
+        setShowAlert(true);
+      }
+    }
+    fetchRepo()
+    setIsLoadingRepo(false);
+  }, [dispatch, mobile, page, search, small, sortQuery, tablet, typeQuery]);
 
   useEffect(() => {
     if(newRepository){
@@ -251,7 +267,7 @@ export default function Home() {
                   value={typeQuery}
                   handleChange={handleChangeTypeQuery}
                   options={typeOption}
-                  defaultValue={'all'}
+                  defaultValue={''}
                 />
                 <Dropdown
                   label={'Order'} 
@@ -259,7 +275,7 @@ export default function Home() {
                   value={sortQuery}
                   handleChange={handleChangeSortQuery}
                   options={sortOption}
-                  defaultValue={'none'}
+                  defaultValue={''}
                 />
               </Box>
 
@@ -284,7 +300,7 @@ export default function Home() {
             { isLoadingRepo &&
               <Loading transparent={true} centered={false}/>
             }
-            { !isLoadingRepo && (repositoryData.isEmpty || repositoryData.repositories.length === 0) &&
+            { !isLoadingRepo && (repositoryData.repositories.length === 0) &&
               <Box
                 sx={{
                   width: '100%', 
@@ -294,26 +310,28 @@ export default function Home() {
                   alignItem: 'center'
                 }}
               >
-                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>{repositoryData.isEmpty ? 'No repository.' : 'No repositories found.'}</Typography>
+                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>{repositoryData.does_user_have_any_repos ? 'No repositories found.' : 'No repository.'}</Typography>
                 <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>
-                  {repositoryData.isEmpty ? 
+                  {repositoryData.does_user_have_any_repos ?
+                  'Please check for typos, or use fewer terms or fields.'
+                  :
                   <>
-                  <Link
-                    variant='paragraph_h4'
-                    underline='none'
-                    href={'/create-repository'}
-                    color={'primary.main'}
-                  >
-                    Create a repository&nbsp;
-                  </Link>
-                  to get started
+                    <Link
+                      variant='paragraph_h4'
+                      underline='none'
+                      href={'/create-repository'}
+                      color={'primary.main'}
+                    >
+                      Create a repository&nbsp;
+                    </Link>
+                    to get started
                   </>
-                  : 
-                  'Please check for typos, or use fewer terms or fields.'}
+                  }
                 </Typography>
               </Box>
             }
-            { !isLoadingRepo && !repositoryData.isEmpty && repositoryData.repositories.length > 0 && 
+            { !isLoadingRepo && repositoryData.repositories.length > 0 && 
+              <>
               <Grid container columns={{ mobile: 4, tablet: 6, small: 12 }} rowSpacing={5} columnSpacing={{ mobile: 5, tablet: 6, small: 7 }}>
               { repositoryData.repositories.map((repo, index) => (
                 <Grid mobile={4} tablet={3} small={4} desktop={3} large={2}  key={index}>
@@ -323,8 +341,22 @@ export default function Home() {
                 </Grid>
               ))}
               </Grid>
+              {
+                repositoryData.total_page > 1 && 
+                <Box
+                  sx={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '40px',
+                  }}
+                >
+                  <Pagination count={repositoryData.total_page} page={pagination} onChange={handleChangePage} shape="rounded" color='primary'/>
+                </Box>
+              }
+              </>
             }
-
           </Box>
           </Container>
         </> 

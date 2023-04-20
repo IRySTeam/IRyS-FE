@@ -74,7 +74,7 @@ export default function RepositoryCard(props) {
               borderRadius: '10px'
             }}
           >
-            <Typography variant='heading_h6' color='white.main' sx={{ textTransform: 'capitalize' }}>{props.item.visibility}</Typography>
+            <Typography variant='heading_h6' color='white.main' sx={{ textTransform: 'capitalize' }}>{props.item.is_public? 'public' : 'private'}</Typography>
           </Box>
           <IconButton onClick={handleOpenElOption} sx={{ p: 0 }}>
             <MoreVertIcon
@@ -181,7 +181,7 @@ export default function RepositoryCard(props) {
             WebkitBoxOrient: 'vertical',
           }}
         >
-          {props.item.owner}
+          {props.item.owner ? `${props.item.owner.first_name} ${props.item.owner.last_name}` : ''}
         </Typography>
       </Box>
       <Box
@@ -205,7 +205,7 @@ export default function RepositoryCard(props) {
             WebkitBoxOrient: 'vertical',
           }}
         >
-          {`Updated on ${formatDate(props.item.last_updated)}`}
+          { props.item.updated_at ? `Updated on ${formatDate(props.item.updated_at)}` : '' }
         </Typography>
       </Box>
     </Box> 
