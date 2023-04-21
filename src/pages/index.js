@@ -244,7 +244,7 @@ export default function Home() {
                     backgroundColor: theme.palette.primary.main,
                     borderRadius: '5px'
                   }}
-                  onClick={handleSearch}
+                  onClick={() => handleSearch()}
                 >
                   <SearchIcon />
                 </Button>
