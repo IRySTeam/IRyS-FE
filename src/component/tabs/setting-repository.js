@@ -1,15 +1,15 @@
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import { Box, Typography, } from '@mui/material';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import SettingsIcon from '@mui/icons-material/Settings';
+import GroupsIcon from '@mui/icons-material/Groups';
 
-export default function SearchTabs(props) {
+export default function SettingRepositoryTabs(props) {
   const theme = useTheme();
   const router = useRouter();
 
-  const handleClickCategory = (query, category) => {
-    router.push({ pathname: '/search', query: { q : query, category: category } })
+  const handleClickSetting = (id, type) => {
+    router.push({ pathname: `/repository/setting/${type === 'general' ? 'general' : 'collaborators'}`, query: { id : id } })
   }
 
   return (
@@ -28,21 +28,21 @@ export default function SearchTabs(props) {
           [theme.breakpoints.down('small')]: {
             width:'50%',
             borderBottom: '3px solid',
-            borderColor: props.category === 'repo' ? theme.palette.primary.main : 'transparent',
+            borderColor: props.type === 'general' ? theme.palette.primary.main : 'transparent',
             borderRadius: '1px',
             padding: '4px'
           }, 
           [theme.breakpoints.up('small')]: {
             width: '234px',
             borderLeft: '3px solid',
-            borderColor: props.category === 'repo' ? theme.palette.primary.main : 'transparent',
+            borderColor:  props.type === 'general' ? theme.palette.primary.main : 'transparent',
             borderRadius: '1px',
             marginY: '8px',
           },
           padding: '0 4px',
           cursor: 'pointer',
         }}
-        onClick={()=> handleClickCategory(props.query, 'repo')}
+        onClick={()=> handleClickSetting(props.id, 'general')}
       >
         <Box
           sx={{
@@ -53,18 +53,18 @@ export default function SearchTabs(props) {
             justifyContent: { mobile: 'center', small:'flex-start' },
             gap: { mobile: '16px', small:'4px' },
             borderRadius: '5px',
-            backgroundColor: props.category === 'repo' ? theme.palette.light_gray.light : 'transparent',
+            backgroundColor: props.type === 'general' ? theme.palette.light_gray.light : 'transparent',
             padding: '5px 8px'
           }} 
         >
-          <FolderOpenIcon color='dark_gray.light' sx={{width: '20px', height: '20px'}}/>
+          <SettingsIcon color='dark_gray.light' sx={{width: '20px', height: '20px'}}/>
           <Typography
             sx={{ 
               color: 'black.main', 
-              typography: props.category === 'repo' ? 'paragraph_h6_bold' : 'paragraph_h6',
+              typography: props.type === 'general' ? 'paragraph_h6_bold' : 'paragraph_h6',
             }}
           >
-            Repositories
+            General
           </Typography>
         </Box>
       </Box>
@@ -82,21 +82,21 @@ export default function SearchTabs(props) {
           [theme.breakpoints.down('small')]: {
             width:'50%',
             borderBottom: '3px solid',
-            borderColor: props.category === 'docs' ? theme.palette.primary.main : 'transparent',
+            borderColor: props.type === 'collaborators'? theme.palette.primary.main : 'transparent',
             borderRadius: '1px',
             padding: '4px'
           }, 
           [theme.breakpoints.up('small')]: {
             width: '234px',
             borderLeft: '3px solid',
-            borderColor: props.category === 'docs' ? theme.palette.primary.main : 'transparent',
+            borderColor: props.type === 'collaborators'? theme.palette.primary.main : 'transparent',
             borderRadius: '1px',
             marginY: '8px',
           },
           padding: '0 4px',
           cursor: 'pointer',
         }}
-        onClick={()=> handleClickCategory(props.query, 'docs')}
+        onClick={()=> handleClickSetting(props.id, 'collaborators')}
       >
         <Box
           sx={{
@@ -107,18 +107,18 @@ export default function SearchTabs(props) {
             justifyContent: { mobile: 'center', small:'flex-start' },
             gap: { mobile: '16px', small: '4px' },
             borderRadius: '5px',
-            backgroundColor: props.category === 'docs' ? theme.palette.light_gray.light : 'transparent',
+            backgroundColor: props.type === 'collaborators'? theme.palette.light_gray.light : 'transparent',
             padding: '5px 8px'
           }} 
         >
-          <InsertDriveFileOutlinedIcon color='dark_gray.light' sx={{width: '20px', height: '20px'}}/>
+          <GroupsIcon color='dark_gray.light' sx={{width: '20px', height: '20px'}}/>
           <Typography
             sx={{ 
               color: 'black.main', 
-              typography: props.category === 'docs' ? 'paragraph_h6_bold' : 'paragraph_h6',
+              typography: props.type === 'collaborators'? 'paragraph_h6_bold' : 'paragraph_h6',
             }}
           >
-            Documents
+            Collaborators
           </Typography>
         </Box>
       </Box>

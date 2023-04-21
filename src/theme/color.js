@@ -145,5 +145,8 @@ export const palette = {
   },
   backdrop:{
     main: 'rgba(0, 0, 0, 0.5)',
+  },
+  danger_button:{
+    main: danger[70],
   }
 }
