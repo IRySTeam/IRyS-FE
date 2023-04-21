@@ -6,7 +6,7 @@ export default function Logo(props) {
   const router = useRouter();
 
   const handleClickLogo = () => {
-    router.push({ pathname: '/' })
+    router.push({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
   }
 
   return (

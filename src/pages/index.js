@@ -352,7 +352,17 @@ export default function Home() {
                     marginTop: '40px',
                   }}
                 >
-                  <Pagination count={repositoryData.total_page} page={pagination} onChange={handleChangePage} shape="rounded" color='primary'/>
+                  <Pagination 
+                    count={repositoryData.total_page} 
+                    page={parseInt(pagination)} 
+                    onChange={handleChangePage} 
+                    shape="rounded" 
+                    color='primary' 
+                    sx={{
+                      '& .MuiPaginationItem-root': {
+                        typography: theme.typography.heading_h6
+                      }
+                    }}/>
                 </Box>
               }
               </>

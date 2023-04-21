@@ -136,7 +136,18 @@ export default function SuccessSearch(props) {
                   marginTop: '40px',
                 }}
               >
-                <Pagination count={props.total_page} page={parseInt(props.page)} onChange={props.onChangePage} shape="rounded" color='primary'/>
+                <Pagination 
+                  count={props.total_page} 
+                  page={parseInt(props.page)} 
+                  onChange={props.onChangePage}                     
+                  shape="rounded" 
+                  color='primary' 
+                  sx={{
+                    '& .MuiPaginationItem-root': {
+                      typography: theme.typography.heading_h6
+                    }
+                  }}
+                />
               </Box>
             }
             </>
