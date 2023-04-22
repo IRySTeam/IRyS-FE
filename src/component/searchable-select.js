@@ -159,10 +159,10 @@ export default function SearchableSelect(props) {
         </Box>)
       }}
       noOptionsText={
-        <Typography  variant='form_sublabel_small' color="black.main">Sorry, we cannot find any users. Try other keywords or email</Typography>
+        <Typography  variant='heading_h6' color="black.main">{`Could not find a IRyS account matching ${props.inputValue}`}</Typography>
       }
       loadingText={
-        <Typography variant='form_sublabel_small' color="black.main">Fetching users .....</Typography>
+        <Typography variant='heading_h6' color="black.main">Fetching users .....</Typography>
       }
       ListboxProps={{
         sx: {
