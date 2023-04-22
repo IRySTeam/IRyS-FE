@@ -114,6 +114,7 @@ export default function CollaboratorCard(props) {
             },
           }}
           disabled={props.item.role === 'owner'}
+          onClick={props.onRemoveAccess}
         >
           Remove Access
         </Button>

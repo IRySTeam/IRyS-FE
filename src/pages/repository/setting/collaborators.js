@@ -7,8 +7,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import FolderSharedOutlinedIcon from '@mui/icons-material/FolderSharedOutlined';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
@@ -25,12 +24,12 @@ export default function CollaboratorsSettingRepository() {
   const { id } = router.query;
 
   const [isLoading, setIsLoading] = useState(true);
-  const [visibility, setVisibility] = useState('public');
-  const [isVisibilityModalOpen, setIsVisibilityModalOpen] = useState(false);
+  const [isRemoveAccessModalOpen, setIsRemoveAccessModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Role updated successfully');
+  const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(1);
   const repositoryName = 'Repository XYZ'
   
   useEffect(() => {
@@ -56,17 +55,18 @@ export default function CollaboratorsSettingRepository() {
     } ,
   });
 
-  const handleClickOpenVisibility = () => {setIsVisibilityModalOpen(true);};
-  const handleCloseVisibility = () => {setIsVisibilityModalOpen(false);};
+  const handleClickOpenRemoveAccess = (id) => {
+    setCurrentRemoveAccessId(id);
+    setIsRemoveAccessModalOpen(true);
+  };
+  const handleCloseRemoveAccess = () => {setIsRemoveAccessModalOpen(false);};
   const handleClickOpenDelete = () => {setIsDeleteModalOpen(true);};
   const handleCloseDelete = () => {setIsDeleteModalOpen(false);};
-  const handleChangeVisibility = () => { 
-    if(visibility === 'public'){
-      setVisibility('private')
-    } else {
-      setVisibility('public')
-    }
-    handleCloseVisibility();
+  const handleChangeRemoveAccess = () => {
+    setAlertSeverity('success')
+    setAlertLabel(`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name} has been removed`)
+    setShowAlert(true)
+    handleCloseRemoveAccess();
   }
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
@@ -245,6 +245,7 @@ export default function CollaboratorsSettingRepository() {
                         key={index}
                         item={collaborator}
                         onRoleChange={handleRoleChanged}
+                        onRemoveAccess={() => handleClickOpenRemoveAccess(index)}
                       />
                     ))}
                   </Box>
@@ -253,8 +254,8 @@ export default function CollaboratorsSettingRepository() {
             </Box>
           </Container>
           <Dialog
-            open={isVisibilityModalOpen}
-            onClose={handleCloseVisibility}
+            open={isRemoveAccessModalOpen}
+            onClose={handleCloseRemoveAccess}
             sx={{
               "& .MuiDialog-container": {
                 "& .MuiPaper-root": {
@@ -274,8 +275,8 @@ export default function CollaboratorsSettingRepository() {
                 padding: '24px 24px 40px 24px'
               }}
             >
-                <Typography variant='popup_heading' color='black.main'>Change Visibility</Typography>
-                <IconButton sx={{ padding: 0, }} onClick={handleCloseVisibility}>
+                <Typography variant='popup_heading' color='black.main'>Confirm Remove Access</Typography>
+                <IconButton sx={{ padding: 0, }} onClick={handleCloseRemoveAccess}>
                   <CloseIcon
                     sx={{
                       width: '36px',
@@ -296,25 +297,26 @@ export default function CollaboratorsSettingRepository() {
                 gap: '12px',
               }}
             >
-              { 
-                visibility === 'public' ?
-                <LockOutlinedIcon
-                  sx={{
-                    width: '64px',
-                    height: '64px',
-                    color: theme.palette.dark_gray.main
-                  }}
-                /> :
-                <FolderSharedOutlinedIcon 
-                  sx={{
-                    width: '64px',
-                    height: '64px',
-                    color: theme.palette.dark_gray.main
-                  }}
-                />  
-              }
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Make My Repository as a ${visibility === 'public'? 'private' : 'public' } repository`}</Typography>
-              <Typography variant='form_sublabel_small' color='black.main'  textAlign='center'>{visibility === 'public'? 'Private repositories are only visible to you and selected collaborators' : 'Public repositories are visible to everyone' }</Typography>
+              <RemoveCircleIcon
+                sx={{
+                  width: '64px',
+                  height: '64px',
+                  color: theme.palette.dark_gray.main
+                }}
+              />  
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>Remove {`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name}`} from this repository</Typography>
+              <Typography 
+                variant='form_sublabel_small' 
+                color='black.main'
+                textAlign='center'
+                sx={{
+                  "& .bold": {
+                    typography: theme.typography.form_sublabel_small_bold
+                  }
+                }}
+              >
+                Once removed, <span className='bold'>{`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name}`}</span> will no longer have direct access to this repository.
+              </Typography>
               <Button 
                 color='danger_button' 
                 variant='contained' 
@@ -326,9 +328,9 @@ export default function CollaboratorsSettingRepository() {
                   typography: theme.typography.heading_h6,
                   color: theme.palette.white.main,
                 }}
-                onClick={handleChangeVisibility}
+                onClick={handleChangeRemoveAccess}
               >
-                {visibility === 'public'? 'Make this repository private' : 'Make this repository public'}
+                Remove Access
               </Button> 
             </DialogContent>
           </Dialog>
