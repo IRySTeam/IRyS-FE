@@ -93,7 +93,8 @@ export default function CollaboratorCard(props) {
           label={'Role'}
           placeholder={'Role'} 
           value={props.item.role}
-          // handleChange={handleChangeTypeQuery}
+          id={props.item.id}
+          handleChange={props.onRoleChange}
           options={roleOption}
           width='150px'
           backgroundColor={theme.palette.white.main}

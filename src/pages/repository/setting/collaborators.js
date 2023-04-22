@@ -29,6 +29,8 @@ export default function CollaboratorsSettingRepository() {
   const [isVisibilityModalOpen, setIsVisibilityModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState('success');
+  const [alertLabel, setAlertLabel] = useState('Role updated successfully');
   const repositoryName = 'Repository XYZ'
   
   useEffect(() => {
@@ -69,6 +71,21 @@ export default function CollaboratorsSettingRepository() {
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
+  const handleRoleChanged = (event, id) => {
+    if(id !== 3){
+      console.log(`Change collaborators with id ${id} role to ${event.target.value}`)
+      setAlertSeverity('success')
+      setAlertLabel('Role updated successfully')
+      setShowAlert(true)
+    } else {
+      console.log(`Failed to change collaborators with id ${id}`)
+      setAlertSeverity('error')
+      setAlertLabel('Failed to update role')
+      setShowAlert(true)
+    }
+
+  }
+
   return (
     <>
       { isLoading && <Loading centered={true}/> }
@@ -79,8 +96,8 @@ export default function CollaboratorsSettingRepository() {
           />
           { !isLoading && showAlert &&
             <CustomAlert
-              severity={'success'}
-              label={'Your changes to the repository settings have been successfully saved'}
+              severity={alertSeverity}
+              label={alertLabel}
               onClose={handleClickShowAlert}
             /> 
           }
@@ -227,6 +244,7 @@ export default function CollaboratorsSettingRepository() {
                       <CollaboratorCard 
                         key={index}
                         item={collaborator}
+                        onRoleChange={handleRoleChanged}
                       />
                     ))}
                   </Box>
