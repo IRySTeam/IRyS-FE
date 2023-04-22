@@ -16,6 +16,7 @@ import CustomAlert from '@/component/custom-alert';
 import { collaborators } from '@/data/collaborators';
 import CollaboratorCard from '@/component/collaborator-card';
 import SearchableSelect from '@/component/searchable-select';
+import NewCollaboratorCard from '@/component/new-collaborator-card';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
@@ -72,6 +73,15 @@ export default function CollaboratorsSettingRepository() {
       setAlertLabel('Failed to update role')
       setShowAlert(true)
     }
+  }
+
+  const handleNewCollaboratorRoleChange = (event, id) => {
+    setNewCollaboratorRole(event.target.value)
+  }
+
+  const handleRemoveNewCollaborator = () => {
+    setNewCollaborator(null)
+    setNewCollaboratorRole('viewer')
   }
 
   return (
@@ -385,6 +395,16 @@ export default function CollaboratorsSettingRepository() {
                   setSearchUsers(newInputValue);
                 }}
               />
+              { newCollaborator &&
+                <NewCollaboratorCard
+                  item={newCollaborator}
+                  role={newCollaboratorRole}
+                  new={true}
+                  onRoleChange={handleNewCollaboratorRoleChange}
+                  onRemoveNewCollaborator={handleRemoveNewCollaborator}
+                />
+              }
+
               <Button 
                 color='primary' 
                 variant='contained' 
@@ -399,7 +419,7 @@ export default function CollaboratorsSettingRepository() {
                     color: theme.palette.white.main,
                   },
                 }}
-                disabled
+                disabled={!newCollaborator}
               >
                 Add to this repository
               </Button>

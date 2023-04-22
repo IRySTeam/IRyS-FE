@@ -28,7 +28,7 @@ export default function CollaboratorCard(props) {
         sx={{
           width:{mobile: 'calc(100% - 166px)', tablet: 'calc(100% - 180px)', small: 'calc(100% - 332px)'},
           display: 'flex',
-          flexDirection: 'row', 
+          flexDirection: {mobile:'column', tablet: 'row'}, 
           alignItems: 'center',
           justifyContent:'flex-start',
           gap: '16px'
@@ -36,7 +36,7 @@ export default function CollaboratorCard(props) {
       >
         <Box
           sx={{
-            display: {mobile: 'none', tablet: 'flex'},
+            display: 'flex',
             width: '36px',
             height: '36px',
             borderRadius: '18px',

@@ -71,6 +71,7 @@ export default function SearchableSelect(props) {
       }}
       options={options}
       loading={loading}
+      disableClearable={true}
       renderInput={(params) => (
         <TextField
           {...params}
