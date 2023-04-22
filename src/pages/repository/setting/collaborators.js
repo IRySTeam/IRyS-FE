@@ -84,6 +84,16 @@ export default function CollaboratorsSettingRepository() {
     setNewCollaboratorRole('viewer')
   }
 
+  const addToRepo = () => {
+    console.log(`Added ${newCollaborator.first_name} ${newCollaborator.last_name} to my repository`)
+    setNewCollaborator(null)
+    setNewCollaborator('viewer')
+    setAlertSeverity('success')
+    setAlertLabel('A new collaborator has been successfully added')
+    setShowAlert(true)
+    handleCloseAddCollaborator()
+  }
+
   return (
     <>
       { isLoading && <Loading centered={true}/> }
@@ -340,7 +350,7 @@ export default function CollaboratorsSettingRepository() {
               "& .MuiDialog-container": {
                 "& .MuiPaper-root": {
                   width: "100%",
-                  maxWidth: "516px",
+                  maxWidth: "640px",
                 },
               },
             }}
@@ -420,6 +430,7 @@ export default function CollaboratorsSettingRepository() {
                   },
                 }}
                 disabled={!newCollaborator}
+                onClick={addToRepo}
               >
                 Add to this repository
               </Button>
