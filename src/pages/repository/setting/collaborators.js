@@ -13,13 +13,13 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import SettingRepositoryTabs from '@/component/tabs/setting-repository';
-import FormInput from '@/component/form-input';
-import { editRepositoryValidation } from '@/schema/edit-repository';
 import { deleteRepositoryValidation } from '@/schema/delete-repository';
 import FormInputDialog from '@/component/form-input-dialog';
 import CustomAlert from '@/component/custom-alert';
+import { collaborators } from '@/data/collaborators';
+import CollaboratorCard from '@/component/collaborator-card';
 
-export default function GeneralSettingRepository() {
+export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
   const router = useRouter();
   const { id } = router.query;
@@ -30,32 +30,16 @@ export default function GeneralSettingRepository() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const repositoryName = 'Repository XYZ'
-
-  const hasFormChanged = (currentValues, initialValues) => Object.keys(initialValues).some(fieldName => initialValues[fieldName] !== currentValues[fieldName]);
   
   useEffect(() => {
     setIsLoading(true);
     const { id } = router.query;
     if(!id){
-      router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
+      // router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
     }else{
       setIsLoading(false);
     }
   }, [router]);
-
-  const formik = useFormik({
-    initialValues: {
-      name: repositoryName,
-      description: '',
-    },
-    validationSchema: editRepositoryValidation,
-    onSubmit: (values) => {
-      setIsLoading(true);
-      console.log(values);
-      setShowAlert(true);
-      setIsLoading(false);
-    } ,
-  });
 
   const formikDialog = useFormik({
     initialValues: {
@@ -159,7 +143,7 @@ export default function GeneralSettingRepository() {
                 </Typography>
                 <SettingRepositoryTabs
                   id={id} 
-                  type={'general'}
+                  type={'collaborators'}
                 />
               </Box>
               <Box
@@ -176,7 +160,7 @@ export default function GeneralSettingRepository() {
               >
                 <Box
                   sx={{
-                    width:{ mobile: '100%'},
+                    width:'100%',
                     display: 'flex',
                     flexDirection: 'column', 
                     alignItems: 'flex-start',
@@ -184,56 +168,32 @@ export default function GeneralSettingRepository() {
                     gap: '16px'
                   }} 
                 >
-                  <Typography 
-                    sx={{ 
-                      color: 'black.main', 
-                      typography: 'heading_h2',
-                      [theme.breakpoints.down('small')]: {
-                        typography: 'heading_h3',
-                      },
-                      marginLeft: '16px', 
-                    }}
-                  >
-                    General
-                  </Typography>
-                  <Box sx={{ backgroundColor: 'light_gray.main', width: '100%', height: '1px',}}/>
-                  <form 
-                    onSubmit={formik.handleSubmit} 
-                    style={{
+                  <Box
+                    sx={{
+                      width:'100%',
                       display: 'flex',
-                      flexDirection: 'column',
-                      width: '100%',
-                      gap: '16px',
-                      paddingLeft: '24px',
-                    }}
+                      flexDirection: 'row', 
+                      alignItems: 'flex-start',
+                      justifyContent:'space-between',
+                    }} 
                   >
-                    <FormInput 
-                      id='name'            
-                      name='name'
-                      label='Repository Name'
-                      placeholder='Enter a repository name'
-                      value={formik.values.name}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.name && Boolean(formik.errors.name)}
-                      helpertext={formik.touched.name && formik.errors.name}
-                      required={true}
-                      small={true}
-                    />
-                    <FormInput 
-                      id='description'            
-                      name='description'
-                      label='Description'
-                      placeholder='Enter repository description'
-                      value={formik.values.description}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.description && Boolean(formik.errors.description)}
-                      helpertext={formik.touched.description && formik.errors.description}
-                      small={true}
-                      multiline={true}
-                      optional={true}
-                    />
+                    <Typography 
+                      sx={{ 
+                        color: 'black.main', 
+                        typography: 'heading_h2',
+                        marginLeft: '16px', 
+                        [theme.breakpoints.down('small')]: {
+                          typography: 'heading_h3',
+                          marginLeft: 0,
+                        },
+                        [theme.breakpoints.down('mobile_l')]: {
+                          typography: 'heading_h4',
+                        },
+                        maxWidth: 'calc(100% - 150px)',
+                      }}
+                    >
+                      Manage Access
+                    </Typography>
                     <Button 
                       color='primary' 
                       variant='contained' 
@@ -243,115 +203,32 @@ export default function GeneralSettingRepository() {
                         width: '150px',
                         typography: theme.typography.heading_h6,
                         alignSelf: 'flex-end',
-                        '&.Mui-disabled': {
-                          backgroundColor: theme.palette.dark_gray.light,
-                          color: theme.palette.light_gray.light,
-                        },}}
-                      type='submit'
-                      disabled={!(hasFormChanged(formik.values, formik.initialValues))}
+                      }}
                     >
-                      Save Changes 
+                      Add Collaborator
                     </Button> 
-                  </form>
-                </Box>
-                <Box
-                  sx={{
-                    width:'100%',
-                    display: 'flex',
-                    flexDirection: 'column', 
-                    alignItems: 'flex-start',
-                    justifyContent:'flex-start',
-                    gap: '16px'
-                  }} 
-                >
-                  <Typography 
-                    sx={{ 
-                      color: 'black.main', 
-                      typography: 'heading_h2',
-                      [theme.breakpoints.down('small')]: {
-                        typography: 'heading_h3',
-                      },
-                      marginLeft: '16px', 
-                    }}
-                  >
-                    Danger Zone
-                  </Typography>
+                  </Box>
                   <Box sx={{ backgroundColor: 'light_gray.main', width: '100%', height: '1px',}}/>
                   <Box
                     sx={{
                       width:'100%',
                       display: 'flex',
-                      flexDirection: 'row', 
-                      alignItems: 'center',
-                      justifyContent:'space-between',
-                    }} 
+                      flexDirection: 'column', 
+                      alignItems: 'flex-start',
+                      justifyContent:'flex-start',
+                      gap: '16px',
+                      paddingLeft: '24px',
+                      [theme.breakpoints.down('small')]: {
+                        paddingLeft: '0px',
+                      }, 
+                    }}
                   >
-                    <Box
-                      sx={{
-                        width:'calc(100% - 176px)',
-                        display: 'flex',
-                        flexDirection: 'column', 
-                        alignItems: 'flex-start',
-                        justifyContent:'space-between',
-                        gap: '8px',
-                        paddingLeft: '24px',
-                      }} 
-                    >
-                      <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Change repository visibility</Typography>
-                      <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This repository is currently ${visibility}.`}</Typography>
-                    </Box>
-                    <Button 
-                      color='danger_button' 
-                      variant='contained' 
-                      sx={{ 
-                        height: '32px', 
-                        padding: '0 10px',
-                        width: '150px',
-                        typography: theme.typography.heading_h6,
-                        color: theme.palette.white.main,
-                      }}
-                      onClick={handleClickOpenVisibility}
-                    >
-                      {visibility === 'public'? 'Change to Private' : 'Change to Public'}
-                    </Button> 
-                  </Box>
-                  <Box
-                    sx={{
-                      width:'100%',
-                      display: 'flex',
-                      flexDirection: 'row', 
-                      alignItems: 'center',
-                      justifyContent:'space-between',
-                    }} 
-                  >
-                    <Box
-                      sx={{
-                        width:'calc(100% - 176px)',
-                        display: 'flex',
-                        flexDirection: 'column', 
-                        alignItems: 'flex-start',
-                        justifyContent:'space-between',
-                        gap: '8px',
-                        paddingLeft: '24px',
-                      }} 
-                    >
-                      <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Delete this repository</Typography>
-                      <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>Deleting a repository is permanent and irreversible, so please be certain before proceeding.</Typography>
-                    </Box>
-                    <Button 
-                      color='danger_button' 
-                      variant='contained' 
-                      sx={{ 
-                        height: '32px', 
-                        padding: '0 12px',
-                        width: '150px',
-                        typography: theme.typography.heading_h6,
-                        color: theme.palette.white.main,
-                      }}
-                      onClick={handleClickOpenDelete}
-                    >
-                      Delete
-                    </Button> 
+                    {collaborators.map((collaborator, index) => (
+                      <CollaboratorCard 
+                        key={index}
+                        item={collaborator}
+                      />
+                    ))}
                   </Box>
                 </Box>
               </Box>
