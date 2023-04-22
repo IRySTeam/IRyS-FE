@@ -8,15 +8,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import GroupsIcon from '@mui/icons-material/Groups';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import SettingRepositoryTabs from '@/component/tabs/setting-repository';
-import { deleteRepositoryValidation } from '@/schema/delete-repository';
-import FormInputDialog from '@/component/form-input-dialog';
 import CustomAlert from '@/component/custom-alert';
 import { collaborators } from '@/data/collaborators';
 import CollaboratorCard from '@/component/collaborator-card';
+import SearchableSelect from '@/component/searchable-select';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
@@ -25,12 +24,15 @@ export default function CollaboratorsSettingRepository() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isRemoveAccessModalOpen, setIsRemoveAccessModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Role updated successfully');
   const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(1);
   const repositoryName = 'Repository XYZ'
+  const [newCollaborator, setNewCollaborator] = useState(null);
+  const [newCollaboratorRole, setNewCollaboratorRole] = useState('viewer');
+  const [searchUsers, setSearchUsers] = useState('');
   
   useEffect(() => {
     setIsLoading(true);
@@ -42,26 +44,13 @@ export default function CollaboratorsSettingRepository() {
     }
   }, [router]);
 
-  const formikDialog = useFormik({
-    initialValues: {
-      name: '',
-      real_name: repositoryName,
-    },
-    validationSchema: deleteRepositoryValidation,
-    onSubmit: (values) => {
-      setIsLoading(true);
-      router.push({ pathname: '/', query: { deleteRepository : values.name }})
-      setIsLoading(false);
-    } ,
-  });
-
   const handleClickOpenRemoveAccess = (id) => {
     setCurrentRemoveAccessId(id);
     setIsRemoveAccessModalOpen(true);
   };
   const handleCloseRemoveAccess = () => {setIsRemoveAccessModalOpen(false);};
-  const handleClickOpenDelete = () => {setIsDeleteModalOpen(true);};
-  const handleCloseDelete = () => {setIsDeleteModalOpen(false);};
+  const handleClickOpenAddCollaborator = () => {setIsAddCollaboratorModalOpen(true);};
+  const handleCloseAddCollaborator = () => {setIsAddCollaboratorModalOpen(false);};
   const handleChangeRemoveAccess = () => {
     setAlertSeverity('success')
     setAlertLabel(`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name} has been removed`)
@@ -83,7 +72,6 @@ export default function CollaboratorsSettingRepository() {
       setAlertLabel('Failed to update role')
       setShowAlert(true)
     }
-
   }
 
   return (
@@ -221,6 +209,7 @@ export default function CollaboratorsSettingRepository() {
                         typography: theme.typography.heading_h6,
                         alignSelf: 'flex-end',
                       }}
+                      onClick={handleClickOpenAddCollaborator}
                     >
                       Add Collaborator
                     </Button> 
@@ -335,8 +324,8 @@ export default function CollaboratorsSettingRepository() {
             </DialogContent>
           </Dialog>
           <Dialog
-            open={isDeleteModalOpen}
-            onClose={handleCloseDelete}
+            open={isAddCollaboratorModalOpen}
+            onClose={handleCloseAddCollaborator}
             sx={{
               "& .MuiDialog-container": {
                 "& .MuiPaper-root": {
@@ -356,8 +345,8 @@ export default function CollaboratorsSettingRepository() {
                 padding: '24px 24px 40px 24px'
               }}
             >
-              <Typography variant='popup_heading' color='black.main'>Delete this repository</Typography>
-              <IconButton sx={{ padding: 0, }} onClick={handleCloseDelete}>
+              <Typography variant='popup_heading' color='black.main'>Add Collaborator</Typography>
+              <IconButton sx={{ padding: 0, }} onClick={handleCloseAddCollaborator}>
                 <CloseIcon
                   sx={{
                     width: '36px',
@@ -378,68 +367,42 @@ export default function CollaboratorsSettingRepository() {
                 gap: '12px',
               }}
             >
-              <DeleteOutlinedIcon
+              <GroupsIcon
                 sx={{
                   width: '64px',
                   height: '64px',
                   color: theme.palette.dark_gray.main
                 }}
               /> 
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Delete ${repositoryName}`}</Typography>
-              <Typography 
-                variant='form_sublabel_small' 
-                color='black.main'
-                textAlign='center'
-                sx={{
-                  "& .bold": {
-                    typography: theme.typography.form_sublabel_small_bold
-                  }
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Add a collaborator to ${repositoryName}`}</Typography>
+              <SearchableSelect 
+                value={newCollaborator}
+                onChange={(event, newValue) => {
+                  setNewCollaborator(newValue);
                 }}
-              >
-                This action <span className='bold'>cannot</span> be undone. This will permanently delete the <span className='bold'>{repositoryName}</span>, delete all <span className='bold'>documents</span> inside and remove all <span className='bold'>collaborator associations.</span>
-              </Typography>
-              <form 
-                onSubmit={formikDialog.handleSubmit} 
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
+                inputValue={searchUsers}
+                onInputChange={(event, newInputValue) => {
+                  setSearchUsers(newInputValue);
+                }}
+              />
+              <Button 
+                color='primary' 
+                variant='contained' 
+                sx={{ 
+                  height: '32px', 
+                  padding: '0 12px',
                   width: '100%',
-                  gap: '24px',
-                  marginTop: '12px',
-                }}
-              >
-                <FormInputDialog
-                  id='name'            
-                  name='name'
-                  label={["Please type ", <span key={1} className='bold'>{repositoryName}</span>,  " to confirm."]}
-                  placeholder={repositoryName}
-                  value={formikDialog.values.name}
-                  onChange={formikDialog.handleChange}
-                  onBlur={formikDialog.handleBlur}
-                  error={formikDialog.touched.name && Boolean(formikDialog.errors.name)}
-                  helpertext={formikDialog.touched.name && formikDialog.errors.name}
-                />
-                <Button 
-                  color='danger_button' 
-                  variant='contained' 
-                  sx={{ 
-                    height: '32px', 
-                    padding: '0 12px',
-                    width: '100%',
-                    marginTop: '4px',
-                    typography: theme.typography.heading_h6,
+                  marginTop: '4px',
+                  typography: theme.typography.heading_h6,
+                  '&.Mui-disabled': {
+                    backgroundColor: theme.palette.dark_gray.light,
                     color: theme.palette.white.main,
-                    '&.Mui-disabled': {
-                      backgroundColor: theme.palette.dark_gray.light,
-                      color: theme.palette.white.main,
-                    },
-                  }}
-                  type="submit"
-                  disabled={!formikDialog.touched.name || Boolean(formikDialog.errors.name)}
-                >
-                  I understand, delete this repository
-                </Button>
-              </form>
+                  },
+                }}
+                disabled
+              >
+                Add to this repository
+              </Button>
             </DialogContent>
           </Dialog>
         </>
