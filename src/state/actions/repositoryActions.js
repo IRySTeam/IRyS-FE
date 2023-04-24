@@ -19,6 +19,13 @@ export const changeRepoDetailSuccess = (data) => {
   }
 }
 
+export const changeRepoVisibilitySuccess = (data) => {
+  return {
+    type: 'changeRepoVisibilitySuccess',
+    payload: data,
+  }
+}
+
 export const getRepoDetailFailed = (data) => {
   return {
     type: 'repoDetailFailed',

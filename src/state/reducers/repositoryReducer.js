@@ -52,6 +52,11 @@ const repositoryReducer = (state = initialState, action) => {
         name: action.payload.name,
         description: action.payload.description,
       }; 
+    case 'changeRepoVisibilitySuccess':
+      return {
+        ...state,
+        is_public: action.payload.is_public,
+      }; 
     default: 
       return state    
   }

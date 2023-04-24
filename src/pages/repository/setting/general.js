@@ -22,7 +22,7 @@ import { editRepositoryValidation } from '@/schema/edit-repository';
 import { deleteRepositoryValidation } from '@/schema/delete-repository';
 import FormInputDialog from '@/component/form-input-dialog';
 import CustomAlert from '@/component/custom-alert';
-import { changeRepoDetailSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
+import { changeRepoDetailSuccess, changeRepoVisibilitySuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 
 export default function GeneralSettingRepository() {
   const theme = useTheme();
@@ -31,7 +31,6 @@ export default function GeneralSettingRepository() {
   const { id } = router.query;
 
   const [isLoading, setIsLoading] = useState(true);
-  const [visibility, setVisibility] = useState('public');
   const [isVisibilityModalOpen, setIsVisibilityModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -137,11 +136,47 @@ export default function GeneralSettingRepository() {
   const handleCloseVisibility = () => {setIsVisibilityModalOpen(false);};
   const handleClickOpenDelete = () => {setIsDeleteModalOpen(true);};
   const handleCloseDelete = () => {setIsDeleteModalOpen(false);};
-  const handleChangeVisibility = () => { 
-    if(visibility === 'public'){
-      setVisibility('private')
-    } else {
-      setVisibility('public')
+  const handleChangeVisibility = async (visibility) => { 
+    setIsLoading(true)
+    const data = {
+      is_public: visibility,
+    }
+    try {
+      const token = Cookies.get('access_token');
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${repositoryData.id}/edit`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setAlertSeverity('success');
+      setAlertLabel('Your changes to the repository settings have been successfully saved');
+      setShowAlert(true);
+      dispatch(changeRepoVisibilitySuccess(data));
+      setIsLoading(false);
+    } catch (error) {
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action.');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
+      setIsLoading(false);
     }
     handleCloseVisibility();
   }
@@ -361,7 +396,7 @@ export default function GeneralSettingRepository() {
                       }} 
                     >
                       <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Change repository visibility</Typography>
-                      <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This repository is currently ${visibility}.`}</Typography>
+                      <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This repository is currently ${repositoryData.is_public ? 'public' : 'private'}.`}</Typography>
                     </Box>
                     <Button 
                       color='danger_button' 
@@ -375,7 +410,7 @@ export default function GeneralSettingRepository() {
                       }}
                       onClick={handleClickOpenVisibility}
                     >
-                      {visibility === 'public'? 'Change to Private' : 'Change to Public'}
+                      {repositoryData.is_public? 'Change to Private' : 'Change to Public'}
                     </Button> 
                   </Box>
                   <Box
@@ -465,7 +500,7 @@ export default function GeneralSettingRepository() {
               }}
             >
               { 
-                visibility === 'public' ?
+                repositoryData.is_public ?
                 <LockOutlinedIcon
                   sx={{
                     width: '64px',
@@ -481,8 +516,8 @@ export default function GeneralSettingRepository() {
                   }}
                 />  
               }
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Make My Repository as a ${visibility === 'public'? 'private' : 'public' } repository`}</Typography>
-              <Typography variant='form_sublabel_small' color='black.main'  textAlign='center'>{visibility === 'public'? 'Private repositories are only visible to you and selected collaborators' : 'Public repositories are visible to everyone' }</Typography>
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Make My Repository as a ${repositoryData.is_public? 'private' : 'public' } repository`}</Typography>
+              <Typography variant='form_sublabel_small' color='black.main'  textAlign='center'>{repositoryData.is_public? 'Private repositories are only visible to you and selected collaborators' : 'Public repositories are visible to everyone' }</Typography>
               <Button 
                 color='danger_button' 
                 variant='contained' 
@@ -494,9 +529,9 @@ export default function GeneralSettingRepository() {
                   typography: theme.typography.heading_h6,
                   color: theme.palette.white.main,
                 }}
-                onClick={handleChangeVisibility}
+                onClick={() => handleChangeVisibility(!repositoryData.is_public)}
               >
-                {visibility === 'public'? 'Make this repository private' : 'Make this repository public'}
+                {repositoryData.is_public? 'Make this repository private' : 'Make this repository public'}
               </Button> 
             </DialogContent>
           </Dialog>
