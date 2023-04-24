@@ -99,8 +99,8 @@ export default function EmptyQuery(props) {
         <Link
           variant='paragraph_h4'
           underline='none'
-          href={'/search/advanced'}
           color={'primary.main'}
+          onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath } })}
         >
           advanced search&nbsp;
         </Link>

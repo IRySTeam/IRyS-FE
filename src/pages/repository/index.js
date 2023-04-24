@@ -278,7 +278,7 @@ export default function Repository() {
                         justifyContent: {mobile: 'center', tablet:'space-between'},
                         alignItems: 'center',
                       }}
-                      onClick={() => router.push({ pathname: '/search/advanced' })}
+                      onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath } })}
                     >
                       <Typography
                         sx={{ 
