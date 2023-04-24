@@ -1,25 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { Container, Button, Typography, Box } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import SearchIcon from '@mui/icons-material/Search';
 import Loading from '@/component/loading';
 import NavBar from '@/component/navbar';
 import FilterInput from '@/component/filter/input';
 import FilterDropdown from '@/component/filter/dropdown';
 import FilterCard from '@/component/filter/card';
 import { domainOption } from '@/constants/option';
+import { resetFilterAdvancedSearch, saveAdvancedSearchBasic, saveAdvancedSearchCli } from '@/state/actions/filterAction';
 
 export default function AdvancedSearch() {
   const theme = useTheme();
   const router = useRouter();
+  const dispatch = useDispatch();
+  const advancedSearch = useSelector(state => state.filter);
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState('basic');
   const [path, setPath] = useState('');
-  const [keyword, setKeyword] = useState('');
-  const [domain, setDomain] = useState('');
-  const [filters, setFilters] = useState([
+  const [keyword, setKeyword] = useState(advancedSearch.keyword ?? '');
+  const [domain, setDomain] = useState(advancedSearch.domain ?? '');
+  const [filters, setFilters] = useState( advancedSearch.filters ?? [
     {
       key: '',
       operator: '',
@@ -30,6 +35,7 @@ export default function AdvancedSearch() {
       score_threshold: '',
     },
   ])
+  const [cliQuery, setCliQuery] = useState('');
 
   const addFilter = () => {
     const newFilter = {
@@ -79,10 +85,50 @@ export default function AdvancedSearch() {
     setDomain(event.target.value);
   };
 
+  const redirectBack = () => {
+    router.push(path)
+  }
+
+  const handleSearch = () => {
+    if(mode === 'basic') {
+      const data = {
+        keyword: keyword,
+        domain: domain,
+        filters: filters,
+      }
+      dispatch(saveAdvancedSearchBasic(data))
+    } else if(mode === 'cli'){
+      const data = {
+        cliQuery: cliQuery,
+      }
+      dispatch(saveAdvancedSearchCli(data))
+    }
+    redirectBack()
+  }
+
   useEffect(() => {
-    const { from } = router.query;
-    if(from) setPath(from);
-  }, [router]);
+    const { from, origin } = router.query;
+    if(from && origin) {
+      const decodedPath = decodeURIComponent(from)
+      setPath(decodedPath)
+      if(origin !== advancedSearch.path){
+        const data = { path: origin }
+        dispatch(resetFilterAdvancedSearch(data))
+        setKeyword('')
+        setDomain('')
+        setFilters([{
+          key: '',
+          operator: '',
+          value: '',
+          model: '',
+          scoring_algorithm: '',
+          top_n: '',
+          score_threshold: '',
+        }])
+        setCliQuery('')
+      }
+    }
+  }, [advancedSearch.path, dispatch, router]);
 
   return (
     <>
@@ -144,9 +190,9 @@ export default function AdvancedSearch() {
                 sx={{
                   width: '100%',
                   display: 'flex',
-                  flexDirection: 'row', 
+                  flexDirection: {mobile: 'column', mobile_l:'row'}, 
                   gap: {mobile: '16px', tablet:'32px'},
-                  alignItems: 'center',
+                  alignItems: {mobile: 'flex-start', mobile_l:'center'},
                   justifyContent: 'flex-start',
                 }}
               >
@@ -308,6 +354,73 @@ export default function AdvancedSearch() {
                 </Button>
               </Box>
             }
+            <Box
+              sx= {{
+                width: '100%',
+                display: 'flex',
+                flexDirection: {mobile: 'column-reverse', mobile_l: 'row'}, 
+                gap: {mobile: '16px', mobile_l: '24px'},
+                alignItems: 'flex-start',
+                justifyContent: {mobile: 'center', mobile_l: 'flex-end'},
+              }}
+
+            >
+              <Button 
+                color='primary' 
+                variant='outlined' 
+                sx={{ 
+                  height: '32px',
+                  width: {mobile: '100%', mobile_l: '150px'},
+                  typography: theme.typography.heading_h6,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '8px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onClick={ () => redirectBack()}
+              >
+                <Typography
+                  sx={{ 
+                    color: 'primary.main', 
+                    typography: 'heading_h6',
+                  }}
+                >
+                  Cancel
+                </Typography>
+              </Button>
+              <Button 
+                color='primary' 
+                variant='contained' 
+                sx={{ 
+                  height: '32px',
+                  width: {mobile: '100%', mobile_l: '150px'},
+                  typography: theme.typography.heading_h6,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '8px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onClick={() => handleSearch()}
+              >
+                <Typography
+                  sx={{ 
+                    color: 'white.main', 
+                    typography: 'heading_h6',
+                  }}
+                >
+                  Search
+                </Typography>
+                <SearchIcon
+                  sx={{
+                    width: '18px',
+                    height: '18px',
+                    color: theme.palette.white.main
+                  }}
+                />
+              </Button>
+            </Box>
           </Container>
         </> 
       }

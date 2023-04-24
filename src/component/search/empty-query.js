@@ -100,7 +100,7 @@ export default function EmptyQuery(props) {
           variant='paragraph_h4'
           underline='none'
           color={'primary.main'}
-          onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath } })}
+          onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath, origin: router.pathname } })}
         >
           advanced search&nbsp;
         </Link>

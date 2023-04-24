@@ -105,6 +105,9 @@ export default function FilterCard(props) {
             padding: '4px',
             backgroundColor: theme.palette.error.main,
             borderRadius: '5px',
+            '&:hover': {
+              backgroundColor: theme.palette.error.main,
+            },
           }}
           onClick={props.onRemove}
         >

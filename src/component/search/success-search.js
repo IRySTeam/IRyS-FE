@@ -89,7 +89,7 @@ export default function SuccessSearch(props) {
               marginLeft: {mobile: 0, small:'16px'},
               marginTop: {mobile: 0, small:'6px'},
             }}
-            onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath } })}
+            onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath, origin: router.pathname } })}
           >
             <Typography
               sx={{ 
