@@ -141,6 +141,7 @@ export default function FilterCard(props) {
         value={props.filter.value}
         onChange={handleValueChange}
         required={true}
+        disabled={ props.filter.operator=== 'exists' || props.filter.operator === 'not_exists' }
       />
       { props.filter.operator === 'semantic_search' &&
       <>

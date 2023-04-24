@@ -66,6 +66,7 @@ export const modelOption = [
 
 export const scoringAlgorithmOption = [
   { value: '', label: 'None'},
-  { value: 'svm', label: 'SVM'},
-  { value: 'knn', label: 'KNN'},
+  { value: 'cosine', label: 'COSINE'},
+  { value: 'dot', label: 'DOT'},
+  { value: 'okapi_bm', label: 'OKAPI BM'},
 ]

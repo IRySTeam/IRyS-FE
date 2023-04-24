@@ -23,6 +23,7 @@ export default function FilterInput(props) {
         placeholder={props.placeholder}
         value={props.value}
         onChange={props.onChange}
+        disabled={props.disabled}
         sx={{
           width: {mobile: 'calc(100% - 133px)', mobile_l: 'calc(100% - 199px)', tablet: 'calc(100% - 248px)'},
           '& .MuiInputBase-input': {
@@ -33,7 +34,7 @@ export default function FilterInput(props) {
             justifyContent: 'center',
             typography: theme.typography.paragraph_h6,
             color: props.value === '' ? 'dark_gray.main' : 'black.main',
-            backgroundColor: theme.palette.white.main,
+            backgroundColor: props.disabled ? theme.palette.light_gray.main : theme.palette.white.main,
             border: '1px solid',
             borderColor: theme.palette.light_gray.main,
             borderRadius: '5px',
