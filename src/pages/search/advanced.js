@@ -6,6 +6,9 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Loading from '@/component/loading';
 import NavBar from '@/component/navbar';
+import FilterInput from '@/component/filter/input';
+import FilterDropdown from '@/component/filter/dropdown';
+import { domainOption } from '@/data/domains';
 
 export default function AdvancedSearch() {
   const theme = useTheme();
@@ -13,13 +16,23 @@ export default function AdvancedSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState('basic');
   const [path, setPath] = useState('');
-  const [keyword, setKeyword] = useState(false);
-  const [domain, setDomain] = useState(false);
+  const [keyword, setKeyword] = useState('');
+  const [domain, setDomain] = useState('');
+  const [filter, setFilter] = useState([{}])
 
   const handleChangeMode = (event, newMode) => {
     if (newMode !== null) {
       setMode(newMode);
     }
+  };
+
+  const handleChangeKeyword = (event) => {
+    setKeyword(event.target.value);
+  };
+
+  const handleChangeDomain= (event) => {
+    console.log(event.target.value)
+    setDomain(event.target.value);
   };
 
   useEffect(() => {
@@ -88,7 +101,7 @@ export default function AdvancedSearch() {
                   width: '100%',
                   display: 'flex',
                   flexDirection: 'row', 
-                  gap: '16px',
+                  gap: {mobile: '16px', tablet:'32px'},
                   alignItems: 'center',
                   justifyContent: 'flex-start',
                 }}
@@ -157,6 +170,23 @@ export default function AdvancedSearch() {
                   </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
+              { mode === 'basic' &&
+                <>
+                  <FilterInput 
+                    label="Keyword"
+                    placeholder="Enter a keyword..."
+                    value={keyword}
+                    onChange={handleChangeKeyword}
+                  />
+                  <FilterDropdown
+                    label="Domain"
+                    placeholder="Select a domain.."
+                    value={domain}
+                    options={domainOption}
+                    onChange={handleChangeDomain}
+                  />
+                </>
+              }
             </Box>
           </Container>
         </> 
