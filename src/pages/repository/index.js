@@ -20,7 +20,7 @@ import { documentList } from '@/data/documents';
 import { getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import DocumentCard from '@/component/document-card';
 import { sortOption } from '@/constants/option';
-import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoListSuccess } from '@/state/actions/repositoryActions';
+import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 
 export default function Repository() {
   const theme = useTheme();
@@ -100,9 +100,9 @@ export default function Repository() {
               Authorization: `Bearer ${token}`
             }
           })
-          dispatch(getRepoListSuccess(response.data))
+          dispatch(getRepoDetailSuccess(response.data))
         } catch (error){
-          dispatch(getRepoListSuccess(error.response.data))
+          dispatch(getRepoDetailFailed(error.response.data))
           setAlertSeverity('error');
           setAlertLabel(`Network Error, Please try again`);
           setShowAlert(true);

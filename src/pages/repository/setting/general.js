@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
+import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { Container, Box, Typography, Button, IconButton} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -18,10 +22,12 @@ import { editRepositoryValidation } from '@/schema/edit-repository';
 import { deleteRepositoryValidation } from '@/schema/delete-repository';
 import FormInputDialog from '@/component/form-input-dialog';
 import CustomAlert from '@/component/custom-alert';
+import { changeRepoDetailSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 
 export default function GeneralSettingRepository() {
   const theme = useTheme();
   const router = useRouter();
+  const dispatch = useDispatch();
   const { id } = router.query;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +35,9 @@ export default function GeneralSettingRepository() {
   const [isVisibilityModalOpen, setIsVisibilityModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const repositoryName = 'Repository XYZ'
+  const [alertSeverity, setAlertSeverity] = useState('success');
+  const [alertLabel, setAlertLabel] = useState('Your changes to the repository settings have been successfully saved');
+  const repositoryData = useSelector(state => state.repository);
 
   const hasFormChanged = (currentValues, initialValues) => Object.keys(initialValues).some(fieldName => initialValues[fieldName] !== currentValues[fieldName]);
   
@@ -39,28 +47,83 @@ export default function GeneralSettingRepository() {
     if(!id){
       router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
     }else{
+      const fetchDetailRepo = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getRepoDetailSuccess(response.data))
+        } catch (error){
+          dispatch(getRepoDetailFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+        }
+      }
+
+      if(!repositoryData.id || repositoryData.id !== id){
+        fetchDetailRepo()
+      }
+
       setIsLoading(false);
     }
-  }, [router]);
+  }, [dispatch, router, repositoryData.id]);
 
   const formik = useFormik({
     initialValues: {
-      name: repositoryName,
-      description: '',
+      name: repositoryData.name,
+      description: repositoryData.description,
     },
     validationSchema: editRepositoryValidation,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       setIsLoading(true);
-      console.log(values);
-      setShowAlert(true);
-      setIsLoading(false);
+      try {
+        const token = Cookies.get('access_token');
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${repositoryData.id}/edit`, values, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setAlertSeverity('success');
+        setAlertLabel('Your changes to the repository settings have been successfully saved');
+        setShowAlert(true);
+        dispatch(changeRepoDetailSuccess(values));
+        setIsLoading(false);
+      } catch (error) {
+        setAlertSeverity('error')
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 401:
+              refresh('access_token', 'refresh_token', router)
+              setAlertLabel('Your session has been restored. Please Try Again.');
+              setShowAlert(true);
+              setIsLoading(false);
+              break;
+            case 'USER__NOT_ALLOWED':
+              setAlertLabel('You are not allowed to perform this action.');
+              setShowAlert(true);
+              break;
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
+        } else{
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
+        }
+        setIsLoading(false);
+      }
     } ,
   });
 
   const formikDialog = useFormik({
     initialValues: {
       name: '',
-      real_name: repositoryName,
+      real_name: repositoryData.name,
     },
     validationSchema: deleteRepositoryValidation,
     onSubmit: (values) => {
@@ -95,8 +158,8 @@ export default function GeneralSettingRepository() {
           />
           { !isLoading && showAlert &&
             <CustomAlert
-              severity={'success'}
-              label={'Your changes to the repository settings have been successfully saved'}
+              severity={alertSeverity}
+              label={alertLabel}
               onClose={handleClickShowAlert}
             /> 
           }
@@ -124,7 +187,7 @@ export default function GeneralSettingRepository() {
                 }, 
               }}
             >
-              Repository XYZ
+              {repositoryData.name}
             </Typography>
             <Box
               sx={{
@@ -488,7 +551,7 @@ export default function GeneralSettingRepository() {
                   color: theme.palette.dark_gray.main
                 }}
               /> 
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Delete ${repositoryName}`}</Typography>
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Delete ${repositoryData.name}`}</Typography>
               <Typography 
                 variant='form_sublabel_small' 
                 color='black.main'
@@ -499,7 +562,7 @@ export default function GeneralSettingRepository() {
                   }
                 }}
               >
-                This action <span className='bold'>cannot</span> be undone. This will permanently delete the <span className='bold'>{repositoryName}</span>, delete all <span className='bold'>documents</span> inside and remove all <span className='bold'>collaborator associations.</span>
+                This action <span className='bold'>cannot</span> be undone. This will permanently delete the <span className='bold'>{repositoryData.name}</span>, delete all <span className='bold'>documents</span> inside and remove all <span className='bold'>collaborator associations.</span>
               </Typography>
               <form 
                 onSubmit={formikDialog.handleSubmit} 
@@ -514,8 +577,8 @@ export default function GeneralSettingRepository() {
                 <FormInputDialog
                   id='name'            
                   name='name'
-                  label={["Please type ", <span key={1} className='bold'>{repositoryName}</span>,  " to confirm."]}
-                  placeholder={repositoryName}
+                  label={["Please type ", <span key={1} className='bold'>{repositoryData.name}</span>,  " to confirm."]}
+                  placeholder={repositoryData.name}
                   value={formikDialog.values.name}
                   onChange={formikDialog.handleChange}
                   onBlur={formikDialog.handleBlur}

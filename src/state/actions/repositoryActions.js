@@ -1,6 +1,6 @@
-export const getRepoListSuccess = (data) => {
+export const getRepoDetailSuccess = (data) => {
   return {
-    type: 'repoListSuccess',
+    type: 'repoDetailSuccess',
     payload: data,
   }
 }
@@ -12,9 +12,16 @@ export const getRepoCollaboratorListSuccess = (data) => {
   }
 }
 
-export const getRepoListFailed = (data) => {
+export const changeRepoDetailSuccess = (data) => {
   return {
-    type: 'repoListFailed',
+    type: 'changeRepoDetailSuccess',
+    payload: data,
+  }
+}
+
+export const getRepoDetailFailed = (data) => {
+  return {
+    type: 'repoDetailFailed',
     payload: data,
   }
 }

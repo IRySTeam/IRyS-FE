@@ -12,7 +12,7 @@ const initialState = {
 
 const repositoryReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'repoListSuccess':
+    case 'repoDetailSuccess':
       return {
         ...state,
         id: action.payload.id,
@@ -24,7 +24,7 @@ const repositoryReducer = (state = initialState, action) => {
         current_user_role: action.payload.current_user_role,
         error: null, 
       }; 
-    case 'repoListFailed': 
+    case 'repoDetailFailed': 
       return { 
         ...state, 
         id: null,
@@ -45,6 +45,12 @@ const repositoryReducer = (state = initialState, action) => {
       return {
         ...state,
         error: action.payload.error_code,
+      }; 
+    case 'changeRepoDetailSuccess':
+      return {
+        ...state,
+        name: action.payload.name,
+        description: action.payload.description,
       }; 
     default: 
       return state    
