@@ -27,7 +27,7 @@ export default function Search() {
   const [pagination, setPagination] = useState(page? page : 1);
   const [searchQuery, setSearchQuery] = useState(q? q: '');
   const [categoryQuery, setCategoryQuery] = useState(category? category : 'repo');
-  const repositoryData = useSelector(state => state.publicRepository);
+  const publicRepositoryData = useSelector(state => state.publicRepository);
   const singleRepositoryData = useSelector(state => state.singleRepository);
 
   useEffect(() => {
@@ -89,20 +89,20 @@ export default function Search() {
           <NavBar 
             setIsLoading={setIsLoading}
           />
-          { q && (( categoryQuery === 'repo' && repositoryData.total_items === 0) || ( categoryQuery === 'docs' && singleRepositoryData.documents.length === 0)) &&
+          { q && (( categoryQuery === 'repo' && publicRepositoryData.total_items === 0) || ( categoryQuery === 'docs' && singleRepositoryData.documents.length === 0)) &&
             <EmptySearch
               query={searchQuery} 
               category={categoryQuery}
             />
           }
-          { q && (( categoryQuery === 'repo' && repositoryData.total_items > 0) || ( categoryQuery === 'docs' && singleRepositoryData.documents.length > 0)) &&
+          { q && (( categoryQuery === 'repo' && publicRepositoryData.total_items > 0) || ( categoryQuery === 'docs' && singleRepositoryData.documents.length > 0)) &&
             <SuccessSearch
               query={searchQuery} 
               category={categoryQuery}
-              data={categoryQuery === 'repo' ? repositoryData.repositories : singleRepositoryData.documents}
+              data={categoryQuery === 'repo' ? publicRepositoryData.repositories : singleRepositoryData.documents}
               page={pagination}
               onChangePage={handleChangePage}
-              total_page={categoryQuery === 'repo' ? repositoryData.total_page : 1}
+              total_page={categoryQuery === 'repo' ? publicRepositoryData.total_page : 1}
             />
           }
           { !q &&  
