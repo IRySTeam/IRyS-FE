@@ -1,13 +1,13 @@
-export const getRepoListSuccess = (data) => {
+export const getJoinedRepoListSuccess = (data) => {
   return {
-    type: 'repoListSuccess',
+    type: 'joinedRepoListSuccess',
     payload: data,
   }
 }
 
-export const getRepoListFailed = (data) => {
+export const getJoinedRepoListFailed = (data) => {
   return {
-    type: 'repoListFailed',
+    type: 'joinedRepoListFailed',
     payload: data,
   }
 }

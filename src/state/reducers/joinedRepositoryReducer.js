@@ -6,9 +6,9 @@ const initialState = {
   error: null,
 }
 
-const repositoryReducer = (state = initialState, action) => {
+const joinedRepositoryReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'repoListSuccess':
+    case 'joinedRepoListSuccess':
       return {
         ...state,
         repositories: action.payload.results,
@@ -17,7 +17,7 @@ const repositoryReducer = (state = initialState, action) => {
         does_user_have_any_repos: action.payload.does_user_have_any_repos,
         error: null, 
       }; 
-    case 'repoListFailed': 
+    case 'joinedRepoListFailed': 
       return { 
         ...state, 
         repositories: [],
@@ -31,4 +31,4 @@ const repositoryReducer = (state = initialState, action) => {
   }
 }
 
-export default repositoryReducer;
+export default joinedRepositoryReducer;

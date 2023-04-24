@@ -15,7 +15,7 @@ import NavBar from '@/component/navbar';
 import SearchIcon from '@mui/icons-material/Search';
 import Dropdown from '@/component/dropdown';
 import RepositoryCard from '@/component/repository-card';
-import { getRepoListSuccess } from '@/state/actions/joinedRepositoryActions';
+import { getJoinedRepoListSuccess } from '@/state/actions/joinedRepositoryActions';
 import { typeOption, sortOption } from '@/constants/option';
 
 export default function Home() {
@@ -84,7 +84,7 @@ export default function Home() {
             Authorization: `Bearer ${token}`
           }
         })
-        dispatch(getRepoListSuccess(response.data))
+        dispatch(getJoinedRepoListSuccess(response.data))
       } catch (error){
         setAlertSeverity('error');
         setAlertLabel(`Network Error, Please try again`);
