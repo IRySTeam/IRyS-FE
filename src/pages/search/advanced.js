@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { Container, Button, Typography, Box } from '@mui/material';
+import { Container, Button, Typography, Box, OutlinedInput } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import SearchIcon from '@mui/icons-material/Search';
@@ -35,7 +35,7 @@ export default function AdvancedSearch() {
       score_threshold: '',
     },
   ])
-  const [cliQuery, setCliQuery] = useState('');
+  const [cliQuery, setCliQuery] = useState(advancedSearch.cliQuery ?? '');
 
   const addFilter = () => {
     const newFilter = {
@@ -81,7 +81,6 @@ export default function AdvancedSearch() {
   };
 
   const handleChangeDomain= (event) => {
-    console.log(event.target.value)
     setDomain(event.target.value);
   };
 
@@ -352,6 +351,40 @@ export default function AdvancedSearch() {
                 >
                   <Typography sx={{ color: 'white.main', typography: 'heading_h6',}}> Add Filter </Typography>
                 </Button>
+              </Box>
+            }
+            { mode === 'cli' &&
+              <Box
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column', 
+                  gap: '16px',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <Typography 
+                  sx={{ 
+                    color: 'black.main', 
+                    typography: 'heading_h3',
+                    [theme.breakpoints.down('tablet')]: {
+                      typography: 'heading_h4',
+                    }, 
+                  }}
+                >
+                  Terminal
+                </Typography>
+                <OutlinedInput
+                  id={'cli'}
+                  name={'cli'}
+                  placeholder={'Enter a command or query ...'}
+                  value={cliQuery}
+                  onChange={(event) => setCliQuery(event.target.value)}
+                  sx={{ width: '100%', borderRadius: '5px'}}
+                  multiline={true}
+                  minRows={12}
+                />
               </Box>
             }
             <Box
