@@ -134,12 +134,10 @@ export default function AdvancedSearch() {
                       borderColor: theme.palette.light_gray.main,
                       '&.Mui-selected':{
                         backgroundColor: theme.palette.primary.main,
-                        borderRadius: '5px',
                         borderColor: theme.palette.primary.main,
                       },
                       '&.Mui-selected:hover':{
                         backgroundColor: theme.palette.primary.main,
-                        borderRadius: '5px',
                         borderColor: theme.palette.primary.main,
                       }
                     }}
@@ -154,14 +152,13 @@ export default function AdvancedSearch() {
                       width: '60px',
                       backgroundColor: theme.palette.white.main,
                       borderColor: theme.palette.light_gray.main,
+                      borderRadius: '5px',
                       '&.Mui-selected':{
                         backgroundColor: theme.palette.primary.main,
-                        borderRadius: '5px',
                         borderColor: theme.palette.primary.main,
                       },
                       '&.Mui-selected:hover':{
                         backgroundColor: theme.palette.primary.main,
-                        borderRadius: '5px',
                         borderColor: theme.palette.primary.main,
                       }
                     }}
