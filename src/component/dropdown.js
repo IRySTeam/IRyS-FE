@@ -10,13 +10,13 @@ export default function Dropdown(props) {
   const [open, setOpen] = useState(false);
 
   return (
-    <FormControl sx={{minWidth: 180, height: 32, minHeight: 32, maxHeight: 32, padding: 0 }}>
+    <FormControl sx={{ ...props.sx, minWidth: props.width?? '180px', height: 32, minHeight: 32, maxHeight: 32, padding: 0 }}>
       <Select
         open={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
         value={props.value}
-        onChange={props.handleChange}
+        onChange={(event) => props.handleChange(event, props.id)}
         displayEmpty
         renderValue={(selected) => {
           return <Typography variant='heading_h6' color='black.main'>{selected === props.defaultValue ? props.placeholder : props.options.find(x => x.value === selected).label}</Typography>
@@ -24,7 +24,7 @@ export default function Dropdown(props) {
         sx={{
           '&& .MuiSelect-select' : {
             padding: '4px 16px',
-            backgroundColor: theme.palette.light_gray.light,
+            backgroundColor: props.backgroundColor ?? theme.palette.light_gray.light,
             borderColor: theme.palette.light_gray.main,
           },
         }}

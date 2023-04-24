@@ -82,7 +82,7 @@ export default function EmptyQuery(props) {
             backgroundColor: theme.palette.primary.main,
             borderRadius: '5px'
           }}
-          onClick={handleSearch}
+          onClick={() => handleSearch()}
         >
           <SearchIcon 
             sx={{

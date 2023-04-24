@@ -27,7 +27,7 @@ export default function Repository() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
   const [searchQuery, setSearchQuery] = useState(search? search : '');
-  const [sortQuery, setSortQuery] = useState(sort? sort : 'none');
+  const [sortQuery, setSortQuery] = useState(sort? sort : '');
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
@@ -35,7 +35,7 @@ export default function Repository() {
 
   const handleChangeSortQuery = (event) => {
     setSortQuery(event.target.value);
-    handleSearch(searchQuery, typeQuery, event.target.value);
+    handleSearch(searchQuery, event.target.value);
   };
 
   const handleKeyPress = (event) => {
@@ -45,26 +45,32 @@ export default function Repository() {
     }
   };
 
-  const handleSearch = (searchFilter = searchQuery, typeFilter = typeQuery, sortFilter = sortQuery) => {
-    router.push({ pathname: '/', query: { search : searchFilter, type: typeFilter, sort: sortFilter} })
+  const handleSearch = (searchFilter = searchQuery, sortFilter = sortQuery) => {
+    const { id } = router.query;
+    router.push({ pathname: '/repository', query: { id: id, search: searchFilter, sort: sortFilter } })
   }
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
+  const goToSetting = () => {
+    const { id } = router.query;
+    router.push({ pathname: '/repository/setting/general', query: { id: id} })
+  }
+
   const sortOption = [
-    { value: 'none', label: 'None'},
-    { value: 'last_updated', label: 'Last Updated'},
-    { value: 'alphabet', label: 'Name (A-Z)'},
+    { value: '', label: 'None'},
+    { value: 'updated_at', label: 'Last Updated'},
+    { value: 'name', label: 'Name (A-Z)'},
   ]
 
   useEffect(() => {
     setIsLoadingDocs(true);
     const filterArrayRepo = (array) => {
       const searchFilter = !search ? array : array.filter((repo) => repo.name.toLowerCase().includes(search.toLowerCase()))
-      const sortFilter = sortQuery === 'none'? searchFilter: searchFilter.sort((a, b) => {
-        if (sortQuery === 'last_updated') {
+      const sortFilter = sortQuery === ''? searchFilter: searchFilter.sort((a, b) => {
+        if (sortQuery === 'updated_at') {
           return b.last_updated - a.last_updated;
-        } else if (sortQuery === 'alphabet') {
+        } else if (sortQuery === 'name') {
           return a.name.localeCompare(b.name);
         }
       });
@@ -80,6 +86,16 @@ export default function Repository() {
       setIsLoadingDocs(false);
     }, 1000);
   }, [dispatch, search, sortQuery]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const { id } = router.query;
+    if(!id){
+      router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
+    }else{
+      setIsLoading(false);
+    }
+  }, [router]);
 
   return (
     <>
@@ -233,7 +249,7 @@ export default function Repository() {
                         backgroundColor: theme.palette.primary.main,
                         borderRadius: '5px'
                       }}
-                      onClick={handleSearch}
+                      onClick={() => handleSearch()}
                     >
                       <SearchIcon />
                     </Button>
@@ -286,7 +302,7 @@ export default function Repository() {
                       value={sortQuery}
                       handleChange={handleChangeSortQuery}
                       options={sortOption}
-                      defaultValue={'none'}
+                      defaultValue={''}
                     />
                   </Box>
                 </Box>
@@ -369,7 +385,10 @@ export default function Repository() {
                 }}
               >
                 <Typography sx={{ color: 'black.main', typography: 'heading_h4' }}>Setting</Typography>
-                <IconButton sx={{ padding: 0 }}>
+                <IconButton 
+                  sx={{ padding: 0 }}
+                  onClick={() => goToSetting()}
+                >
                   <SettingsIcon
                     sx={{
                       width: '24px',

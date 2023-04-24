@@ -23,7 +23,7 @@ export default function Home() {
   const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
   const tablet = useMediaQuery(theme.breakpoints.down('small'));
   const small = useMediaQuery(theme.breakpoints.down('desktop'));
-  const { search, type, sort, page, newRepository} = router.query;
+  const { search, type, sort, page, newRepository, deleteRepository} = router.query;
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -109,10 +109,18 @@ export default function Home() {
   useEffect(() => {
     if(newRepository){
       setAlertSeverity('success');
-      setAlertLabel(`Congratulations! Your new repository (${newRepository}) was successful created`);
+      setAlertLabel(`Congratulations! Your new repository (${newRepository}) was successfully created`);
       setShowAlert(true);
     }
   }, [newRepository]);
+
+  useEffect(() => {
+    if(deleteRepository){
+      setAlertSeverity('success');
+      setAlertLabel(`${deleteRepository} was successfully deleted`);
+      setShowAlert(true);
+    }
+  }, [deleteRepository]);
 
   return (
     <>
@@ -244,7 +252,7 @@ export default function Home() {
                     backgroundColor: theme.palette.primary.main,
                     borderRadius: '5px'
                   }}
-                  onClick={handleSearch}
+                  onClick={() => handleSearch()}
                 >
                   <SearchIcon />
                 </Button>
