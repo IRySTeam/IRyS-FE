@@ -106,6 +106,7 @@ export default function FilterCard(props) {
             backgroundColor: theme.palette.error.main,
             borderRadius: '5px',
           }}
+          onClick={props.onRemove}
         >
           <CloseIcon
             sx={{
@@ -123,6 +124,7 @@ export default function FilterCard(props) {
         options={filterOption}
         defaultValue={''}
         onChange={handleKeyChange}
+        required={true}
       />
       <FilterDropdown
         label="Operator"
@@ -131,12 +133,14 @@ export default function FilterCard(props) {
         options={operatorOption}
         defaultValue={''}
         onChange={handleOperatorChange}
+        required={true}
       />
       <FilterInput
         label="Value"
         placeholder="Enter filter value.."
         value={props.filter.value}
         onChange={handleValueChange}
+        required={true}
       />
       { props.filter.operator === 'semantic_search' &&
       <>
@@ -170,6 +174,13 @@ export default function FilterCard(props) {
         />
       </>
       }
+      <Box 
+        sx={{ 
+          height: '1px', 
+          width: '100%',
+          backgroundColor: theme.palette.light_gray.main
+        }}
+      />
     </Box>
   )
 }

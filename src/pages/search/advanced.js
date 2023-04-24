@@ -29,6 +29,15 @@ export default function AdvancedSearch() {
       top_n: '',
       score_threshold: '',
     },
+    {
+      key: '',
+      operator: '',
+      value: '',
+      model: '',
+      scoring_algorithm: '',
+      top_n: '',
+      score_threshold: '',
+    },
   ])
 
   const addFilter = () => {

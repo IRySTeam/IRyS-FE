@@ -13,7 +13,10 @@ export default function FilterInput(props) {
         alignItems: 'center',
       }}
     >
-      <Typography variant='heading_h5' color='black.main'>{props.label}</Typography>
+      <Typography variant='heading_h5' color='black.main'>
+        {props.label}
+        {props.required ? <span style={{color: theme.palette.error.main}}> *</span> : <></>}
+      </Typography>
       <OutlinedInput
         id='filterInput'
         name='filterInput'

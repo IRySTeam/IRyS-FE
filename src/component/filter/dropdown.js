@@ -19,7 +19,10 @@ export default function FilterDropdown(props) {
         alignItems: 'center',
       }}
     >
-      <Typography variant='heading_h5' color='black.main'>{props.label}</Typography>
+      <Typography variant='heading_h5' color='black.main'>
+        {props.label}
+        {props.required ? <span style={{color: theme.palette.error.main}}> *</span> : <></>}
+      </Typography>
       <FormControl 
         sx={{
           minWidth: {mobile: 'calc(100% - 133px)', mobile_l: 'calc(100% - 199px)', tablet: 'calc(100% - 248px)'}, 
