@@ -29,6 +29,7 @@ export default function FilterInput(props) {
             display: 'flex',
             justifyContent: 'center',
             typography: theme.typography.paragraph_h6,
+            color: props.value === '' ? 'dark_gray.main' : 'black.main',
             backgroundColor: theme.palette.white.main,
             border: '1px solid',
             borderColor: theme.palette.light_gray.main,

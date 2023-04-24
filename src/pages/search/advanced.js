@@ -19,17 +19,50 @@ export default function AdvancedSearch() {
   const [path, setPath] = useState('');
   const [keyword, setKeyword] = useState('');
   const [domain, setDomain] = useState('');
-  const [filter, setFilter] = useState([
+  const [filters, setFilters] = useState([
     {
       key: '',
       operator: '',
       value: '',
       model: '',
       scoring_algorithm: '',
-      top_n: null,
-      score_threshold: null,
+      top_n: '',
+      score_threshold: '',
     },
   ])
+
+  const addFilter = () => {
+    const newFilter = {
+      key: '',
+      operator: '',
+      value: '',
+      model: '',
+      scoring_algorithm: '',
+      top_n: '',
+      score_threshold: '',
+    }
+    setFilters([...filters, newFilter]);
+  };
+
+  const removeFilter = (index) => {
+    const newFilters = [...filters];
+    newFilters.splice(index, 1);
+    setFilters(newFilters);
+  };
+
+  const updateFilter = (index, key, operator, value, model, scoring_algorithm, top_n, score_threshold ) => {
+    const newFilters = [...filters];
+    newFilters[index] = { 
+      key: key,
+      operator: operator,
+      value: value,
+      model: model,
+      scoring_algorithm: scoring_algorithm,
+      top_n: top_n,
+      score_threshold: score_threshold,
+    };
+    setFilters(newFilters);
+  };
 
   const handleChangeMode = (event, newMode) => {
     if (newMode !== null) {
@@ -164,6 +197,7 @@ export default function AdvancedSearch() {
                       backgroundColor: theme.palette.white.main,
                       borderColor: theme.palette.light_gray.main,
                       borderRadius: '5px',
+                      borderLeft: '1px solid #CCCCCC !important',
                       '&.Mui-selected':{
                         backgroundColor: theme.palette.primary.main,
                         borderColor: theme.palette.primary.main,
@@ -185,6 +219,7 @@ export default function AdvancedSearch() {
                       backgroundColor: theme.palette.white.main,
                       borderColor: theme.palette.light_gray.main,
                       borderRadius: '5px',
+                      borderLeft: '1px solid #CCCCCC !important',
                       '&.Mui-selected':{
                         backgroundColor: theme.palette.primary.main,
                         borderColor: theme.palette.primary.main,
@@ -210,6 +245,7 @@ export default function AdvancedSearch() {
                   <FilterDropdown
                     label="Domain"
                     placeholder="Select a domain.."
+                    defaultValue=''
                     value={domain}
                     options={domainOption}
                     onChange={handleChangeDomain}
@@ -246,11 +282,15 @@ export default function AdvancedSearch() {
                     backgroundColor: theme.palette.light_gray.main
                   }}
                 />
-                {filter.map((f, index) => (
+                {filters.map((f, index) => (
                   <FilterCard 
                     key={index}
                     filter={f}
                     order={index}
+                    onRemove={() => removeFilter(index)}
+                    onChange={
+                      (key, operator, value, model, scoring_algorithm, top_n, score_threshold) => updateFilter(index, key, operator, value, model, scoring_algorithm, top_n, score_threshold)
+                    }
                   />
                 ))}
               </Box>

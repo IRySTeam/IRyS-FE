@@ -57,3 +57,15 @@ export const operatorOption = [
   { value: 'not_contains', label: 'NOT CONTAINS', desc: 'Finds documents that does not contain certain keywords'},
   { value: 'semantic_search', label: 'SEMANTIC SEARCH', desc: 'Filters documents with an additional layer of semantic search on the specific metadata/entity'},
 ]
+
+export const modelOption = [
+  { value: '', label: 'None'},
+  { value: 'ner', label: 'NER'},
+  { value: 'bert', label: 'BERT'},
+]
+
+export const scoringAlgorithmOption = [
+  { value: '', label: 'None'},
+  { value: 'svm', label: 'SVM'},
+  { value: 'knn', label: 'KNN'},
+]
