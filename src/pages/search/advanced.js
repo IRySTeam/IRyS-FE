@@ -8,7 +8,8 @@ import Loading from '@/component/loading';
 import NavBar from '@/component/navbar';
 import FilterInput from '@/component/filter/input';
 import FilterDropdown from '@/component/filter/dropdown';
-import { domainOption } from '@/data/domains';
+import FilterCard from '@/component/filter/card';
+import { domainOption } from '@/constants/option';
 
 export default function AdvancedSearch() {
   const theme = useTheme();
@@ -18,7 +19,17 @@ export default function AdvancedSearch() {
   const [path, setPath] = useState('');
   const [keyword, setKeyword] = useState('');
   const [domain, setDomain] = useState('');
-  const [filter, setFilter] = useState([{}])
+  const [filter, setFilter] = useState([
+    {
+      key: '',
+      operator: '',
+      value: '',
+      model: '',
+      scoring_algorithm: '',
+      top_n: null,
+      score_threshold: null,
+    },
+  ])
 
   const handleChangeMode = (event, newMode) => {
     if (newMode !== null) {
@@ -165,6 +176,27 @@ export default function AdvancedSearch() {
                   >
                     <Typography sx={{ color: mode === 'cli' ? 'white.main' : 'black.main', typography: 'heading_h6',}}>CLI</Typography>
                   </ToggleButton>
+                  <ToggleButton 
+                    value="file"
+                    sx={{
+                      padding: 0,
+                      height: '35px',
+                      width: '60px',
+                      backgroundColor: theme.palette.white.main,
+                      borderColor: theme.palette.light_gray.main,
+                      borderRadius: '5px',
+                      '&.Mui-selected':{
+                        backgroundColor: theme.palette.primary.main,
+                        borderColor: theme.palette.primary.main,
+                      },
+                      '&.Mui-selected:hover':{
+                        backgroundColor: theme.palette.primary.main,
+                        borderColor: theme.palette.primary.main,
+                      }
+                    }}
+                  >
+                    <Typography sx={{ color: mode === 'file' ? 'white.main' : 'black.main', typography: 'heading_h6',}}>File</Typography>
+                  </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
               { mode === 'basic' &&
@@ -185,6 +217,44 @@ export default function AdvancedSearch() {
                 </>
               }
             </Box>
+            { mode === 'basic' &&
+              <Box
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column', 
+                  gap: '16px',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start',
+              }}
+              >
+                <Typography 
+                  sx={{ 
+                    color: 'black.main', 
+                    typography: 'heading_h4',
+                    [theme.breakpoints.down('tablet')]: {
+                      typography: 'heading_h5',
+                    }, 
+                  }}
+                >
+                  Filter Options
+                </Typography>
+                <Box 
+                  sx={{ 
+                    height: '1px', 
+                    width: '100%',
+                    backgroundColor: theme.palette.light_gray.main
+                  }}
+                />
+                {filter.map((f, index) => (
+                  <FilterCard 
+                    key={index}
+                    filter={f}
+                    order={index}
+                  />
+                ))}
+              </Box>
+            }
           </Container>
         </> 
       }
