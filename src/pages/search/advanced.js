@@ -302,6 +302,19 @@ export default function AdvancedSearch() {
                     }
                   />
                 ))}
+                <Button 
+                  color='primary' 
+                  variant='contained' 
+                  sx={{ 
+                    height: '32px',
+                    width: '150px',
+                    typography: theme.typography.heading_h6,
+                    alignSelf: 'flex-end'
+                  }}
+                  onClick={() => addFilter()}
+                >
+                  <Typography sx={{ color: 'white.main', typography: 'heading_h6',}}> Add Filter </Typography>
+                </Button>
               </Box>
             }
           </Container>
