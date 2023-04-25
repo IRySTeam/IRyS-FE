@@ -17,6 +17,7 @@ import { documentList } from '@/data/documents';
 import { repositoryFilled } from '@/data/repository';
 import { getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import DocumentCard from '@/component/document-card';
+import { sortOption } from '@/constants/option';
 
 export default function Repository() {
   const theme = useTheme();
@@ -56,12 +57,6 @@ export default function Repository() {
     const { id } = router.query;
     router.push({ pathname: '/repository/setting/general', query: { id: id} })
   }
-
-  const sortOption = [
-    { value: '', label: 'None'},
-    { value: 'updated_at', label: 'Last Updated'},
-    { value: 'name', label: 'Name (A-Z)'},
-  ]
 
   useEffect(() => {
     setIsLoadingDocs(true);
@@ -278,7 +273,7 @@ export default function Repository() {
                         justifyContent: {mobile: 'center', tablet:'space-between'},
                         alignItems: 'center',
                       }}
-                      onClick={() => router.push({ pathname: '/search/advanced' })}
+                      onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath, origin: router.pathname } })}
                     >
                       <Typography
                         sx={{ 

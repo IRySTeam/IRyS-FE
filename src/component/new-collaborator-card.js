@@ -4,17 +4,12 @@ import { Box, Typography, IconButton } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import CloseIcon from '@mui/icons-material/Close';
 import Dropdown from './dropdown';
+import { newRoleOption } from '@/constants/option';
 
 export default function NewCollaboratorCard(props) {
   const theme = useTheme();
   const mobile_l = useMediaQuery(theme.breakpoints.down('tablet'));
   const mobile = useMediaQuery(theme.breakpoints.down('mobile_l'));
-
-  const newRoleOption = [
-    { value: 'admin', label: 'Admin'},
-    { value: 'uploader', label: 'Uploader'},
-    { value: 'viewer', label: 'Viewer'},
-  ]
 
   return (
     <Box

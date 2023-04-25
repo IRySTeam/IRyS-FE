@@ -16,6 +16,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import Dropdown from '@/component/dropdown';
 import RepositoryCard from '@/component/repository-card';
 import { getRepoListSuccess } from '@/state/actions/repositoryActions';
+import { typeOption, sortOption } from '@/constants/option';
 
 export default function Home() {
   const theme = useTheme();
@@ -64,18 +65,6 @@ export default function Home() {
     setPagination(value);
     router.push({ pathname: '/', query: { search : searchQuery, type: typeQuery, sort: sortQuery, page: value} })
   };
-
-  const typeOption = [
-    { value: '', label: 'All'},
-    { value: 'public', label: 'Public'},
-    { value: 'private', label: 'Private'},
-  ]
-
-  const sortOption = [
-    { value: '', label: 'None'},
-    { value: 'updated_at', label: 'Last Updated'},
-    { value: 'name', label: 'Name (A-Z)'},
-  ]
 
   useEffect(() => {
     setIsLoadingRepo(true);

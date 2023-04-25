@@ -2,17 +2,10 @@ import { useTheme } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import Dropdown from './dropdown';
+import { roleOption } from '@/constants/option';
 
 export default function CollaboratorCard(props) {
   const theme = useTheme();
-
-  const roleOption = [
-    { value: 'owner', label: 'Owner'},
-    { value: 'admin', label: 'Admin'},
-    { value: 'uploader', label: 'Uploader'},
-    { value: 'viewer', label: 'Viewer'},
-  ]
-
   return (
     <Box
       sx={{
