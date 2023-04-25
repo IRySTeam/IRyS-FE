@@ -47,3 +47,10 @@ export const addNewCollaboratorToRepo = (data) => {
     payload: data,
   }
 }
+
+export const changeCollaboratorRoleInRepo = (data) => {
+  return {
+    type: 'changeCollaboratorRoleInRepo',
+    payload: data,
+  }
+}

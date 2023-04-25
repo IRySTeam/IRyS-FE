@@ -20,7 +20,7 @@ import CollaboratorCard from '@/component/collaborator-card';
 import SearchableSelect from '@/component/searchable-select';
 import NewCollaboratorCard from '@/component/new-collaborator-card';
 import Cookies from 'js-cookie';
-import { addNewCollaboratorToRepo } from '@/state/actions/repositoryActions';
+import { addNewCollaboratorToRepo, changeCollaboratorRoleInRepo } from '@/state/actions/repositoryActions';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
@@ -67,18 +67,63 @@ export default function CollaboratorsSettingRepository() {
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
-  const handleRoleChanged = (event, id) => {
-    if(id !== 3){
-      console.log(`Change collaborators with id ${id} role to ${event.target.value}`)
+  const handleRoleChanged = async (event, index) => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : repositoryData.collaborators[index].id,
+        role : event.target.value
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members/edit`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const newData = {
+        order: index,
+        newCollaborator: repositoryData.collaborators[index],
+        role: event.target.value,
+      }
+      dispatch(changeCollaboratorRoleInRepo(newData));
       setAlertSeverity('success')
       setAlertLabel('Role updated successfully')
       setShowAlert(true)
-    } else {
-      console.log(`Failed to change collaborators with id ${id}`)
-      setAlertSeverity('error')
-      setAlertLabel('Failed to update role')
       setShowAlert(true)
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found. Please try again.');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__INVALID_COLLABORATOR':
+            setAlertLabel('Invalid collaborator.');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Failed to update role');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Failed to update role');
+        setShowAlert(true);
+      }
     }
+    setIsLoading(false);
   }
 
   const handleNewCollaboratorRoleChange = (event, id) => {
@@ -308,6 +353,7 @@ export default function CollaboratorsSettingRepository() {
                     {repositoryData.collaborators.map((collaborator, index) => (
                       <CollaboratorCard 
                         key={index}
+                        order={index}
                         item={collaborator}
                         onRoleChange={handleRoleChanged}
                         onRemoveAccess={() => handleClickOpenRemoveAccess(index)}

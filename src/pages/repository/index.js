@@ -62,6 +62,11 @@ export default function Repository() {
     router.push({ pathname: '/repository/setting/general', query: { id: id} })
   }
 
+  const goToCollaboratorSetting = () => {
+    const { id } = router.query;
+    router.push({ pathname: '/repository/setting/collaborators', query: { id: id} })
+  }
+
   useEffect(() => {
     setIsLoadingDocs(true);
     const filterArrayRepo = (array) => {
@@ -570,6 +575,7 @@ export default function Repository() {
                     width: '100%',
                     typography: theme.typography.heading_h6,
                   }}
+                  onClick={() => goToCollaboratorSetting()}
                 >
                   <Typography sx={{ color: 'white.main', typography: 'heading_h6',}}> Manage Collaborators </Typography>
                 </Button>
