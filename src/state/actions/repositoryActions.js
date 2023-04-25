@@ -39,3 +39,11 @@ export const getRepoCollaboratorListFailed = (data) => {
     payload: data,
   }
 }
+
+
+export const addNewCollaboratorToRepo = (data) => {
+  return {
+    type: 'addCollaboratorToRepo',
+    payload: data,
+  }
+}

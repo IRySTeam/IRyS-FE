@@ -56,7 +56,19 @@ const repositoryReducer = (state = initialState, action) => {
       return {
         ...state,
         is_public: action.payload.is_public,
-      }; 
+      };
+    case 'addCollaboratorToRepo':
+      const newCollaborator = {
+        id: action.payload.newCollaborator.id,
+        first_name: action.payload.newCollaborator.first_name,
+        last_name: action.payload.newCollaborator.last_name,
+        email: action.payload.newCollaborator.email,
+        role: action.payload.role,
+      }
+      return{
+        ...state,
+        collaborators: [...state.collaborators, newCollaborator]
+      };
     default: 
       return state    
   }

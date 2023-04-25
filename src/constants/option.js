@@ -1,14 +1,14 @@
 export const roleOption = [
-  { value: 'owner', label: 'Owner'},
-  { value: 'admin', label: 'Admin'},
-  { value: 'uploader', label: 'Uploader'},
-  { value: 'viewer', label: 'Viewer'},
+  { value: 'Owner', label: 'Owner'},
+  { value: 'Admin', label: 'Admin'},
+  { value: 'Uploader', label: 'Uploader'},
+  { value: 'Viewer', label: 'Viewer'},
 ]
 
 export const newRoleOption = [
-  { value: 'admin', label: 'Admin'},
-  { value: 'uploader', label: 'Uploader'},
-  { value: 'viewer', label: 'Viewer'},
+  { value: 'Admin', label: 'Admin'},
+  { value: 'Uploader', label: 'Uploader'},
+  { value: 'Viewer', label: 'Viewer'},
 ]
 
 export const domainOption = [

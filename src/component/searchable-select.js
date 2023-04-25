@@ -33,23 +33,22 @@ export default function SearchableSelect(props) {
         page_size: 10,
       }
       try {
-        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/users/search`, {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${props.repoId}/members/add/search`, {
           params : data,
           headers: {
             Authorization: `Bearer ${token}`
           },
           signal: abortController.signal
         })
-        console.log(response)
         setOptions(response.data.results)
       } catch (error){
-        console.log(error)
+        if(error.code !== 'ERR_CANCELED')console.log(error)
       }
     }
     fetchUsers()
     setLoading(false)
     return () => abortController.abort();
-  }, [props.inputValue]);
+  }, [props.inputValue, props.repoId]);
 
   return (
     <Autocomplete

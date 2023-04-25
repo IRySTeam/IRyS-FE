@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
+import axios from 'axios';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
+import { useSelector, useDispatch } from 'react-redux';
 import { Container, Box, Typography, Button, IconButton} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -17,10 +19,13 @@ import { collaborators } from '@/data/collaborators';
 import CollaboratorCard from '@/component/collaborator-card';
 import SearchableSelect from '@/component/searchable-select';
 import NewCollaboratorCard from '@/component/new-collaborator-card';
+import Cookies from 'js-cookie';
+import { addNewCollaboratorToRepo } from '@/state/actions/repositoryActions';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
   const router = useRouter();
+  const dispatch = useDispatch();
   const { id } = router.query;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -32,8 +37,9 @@ export default function CollaboratorsSettingRepository() {
   const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(1);
   const repositoryName = 'Repository XYZ'
   const [newCollaborator, setNewCollaborator] = useState(null);
-  const [newCollaboratorRole, setNewCollaboratorRole] = useState('viewer');
+  const [newCollaboratorRole, setNewCollaboratorRole] = useState('Viewer');
   const [searchUsers, setSearchUsers] = useState('');
+  const repositoryData = useSelector(state => state.repository);
   
   useEffect(() => {
     setIsLoading(true);
@@ -84,13 +90,63 @@ export default function CollaboratorsSettingRepository() {
     setNewCollaboratorRole('viewer')
   }
 
-  const addToRepo = () => {
-    console.log(`Added ${newCollaborator.first_name} ${newCollaborator.last_name} to my repository`)
-    setNewCollaborator(null)
-    setNewCollaborator('viewer')
-    setAlertSeverity('success')
-    setAlertLabel('A new collaborator has been successfully added')
-    setShowAlert(true)
+  const addToRepo = async () => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : newCollaborator.id,
+        role : newCollaboratorRole
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members/add`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const newData = {
+        newCollaborator: newCollaborator,
+        role: newCollaboratorRole,
+      }
+      dispatch(addNewCollaboratorToRepo(newData));
+      setNewCollaborator(null)
+      setNewCollaboratorRole('Viewer')
+      setAlertSeverity('success')
+      setAlertLabel('A new collaborator has been successfully added')
+      setShowAlert(true)
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found. Please try again.');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__DUPLICATE_COLLABORATOR':
+            setAlertLabel('User is already a collaborator of this repository');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
+    }
+    setIsLoading(false);
     handleCloseAddCollaborator()
   }
 
@@ -249,7 +305,7 @@ export default function CollaboratorsSettingRepository() {
                       }, 
                     }}
                   >
-                    {collaborators.map((collaborator, index) => (
+                    {repositoryData.collaborators.map((collaborator, index) => (
                       <CollaboratorCard 
                         key={index}
                         item={collaborator}
@@ -396,6 +452,7 @@ export default function CollaboratorsSettingRepository() {
               /> 
               <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Add a collaborator to ${repositoryName}`}</Typography>
               <SearchableSelect 
+                repoId={id}
                 value={newCollaborator}
                 onChange={(event, newValue) => {
                   setNewCollaborator(newValue);
