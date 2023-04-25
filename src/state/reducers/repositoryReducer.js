@@ -82,6 +82,13 @@ const repositoryReducer = (state = initialState, action) => {
         ...state,
         collaborators: newCollaborators
       };
+    case 'removeCollaborator':
+      const newCollaboratorList = [...state.collaborators]
+      newCollaboratorList.splice(action.payload.index, 1);
+      return{
+        ...state,
+        collaborators: newCollaboratorList
+      };
     default: 
       return state    
   }

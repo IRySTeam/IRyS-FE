@@ -54,3 +54,10 @@ export const changeCollaboratorRoleInRepo = (data) => {
     payload: data,
   }
 }
+
+export const removeCollaboratorInRepo = (data) => {
+  return {
+    type: 'removeCollaborator',
+    payload: data,
+  }
+}

@@ -15,12 +15,11 @@ import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import SettingRepositoryTabs from '@/component/tabs/setting-repository';
 import CustomAlert from '@/component/custom-alert';
-import { collaborators } from '@/data/collaborators';
 import CollaboratorCard from '@/component/collaborator-card';
 import SearchableSelect from '@/component/searchable-select';
 import NewCollaboratorCard from '@/component/new-collaborator-card';
 import Cookies from 'js-cookie';
-import { addNewCollaboratorToRepo, changeCollaboratorRoleInRepo } from '@/state/actions/repositoryActions';
+import { addNewCollaboratorToRepo, changeCollaboratorRoleInRepo, removeCollaboratorInRepo } from '@/state/actions/repositoryActions';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
@@ -34,7 +33,7 @@ export default function CollaboratorsSettingRepository() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Role updated successfully');
-  const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(1);
+  const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(0);
   const repositoryName = 'Repository XYZ'
   const [newCollaborator, setNewCollaborator] = useState(null);
   const [newCollaboratorRole, setNewCollaboratorRole] = useState('Viewer');
@@ -44,24 +43,66 @@ export default function CollaboratorsSettingRepository() {
   useEffect(() => {
     setIsLoading(true);
     const { id } = router.query;
-    if(!id){
-      // router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
-    }else{
-      setIsLoading(false);
-    }
+    if(id) setIsLoading(false);
   }, [router]);
 
-  const handleClickOpenRemoveAccess = (id) => {
-    setCurrentRemoveAccessId(id);
+  const handleClickOpenRemoveAccess = (index) => {
+    setCurrentRemoveAccessId(index);
     setIsRemoveAccessModalOpen(true);
   };
   const handleCloseRemoveAccess = () => {setIsRemoveAccessModalOpen(false);};
   const handleClickOpenAddCollaborator = () => {setIsAddCollaboratorModalOpen(true);};
   const handleCloseAddCollaborator = () => {setIsAddCollaboratorModalOpen(false);};
-  const handleChangeRemoveAccess = () => {
-    setAlertSeverity('success')
-    setAlertLabel(`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name} has been removed`)
-    setShowAlert(true)
+  const handleChangeRemoveAccess = async () => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : repositoryData.collaborators[currentRemoveAccessId].id,
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members/remove`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const newData = {
+        index: currentRemoveAccessId,
+      }
+      dispatch(removeCollaboratorInRepo(newData));
+      setCurrentRemoveAccessId(0);
+      setAlertSeverity('success')
+      setAlertLabel(`${repositoryData.collaborators[currentRemoveAccessId].first_name} ${repositoryData.collaborators[currentRemoveAccessId].last_name} has been removed`)
+      setShowAlert(true)
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found. Please try again.');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Failed to remove collaborator');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Failed to remove collaborator');
+        setShowAlert(true);
+      }
+    }
+    setIsLoading(false);
     handleCloseRemoveAccess();
   }
 
@@ -415,7 +456,7 @@ export default function CollaboratorsSettingRepository() {
                   color: theme.palette.dark_gray.main
                 }}
               />  
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>Remove {`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name}`} from this repository</Typography>
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>Remove {`${repositoryData.collaborators[currentRemoveAccessId].first_name} ${repositoryData.collaborators[currentRemoveAccessId].last_name}`} from this repository</Typography>
               <Typography 
                 variant='form_sublabel_small' 
                 color='black.main'
@@ -426,7 +467,7 @@ export default function CollaboratorsSettingRepository() {
                   }
                 }}
               >
-                Once removed, <span className='bold'>{`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name}`}</span> will no longer have direct access to this repository.
+                Once removed, <span className='bold'>{`${repositoryData.collaborators[currentRemoveAccessId].first_name} ${repositoryData.collaborators[currentRemoveAccessId].last_name}`}</span> will no longer have direct access to this repository.
               </Typography>
               <Button 
                 color='danger_button' 
