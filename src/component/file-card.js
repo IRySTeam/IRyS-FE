@@ -8,10 +8,11 @@ import Image from 'next/image';
 
 export default function FileCard(props) {
   const [progress, setProgress] = useState(0)
+  console.log(props)
   const theme = useTheme();
   useEffect(() => {
     const timer = setTimeout(() => {
-      setProgress(props.progress);
+      setProgress(props.progress??0);
     }, 500);
     return () => clearTimeout(timer);
   }, [props.progress]);
@@ -42,12 +43,30 @@ export default function FileCard(props) {
           gap: '8px',
         }}
       >
-        <Image 
-          src={'/pdf-icon.svg'} 
-          alt='file-icon' 
-          width={54} 
-          height={54}
-        />
+        { props.type === 'text/plain' &&
+          <Image 
+            src={'/txt-icon.svg'} 
+            alt='txt-icon' 
+            width={54} 
+            height={54}
+          />
+        }
+        { (props.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.type === 'application/msword') &&
+          <Image 
+            src={'/doc-icon.svg'} 
+            alt='doc-icon' 
+            width={54} 
+            height={54}
+          />
+        }
+        { props.type === 'application/pdf' &&
+          <Image 
+            src={'/pdf-icon.svg'} 
+            alt='pdf-icon' 
+            width={54} 
+            height={54}
+          />
+        }
         <Box
           sx={{
             width: 'calc(100% - 62px)',
@@ -87,18 +106,19 @@ export default function FileCard(props) {
           </Box>        
         </Box>
       </Box>
-        <IconButton
-          sx={{ padding: 0, }}
-          onClick={props.onDelete}
-        >
-          <CloseIcon
-            sx={{
-              width: {mobile: '16px', tablet: '32px'},
-              height: {mobile: '16px', tablet: '32px'},
-              color: theme.palette.dark_gray.main,
-            }}
-          />
-        </IconButton>
+      <IconButton
+        sx={{ padding: 0, }}
+        onClick={props.onDelete}
+      >
+        <CloseIcon
+          sx={{
+            width: {mobile: '16px', tablet: '32px'},
+            height: {mobile: '16px', tablet: '32px'},
+            color: theme.palette.dark_gray.main,
+          }}
+        />
+      </IconButton>
+      {props.error}
     </Box>
   )
 }

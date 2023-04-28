@@ -12,7 +12,8 @@ export default function Uploader(props) {
   const [files, setFiles] = useState([]);
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
-    const mappedAcc = acceptedFiles.map((file) => ({ file, errors: [], fileType: file.type }))
+    const mappedAcc = acceptedFiles.map((file) => ({ file, errors: [] }))
+    const mappedRej = rejectedFiles.map((file) => ({ file, errors: [] }))
 
     mappedAcc.forEach((fileWrapper) => {
       const reader = new FileReader();
@@ -23,6 +24,8 @@ export default function Uploader(props) {
 
         setFiles((curr) =>
           curr.map((f) => {
+            if(f.errors.length>0) return
+
             if (f.file === fileWrapper.file) {
               return { ...f, progress, loaded, total };
             } else {
@@ -31,12 +34,25 @@ export default function Uploader(props) {
           })
         );
       };
-
       reader.readAsDataURL(fileWrapper.file);
     });
 
-    setFiles((curr) => [...curr,  ...mappedAcc, ...rejectedFiles])
-  }, [])
+    mappedRej.forEach((fileWrapper) => {
+      if(fileWrapper.file.errors.length>0){
+        const code = fileWrapper.file.errors[0].code
+        props.setAlertSeverity('error')
+        if(code === 'file-invalid-type'){
+          props.setAlertLabel('Invalid file types. Only PDF, TXT, and DOCX file types are allowed.');
+        } else if(code === 'too-many-files'){
+          props.setAlertLabel('Sorry, only one file can be uploaded at a time.');
+        } else {
+          props.setAlertLabel('Upload error. Please Try Again.');
+        }
+        props.setShowAlert(true);
+      }
+    });
+    setFiles(() => [...mappedAcc])
+  }, [props])
 
   const removeFiles = (index) => {
     const newFiles = [...files];
@@ -53,6 +69,8 @@ export default function Uploader(props) {
       'application/pdf': ['.pdf'],
     },
     maxSize: 30000 * 1024,
+    maxFiles: props.maxFiles ?? 0,
+    multiple: !(props.maxFiles === 1),
   })
   
   const formik = useFormik({
@@ -149,6 +167,7 @@ export default function Uploader(props) {
             loaded={fileWrapper.loaded}
             total={fileWrapper.total}
             onDelete={() => removeFiles(index)}
+            error={fileWrapper.error}
           />
         ))}
       </Box>

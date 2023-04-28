@@ -14,6 +14,7 @@ import FilterCard from '@/component/filter/card';
 import { domainOption } from '@/constants/option';
 import { resetFilterAdvancedSearch, saveAdvancedSearchBasic, saveAdvancedSearchCli } from '@/state/actions/filterAction';
 import Uploader from '@/component/uploader';
+import CustomAlert from '@/component/custom-alert';
 
 export default function AdvancedSearch() {
   const theme = useTheme();
@@ -23,6 +24,9 @@ export default function AdvancedSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState('basic');
   const [path, setPath] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState('error');
+  const [alertLabel, setAlertLabel] = useState('Upload File Error');
   const [keyword, setKeyword] = useState(advancedSearch.keyword ?? '');
   const [domain, setDomain] = useState(advancedSearch.domain ?? '');
   const [filters, setFilters] = useState( advancedSearch.filters ?? [
@@ -106,6 +110,8 @@ export default function AdvancedSearch() {
     redirectBack()
   }
 
+  const handleClickShowAlert= () => setShowAlert((show) => !show);
+
   useEffect(() => {
     const { from, origin } = router.query;
     if(from && origin) {
@@ -138,6 +144,13 @@ export default function AdvancedSearch() {
           <NavBar 
             setIsLoading={setIsLoading}
           />
+          { showAlert &&
+            <CustomAlert
+              severity={alertSeverity}
+              label={alertLabel}
+              onClose={handleClickShowAlert}
+            /> 
+          }
           <Container 
             sx={{
               padding: '40px 24px', 
@@ -389,7 +402,12 @@ export default function AdvancedSearch() {
               </Box>
             }
             { mode === 'file' &&
-              <Uploader/>
+              <Uploader
+                maxFiles={1}
+                setShowAlert={setShowAlert}
+                setAlertSeverity={setAlertSeverity}
+                setAlertLabel={setAlertLabel}
+              />
             }
             <Box
               sx= {{
