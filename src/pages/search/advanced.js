@@ -13,6 +13,7 @@ import FilterDropdown from '@/component/filter/dropdown';
 import FilterCard from '@/component/filter/card';
 import { domainOption } from '@/constants/option';
 import { resetFilterAdvancedSearch, saveAdvancedSearchBasic, saveAdvancedSearchCli } from '@/state/actions/filterAction';
+import Uploader from '@/component/uploader';
 
 export default function AdvancedSearch() {
   const theme = useTheme();
@@ -386,6 +387,9 @@ export default function AdvancedSearch() {
                   minRows={12}
                 />
               </Box>
+            }
+            { mode === 'file' &&
+              <Uploader/>
             }
             <Box
               sx= {{
