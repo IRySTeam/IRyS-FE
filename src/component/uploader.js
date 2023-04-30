@@ -1,19 +1,22 @@
-import { useCallback, useState} from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone'
 import { useTheme } from '@mui/material/styles';
 import { useFormik } from 'formik';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FileCard from './file-card';
+import ErrorFileCard from './error-file-card';
+import SearchIcon from '@mui/icons-material/Search';
 
 export default function Uploader(props) {
   const theme = useTheme();
 
   const [files, setFiles] = useState([]);
+  const [isUploadError, setIsUploadError] = useState(false);
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     const mappedAcc = acceptedFiles.map((file) => ({ file, errors: [] }))
-    const mappedRej = rejectedFiles.map((file) => ({ file, errors: [] }))
+    const mappedRej = rejectedFiles.map((file) => ({ ...file }))
 
     mappedAcc.forEach((fileWrapper) => {
       const reader = new FileReader();
@@ -37,22 +40,13 @@ export default function Uploader(props) {
       reader.readAsDataURL(fileWrapper.file);
     });
 
-    mappedRej.forEach((fileWrapper) => {
-      if(fileWrapper.file.errors.length>0){
-        const code = fileWrapper.file.errors[0].code
-        props.setAlertSeverity('error')
-        if(code === 'file-invalid-type'){
-          props.setAlertLabel('Invalid file types. Only PDF, TXT, and DOCX file types are allowed.');
-        } else if(code === 'too-many-files'){
-          props.setAlertLabel('Sorry, only one file can be uploaded at a time.');
-        } else {
-          props.setAlertLabel('Upload error. Please Try Again.');
-        }
-        props.setShowAlert(true);
-      }
-    });
-    setFiles(() => [...mappedAcc])
-  }, [props])
+    setFiles((curr) => [...curr, ...mappedAcc, ...mappedRej])
+  }, [])
+
+  useEffect(() => {
+    console.log(files);
+    setIsUploadError(files.some((file) => file.errors && file.errors.length > 0) || files.length === 0);
+  }, [files]);
 
   const removeFiles = (index) => {
     const newFiles = [...files];
@@ -135,6 +129,7 @@ export default function Uploader(props) {
           sx={{ maxWidth: '382px', }}
         >
           Only PDF, TXT, and DOCX file types are allowed
+          {props.maxFiles ? `. (Max ${props.maxFiles} file)` : ''}
         </Typography>
       </div>
       { files.length > 0 &&
@@ -158,19 +153,114 @@ export default function Uploader(props) {
         }}
       >
         { files.map((fileWrapper, index) => (
+          fileWrapper.errors.length > 0?
+          <ErrorFileCard 
+            key={index}
+            name={fileWrapper.file.name}
+            error={fileWrapper.errors[0].code}
+            size={fileWrapper.file.size}
+            onDelete={() => removeFiles(index)}
+          />
+          : 
           <FileCard
             key={index}
             name={fileWrapper.file.name}
-            filePath={fileWrapper.file.path}
             type={fileWrapper.file.type}
             progress={fileWrapper.progress}
             loaded={fileWrapper.loaded}
             total={fileWrapper.total}
             onDelete={() => removeFiles(index)}
-            error={fileWrapper.error}
           />
         ))}
       </Box>
+      { props.page === 'advanced-search' &&
+        <Box
+          sx= {{
+            width: '100%',
+            display: 'flex',
+            flexDirection: {mobile: 'column-reverse', mobile_l: 'row'}, 
+            gap: {mobile: '16px', mobile_l: '24px'},
+            alignItems: 'flex-start',
+            justifyContent: {mobile: 'center', mobile_l: 'flex-end'},
+          }}
+        >
+          <Button 
+            color='primary' 
+            variant='outlined' 
+            sx={{ 
+              height: '32px',
+              width: {mobile: '100%', mobile_l: '150px'},
+              typography: theme.typography.heading_h6,
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            onClick={ () => props.redirectBack()}
+          >
+            <Typography
+              sx={{ 
+                color: 'primary.main', 
+                typography: 'heading_h6',
+              }}
+            >
+              Cancel
+            </Typography>
+          </Button>
+          <Button 
+            color='primary' 
+            variant='contained' 
+            sx={{ 
+              height: '32px',
+              width: {mobile: '100%', mobile_l: '150px'},
+              typography: theme.typography.heading_h6,
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            onClick={() => {}}
+          >
+            <Typography
+              sx={{ 
+                color: 'white.main', 
+                typography: 'heading_h6',
+              }}
+            >
+              Search
+            </Typography>
+            <SearchIcon
+              sx={{
+                width: '18px',
+                height: '18px',
+                color: theme.palette.white.main
+              }}
+            />
+          </Button>
+        </Box>
+      }
+      { props.page === 'upload-file' &&
+        <Button 
+          color='primary' 
+          variant='contained' 
+          sx={{ 
+            height: '32px', 
+            padding: '0 12px',
+            width: '150px',
+            typography: theme.typography.heading_h6,
+            alignSelf: 'flex-end',
+            '&.Mui-disabled': {
+              backgroundColor: theme.palette.dark_gray.light,
+              color: theme.palette.white.main,
+            }
+          }}
+          disabled={isUploadError}
+        >
+          Upload
+        </Button> 
+      }
     </form>
   )
 }

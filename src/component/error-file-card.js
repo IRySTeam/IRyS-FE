@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { formatBytes } from '@/utils/bytes';
 import { Box, Typography, IconButton } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -6,15 +6,20 @@ import { useTheme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import Image from 'next/image';
 
-export default function FileCard(props) {
+export default function ErrorFileCard(props) {
   const [progress, setProgress] = useState(0)
   const theme = useTheme();
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setProgress(props.progress??0);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [props.progress]);
+
+  const errorMessage = () => {
+    if(props.error === 'file-invalid-type'){
+      return 'Invalid file types.';
+    } else if(props.error === 'too-many-files'){
+      return 'File limit exceeded';
+    } else {
+      return ('Unknown error');
+    }
+  }
+
 
   return (
     <Box
@@ -28,7 +33,7 @@ export default function FileCard(props) {
         gap: '16px',
         border: '1px solid',
         borderRadius: '10px',
-        borderColor: theme.palette.light_gray.main,
+        borderColor: theme.palette.error.main,
         padding: '24px 16px',
       }}
     >
@@ -42,30 +47,12 @@ export default function FileCard(props) {
           gap: '8px',
         }}
       >
-        { props.type === 'text/plain' &&
           <Image 
-            src={'/txt-icon.svg'} 
-            alt='txt-icon' 
+            src={'/unknown-icon.svg'} 
+            alt='unknown-icon' 
             width={54} 
             height={54}
           />
-        }
-        { (props.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.type === 'application/msword') &&
-          <Image 
-            src={'/doc-icon.svg'} 
-            alt='doc-icon' 
-            width={54} 
-            height={54}
-          />
-        }
-        { props.type === 'application/pdf' &&
-          <Image 
-            src={'/pdf-icon.svg'} 
-            alt='pdf-icon' 
-            width={54} 
-            height={54}
-          />
-        }
         <Box
           sx={{
             width: 'calc(100% - 62px)',
@@ -73,7 +60,7 @@ export default function FileCard(props) {
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            gap: '24px',
+            gap: '4px',
           }}
         >
           <Box
@@ -87,9 +74,10 @@ export default function FileCard(props) {
             }}
           >
             <Typography variant='heading_h6' color='black.main' sx={{maxWidth: {mobile: '100%', tablet: 'calc(100% - 200px)'},}}>{props.name}</Typography>
-            <Typography variant='paragprah_h6' color='black.main'>{formatBytes(props.loaded)} of {formatBytes(props.total)}</Typography>
+            <Typography variant='paragprah_h6' color='black.main'>{formatBytes(0)} of {formatBytes(props.size)}</Typography>
           </Box>
-          <Box sx={{ width: '100%',}}>
+          <Typography variant='advanced_value' color='error.main'>{errorMessage()}</Typography>
+          <Box sx={{ width: '100%', marginTop:'4px'}}>
             <LinearProgress 
               variant="determinate" 
               value={progress} 

@@ -6,11 +6,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
-import { Container, Box, Typography,} from '@mui/material';
+import { Container, Box, Typography, Button } from '@mui/material';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
 import ManageDocumentsTabs from '@/component/tabs/manage-documents';
+import Uploader from '@/component/uploader';
 
 export default function ManageDocumentsUpload() {
   const theme = useTheme();
@@ -154,6 +155,12 @@ export default function ManageDocumentsUpload() {
                     Upload Documents
                   </Typography>
                   <Box sx={{ backgroundColor: 'light_gray.main', width: '100%', height: '1px',}}/>
+                  <Uploader
+                    setShowAlert={setShowAlert}
+                    setAlertSeverity={setAlertSeverity}
+                    setAlertLabel={setAlertLabel}
+                    page={'upload-file'}
+                  />
                 </Box>
               </Box>
             </Box>

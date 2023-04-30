@@ -407,75 +407,78 @@ export default function AdvancedSearch() {
                 setShowAlert={setShowAlert}
                 setAlertSeverity={setAlertSeverity}
                 setAlertLabel={setAlertLabel}
+                page={'advanced-search'}
+                redirectBack={redirectBack}
               />
             }
-            <Box
-              sx= {{
-                width: '100%',
-                display: 'flex',
-                flexDirection: {mobile: 'column-reverse', mobile_l: 'row'}, 
-                gap: {mobile: '16px', mobile_l: '24px'},
-                alignItems: 'flex-start',
-                justifyContent: {mobile: 'center', mobile_l: 'flex-end'},
-              }}
-
-            >
-              <Button 
-                color='primary' 
-                variant='outlined' 
-                sx={{ 
-                  height: '32px',
-                  width: {mobile: '100%', mobile_l: '150px'},
-                  typography: theme.typography.heading_h6,
+            { (mode === 'cli' || mode === 'basic' ) &&
+              <Box
+                sx= {{
+                  width: '100%',
                   display: 'flex',
-                  flexDirection: 'row',
-                  gap: '8px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  flexDirection: {mobile: 'column-reverse', mobile_l: 'row'}, 
+                  gap: {mobile: '16px', mobile_l: '24px'},
+                  alignItems: 'flex-start',
+                  justifyContent: {mobile: 'center', mobile_l: 'flex-end'},
                 }}
-                onClick={ () => redirectBack()}
               >
-                <Typography
+                <Button 
+                  color='primary' 
+                  variant='outlined' 
                   sx={{ 
-                    color: 'primary.main', 
-                    typography: 'heading_h6',
+                    height: '32px',
+                    width: {mobile: '100%', mobile_l: '150px'},
+                    typography: theme.typography.heading_h6,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '8px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
+                  onClick={ () => redirectBack()}
                 >
-                  Cancel
-                </Typography>
-              </Button>
-              <Button 
-                color='primary' 
-                variant='contained' 
-                sx={{ 
-                  height: '32px',
-                  width: {mobile: '100%', mobile_l: '150px'},
-                  typography: theme.typography.heading_h6,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  gap: '8px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-                onClick={() => handleSearch()}
-              >
-                <Typography
+                  <Typography
+                    sx={{ 
+                      color: 'primary.main', 
+                      typography: 'heading_h6',
+                    }}
+                  >
+                    Cancel
+                  </Typography>
+                </Button>
+                <Button 
+                  color='primary' 
+                  variant='contained' 
                   sx={{ 
-                    color: 'white.main', 
-                    typography: 'heading_h6',
+                    height: '32px',
+                    width: {mobile: '100%', mobile_l: '150px'},
+                    typography: theme.typography.heading_h6,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '8px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
+                  onClick={() => handleSearch()}
                 >
-                  Search
-                </Typography>
-                <SearchIcon
-                  sx={{
-                    width: '18px',
-                    height: '18px',
-                    color: theme.palette.white.main
-                  }}
-                />
-              </Button>
-            </Box>
+                  <Typography
+                    sx={{ 
+                      color: 'white.main', 
+                      typography: 'heading_h6',
+                    }}
+                  >
+                    Search
+                  </Typography>
+                  <SearchIcon
+                    sx={{
+                      width: '18px',
+                      height: '18px',
+                      color: theme.palette.white.main
+                    }}
+                  />
+                </Button>
+              </Box>
+            }
           </Container>
         </> 
       }
