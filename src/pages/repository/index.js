@@ -67,6 +67,16 @@ export default function Repository() {
     router.push({ pathname: '/repository/setting/collaborators', query: { id: id} })
   }
 
+  const goToManageDocuments = () => {
+    const { id } = router.query;
+    router.push({ pathname: '/repository/manage-documents/databases', query: { id: id} })
+  }
+
+  const goToUploadDocuments = () => {
+    const { id } = router.query;
+    router.push({ pathname: '/repository/manage-documents/upload', query: { id: id} })
+  }
+
   useEffect(() => {
     setIsLoadingDocs(true);
     const filterArrayRepo = (array) => {
@@ -479,7 +489,10 @@ export default function Repository() {
                   }}
                 >
                   <Typography sx={{ color: 'black.main', typography: 'heading_h4' }}>Documents</Typography>
-                  <IconButton sx={{ padding: 0 }}>
+                  <IconButton 
+                    sx={{ padding: 0 }}
+                    onClick={() => goToUploadDocuments()}
+                  >
                     <AddIcon
                       sx={{
                         width: '24px',
@@ -517,6 +530,7 @@ export default function Repository() {
                     width: '100%',
                     typography: theme.typography.heading_h6,
                   }}
+                  onClick={() => goToManageDocuments()}
                 >
                   <Typography sx={{ color: 'white.main', typography: 'heading_h6',}}> Manage Documents </Typography>
                 </Button>
