@@ -17,6 +17,7 @@ import { getMonitorDataSuccess } from '@/state/actions/monitorActions';
 import { formatDateTable } from '@/utils/date';
 import Dropdown from '@/component/dropdown';
 import { statusOption } from '@/constants/option';
+import { refresh } from '@/utils/token';
 
 export default function ManageDocumentsMonitor() {
   const theme = useTheme();
@@ -136,7 +137,7 @@ export default function ManageDocumentsMonitor() {
             justifyContent: 'center',
             alignItems: 'center',
           }}
-          onClick={() => console.log('reindex', params.row.id)}
+          onClick={() => reindexDocument(params.row.id, params.row.title)}
         >
           <Typography
             sx={{ 
@@ -184,7 +185,111 @@ export default function ManageDocumentsMonitor() {
     }
     fetchMonitor()
     setIsLoading(false);
-  }, [dispatch, id, search, status]);
+  }, [dispatch, id, status]);
+
+  const fetchMonitor = async () =>  {
+    const token =  Cookies.get('access_token');
+    const data = {
+      status: status,
+      page_no: 1,
+      page_size: 100,
+    }
+    try {
+      const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/monitor`, {
+        params : data,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      dispatch(getMonitorDataSuccess(response.data))
+    } catch (error){
+      setAlertSeverity('error');
+      setAlertLabel(`Network Error, Please try again`);
+      setShowAlert(true);
+    }
+  }
+
+  const reindexAll = async () =>  {
+    const token =  Cookies.get('access_token');
+    try {
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/reindex`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setAlertSeverity('success');
+      setAlertLabel('All of your documents has been started to reindex');
+      setShowAlert(true);
+      fetchMonitor()
+    } catch (error){
+      if(error.response){
+        setAlertSeverity('error');
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found. Please try again.');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
+      setIsLoading(false);
+    }
+  }
+
+  const reindexDocument = async (docId) =>  {
+    const token =  Cookies.get('access_token');
+    try {
+      await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/documents/${docId}/reindex`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setAlertSeverity('success');
+      setAlertLabel('Your document has been started to reindex');
+      setShowAlert(true);
+      fetchMonitor()
+    } catch (error){
+      if(error.response){
+        setAlertSeverity('error');
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 404:
+            setAlertLabel('Document not found. Please try again.');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
+      setIsLoading(false);
+    }
+  }
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
@@ -317,6 +422,7 @@ export default function ManageDocumentsMonitor() {
                         width: '150px',
                         typography: theme.typography.heading_h6,
                       }}
+                      onClick={()=> reindexAll()}
                     >
                       Reindex All
                     </Button> 
