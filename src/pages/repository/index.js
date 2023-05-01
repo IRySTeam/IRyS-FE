@@ -36,6 +36,7 @@ export default function Repository() {
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
   const singleRepositoryData = useSelector(state => state.singleRepository);
+  const searchDocumentData = useSelector(state => state.searchDocument);
   const repositoryData = useSelector(state => state.repository);
   const filterDocument = useSelector(state => state.filter);
 
@@ -171,22 +172,22 @@ export default function Repository() {
           })
           console.log('search', response)
           dispatch(getSearchDocumentSuccess(response.data))
+          setIsLoadingDocs(false);
         } catch (error){
           console.log(error)
           dispatch(getSearchDocumentFailed(error.response.data))
           setAlertSeverity('error');
           setAlertLabel(`Network Error, Please try again`);
           setShowAlert(true);
+          setIsLoadingDocs(false);
         }
       }
 
       if(filterDocument.mode === 'basic' || filterDocument.mode === 'cli' ){
         fetchSearchDocumentBasic()
       }else if(filterDocument.mode === 'file' ) {
-        //
+        setIsLoadingDocs(false);
       }
-      
-      setIsLoadingDocs(false);
     }
   }, [dispatch, router, repositoryData.id, filterDocument]);
 
@@ -404,7 +405,7 @@ export default function Repository() {
                 { isLoadingDocs &&
                   <Loading transparent={true} centered={false}/>
                 }
-                { !isLoadingDocs && (singleRepositoryData.isEmpty || singleRepositoryData.documents.length === 0) &&
+                { !isLoadingDocs && (singleRepositoryData.isEmpty || singleRepositoryData.documents.length === 0 || (searchDocumentData.count === 0) ) &&
                   <Box
                     sx={{
                       width: '100%', 
@@ -434,7 +435,7 @@ export default function Repository() {
                     </Typography>
                   </Box>
                 }
-                { !isLoadingDocs && !singleRepositoryData.isEmpty && singleRepositoryData.documents.length > 0 && 
+                { !isLoadingDocs && !singleRepositoryData.isEmpty && singleRepositoryData.documents.length > 0 && searchDocumentData.count > 0 && 
                   <Box
                     sx={{
                       display: 'flex',
@@ -443,13 +444,13 @@ export default function Repository() {
                       width: '100%'
                     }}
                   >
-                    {/* { singleRepositoryData.documents.map((docs, index) => (
+                    { searchDocumentData.documents.map((docs, index) => (
                       <DocumentCard
                         key={index}
                         item={docs}
                         query={search}
                       />
-                    ))} */}
+                    ))}
                   </Box> 
                 }
               </Box>
