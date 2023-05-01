@@ -12,6 +12,13 @@ export const saveAdvancedSearchCli = (data) => {
   }
 }
 
+export const saveAdvancedSearchFile = (data) => {
+  return {
+    type: 'file',
+    payload: data,
+  }
+}
+
 export const resetFilterAdvancedSearch = (data) => {
   return {
     type: 'reset',

@@ -1,5 +1,11 @@
+import moment from 'moment';
+
 export const formatDate = (datetime) => {
-  const date = new Date(datetime);
-  const options = { day: 'numeric', month: 'long', year: 'numeric' };
-  return date.toLocaleDateString('en-GB', options);
+  const localDatetime = moment.utc(datetime).local().format('DD MMMM YYYY');
+  return localDatetime;
+}
+
+export const formatDateTable = (datetime) => {
+  const localDatetime = moment.utc(datetime).local().format('DD MMM YYYY HH:mm');
+  return localDatetime;
 }

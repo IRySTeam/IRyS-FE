@@ -1,23 +1,23 @@
 const initialState = {
   documents: [],
-  isEmpty: false,
+  count: 0,
   error: null,
 }
 
-const singleRepositoryReducer = (state = initialState, action) => {
+const searchDocumentReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'singleRepoSuccess':
+    case 'searchDocumentSuccess':
       return {
         ...state,
-        documents: action.payload ,
-        isEmpty: action.payload.length === 0,
+        documents: action.payload.result,
+        count: action.payload.num_docs_retrieved,
         error: null, 
       }; 
-    case 'singleRepoFailed': 
+    case 'searchDocumentFailed': 
       return { 
         ...state, 
         documents: [],
-        isEmpty: false,
+        count: 0,
         error: action.payload.error, 
       };
     default: 
@@ -25,4 +25,4 @@ const singleRepositoryReducer = (state = initialState, action) => {
   }
 }
 
-export default singleRepositoryReducer;
+export default searchDocumentReducer;

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useDropzone } from 'react-dropzone'
 import { useTheme } from '@mui/material/styles';
 import { useFormik } from 'formik';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import Cookies from 'js-cookie';
@@ -12,10 +13,12 @@ import FileCard from './file-card';
 import ErrorFileCard from './error-file-card';
 import SearchIcon from '@mui/icons-material/Search';
 import { refresh } from '@/utils/token';
+import { saveAdvancedSearchFile } from '@/state/actions/filterAction';
 
 export default function Uploader(props) {
   const theme = useTheme();
   const router = useRouter()
+  const dispatch = useDispatch()
 
   const [files, setFiles] = useState([]);
   const [isUploadError, setIsUploadError] = useState(false);
@@ -50,7 +53,6 @@ export default function Uploader(props) {
   }, [])
 
   useEffect(() => {
-    console.log(files);
     setIsUploadError(files.some((file) => file.errors && file.errors.length > 0) || files.length === 0);
   }, [files]);
 
@@ -60,12 +62,19 @@ export default function Uploader(props) {
     setFiles(newFiles);
   };
 
+  const handleSearchWithFile = () => {
+    const data = {
+      file: files[0],
+    }
+    dispatch(saveAdvancedSearchFile(data))
+    props.redirectBack()
+  };
+
   const uploadFileToRepo = async () => {
     props.setIsLoading(true);
     const data = new FormData();
     if(files.length === 1){
       const file = files[0].file;
-      console.log('file',file)
       data.append('file', file);
     } else {
       const fileArray = files
@@ -292,7 +301,8 @@ export default function Uploader(props) {
               justifyContent: 'center',
               alignItems: 'center',
             }}
-            onClick={() => {}}
+            disabled={isUploadError}
+            onClick={() => handleSearchWithFile}
           >
             <Typography
               sx={{ 
