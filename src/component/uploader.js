@@ -64,7 +64,7 @@ export default function Uploader(props) {
 
   const handleSearchWithFile = () => {
     const data = {
-      file: files[0],
+      file: files[0].file,
     }
     dispatch(saveAdvancedSearchFile(data))
     props.redirectBack()
@@ -302,7 +302,7 @@ export default function Uploader(props) {
               alignItems: 'center',
             }}
             disabled={isUploadError}
-            onClick={() => handleSearchWithFile}
+            onClick={() => handleSearchWithFile()}
           >
             <Typography
               sx={{ 

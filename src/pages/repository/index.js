@@ -183,10 +183,36 @@ export default function Repository() {
         }
       }
 
+      const fetchSearchDocumentFile = async () =>  {
+        const data = new FormData();
+        data.append('file', filterDocument.file)
+        const params = {
+          domain: filterDocument.domain === '' ? 'general' : filterDocument.domain
+        }
+        try {
+          const response = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/search/repository/${id}/file`, data, {
+            params: params,
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
+            }
+          })
+          dispatch(getSearchDocumentSuccess(response.data))
+          setIsLoadingDocs(false);
+        } catch (error){
+          console.log(error)
+          dispatch(getSearchDocumentFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+          setIsLoadingDocs(false);
+        }
+      }
+
       if(filterDocument.mode === 'basic' || filterDocument.mode === 'cli' ){
         fetchSearchDocumentBasic()
       }else if(filterDocument.mode === 'file' ) {
-        setIsLoadingDocs(false);
+        fetchSearchDocumentFile()
       }
     }
   }, [dispatch, router, repositoryData.id, filterDocument]);
