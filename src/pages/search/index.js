@@ -4,7 +4,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie'
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { NEXT_PUBLIC_API_URL } from '@/constants/api';import { useRouter } from 'next/router';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
+import { useRouter } from 'next/router';
 import Loading from '@/component/loading';
 import NavBar from '@/component/navbar';
 import EmptyQuery from '@/component/search/empty-query';

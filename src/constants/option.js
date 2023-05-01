@@ -60,15 +60,15 @@ export const operatorOption = [
 
 export const modelOption = [
   { value: '', label: 'None'},
-  { value: 'ner', label: 'NER'},
-  { value: 'bert', label: 'BERT'},
+  { value: 'BERT_BASE', label: 'BERT BASE'},
+  { value: 'SBERT_MSMARCO', label: 'SBERT_MSMARCO'},
 ]
 
 export const scoringAlgorithmOption = [
   { value: '', label: 'None'},
-  { value: 'cosine', label: 'COSINE'},
-  { value: 'dot', label: 'DOT'},
-  { value: 'okapi_bm', label: 'OKAPI BM'},
+  { value: 'COSINE_SIMILARITY', label: 'COSINE SIMILARITY'},
+  { value: 'DOT_PRODUCT', label: 'DOT PRODUCT'},
+  { value: 'OKAPI_BM', label: 'OKAPI BM'},
 ]
 
 export const rowOption = [

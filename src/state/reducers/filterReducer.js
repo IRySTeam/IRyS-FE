@@ -28,6 +28,7 @@ const filterReducer = (state = initialState, action) => {
         domain: '',
         filters: [{
           key: '',
+          data_type: '',
           operator: '',
           value: '',
           model: '',

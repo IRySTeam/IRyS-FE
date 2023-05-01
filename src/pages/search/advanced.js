@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import Cookies from 'js-cookie'
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { Container, Button, Typography, Box, OutlinedInput } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -15,12 +18,14 @@ import { domainOption } from '@/constants/option';
 import { resetFilterAdvancedSearch, saveAdvancedSearchBasic, saveAdvancedSearchCli } from '@/state/actions/filterAction';
 import Uploader from '@/component/uploader';
 import CustomAlert from '@/component/custom-alert';
+import { getDomainOptionSuccess, getFilterOptionSuccess } from '@/state/actions/filterOption';
 
 export default function AdvancedSearch() {
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useDispatch();
   const advancedSearch = useSelector(state => state.filter);
+  const filterOption = useSelector(state => state.filterOption);
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState('basic');
   const [path, setPath] = useState('');
@@ -32,6 +37,7 @@ export default function AdvancedSearch() {
   const [filters, setFilters] = useState( advancedSearch.filters ?? [
     {
       key: '',
+      data_type: '',
       operator: '',
       value: '',
       model: '',
@@ -45,6 +51,7 @@ export default function AdvancedSearch() {
   const addFilter = () => {
     const newFilter = {
       key: '',
+      data_type: '',
       operator: '',
       value: '',
       model: '',
@@ -61,10 +68,11 @@ export default function AdvancedSearch() {
     setFilters(newFilters);
   };
 
-  const updateFilter = (index, key, operator, value, model, scoring_algorithm, top_n, score_threshold ) => {
+  const updateFilter = (index, key, data_type, operator, value, model, scoring_algorithm, top_n, score_threshold ) => {
     const newFilters = [...filters];
     newFilters[index] = { 
       key: key,
+      data_type: data_type,
       operator: operator,
       value: value,
       model: model,
@@ -124,6 +132,7 @@ export default function AdvancedSearch() {
         setDomain('')
         setFilters([{
           key: '',
+          data_type: '',
           operator: '',
           value: '',
           model: '',
@@ -135,6 +144,40 @@ export default function AdvancedSearch() {
       }
     }
   }, [advancedSearch.path, dispatch, router]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchDomain = async () =>  {
+      try {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/domains`,)
+        dispatch(getDomainOptionSuccess(response.data))
+      } catch (error){
+        setAlertSeverity('error');
+        setAlertLabel(`Network Error, Please try again`);
+        setShowAlert(true);
+      }
+    }
+    fetchDomain()
+    setIsLoading(false);
+  }, [dispatch]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchDomainFilter = async () =>  {
+      try {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/information/${domain === ''? 'general' : domain}`,)
+        console.log(response)
+        dispatch(getFilterOptionSuccess(response.data))
+      } catch (error){
+        console.log(error)
+        setAlertSeverity('error');
+        setAlertLabel(`Network Error, Please try again`);
+        setShowAlert(true);
+      }
+    }
+    fetchDomainFilter()
+    setIsLoading(false);
+  }, [dispatch, domain]);
 
   return (
     <>
@@ -306,7 +349,7 @@ export default function AdvancedSearch() {
                     placeholder="Select a domain.."
                     defaultValue=''
                     value={domain}
-                    options={domainOption}
+                    options={filterOption.domain_option}
                     onChange={handleChangeDomain}
                   />
                 </>
@@ -348,7 +391,7 @@ export default function AdvancedSearch() {
                     order={index}
                     onRemove={() => removeFilter(index)}
                     onChange={
-                      (key, operator, value, model, scoring_algorithm, top_n, score_threshold) => updateFilter(index, key, operator, value, model, scoring_algorithm, top_n, score_threshold)
+                      (key, data_type, operator, value, model, scoring_algorithm, top_n, score_threshold) => updateFilter(index, key, data_type, operator, value, model, scoring_algorithm, top_n, score_threshold)
                     }
                   />
                 ))}

@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
 import FilterDropdown from './dropdown';
-import { filterOption, modelOption, operatorOption, scoringAlgorithmOption } from '@/constants/option';
+import { modelOption, operatorOption, scoringAlgorithmOption } from '@/constants/option';
 import FilterInput from './input';
 
 export default function FilterCard(props) {
   const theme = useTheme();
+  const filterOption = useSelector(state => state.filterOption);
   const [key, setKey] = useState(props.filter.key);
+  const [dataType, setDataType] = useState(props.filter.data_type);
   const [operator, setOperator] = useState(props.filter.operator);
   const [value, setValue] = useState(props.filter.value);
   const [model, setModel] = useState(props.filter.model);
@@ -18,14 +21,16 @@ export default function FilterCard(props) {
 
   const handleKeyChange = (event) => {
     const newKey = event.target.value;
+    const newDataType = getTypeOfKey();
     setKey(newKey);
+    setDataType(newDataType);
     setOperator('');
     setValue('');
     setModel('');
     setScoringAlgorithm('');
     setTopN('');
     setScoreThreshold('');
-    props.onChange(newKey, '', '', '', '', '', '');
+    props.onChange(newKey, newDataType, '', '', '', '', '', '');
   };
 
   const handleOperatorChange = (event) => {
@@ -36,38 +41,49 @@ export default function FilterCard(props) {
     setScoringAlgorithm('');
     setTopN('');
     setScoreThreshold('');
-    props.onChange(key, newOperator, '', '', '', '', '');
+    props.onChange(key, dataType, newOperator, '', '', '', '', '');
   };
 
   const handleValueChange = (event) => {
     const newValue = event.target.value;
     setValue(newValue);
-    props.onChange(key, operator, newValue, model, scoringAlgorithm, topN, scoreThreshold);
+    props.onChange(key, dataType, operator, newValue, model, scoringAlgorithm, topN, scoreThreshold);
   };
 
   const handleModelChange = (event) => {
     const newModel = event.target.value;
     setModel(newModel);
-    props.onChange(key, operator, value, newModel, scoringAlgorithm, topN, scoreThreshold);
+    props.onChange(key, dataType, operator, value, newModel, scoringAlgorithm, topN, scoreThreshold);
   };
 
   const handleScoringAlgorithmChange = (event) => {
     const newScoringAlgorithm = event.target.value;
     setScoringAlgorithm(newScoringAlgorithm);
-    props.onChange(key, operator, value, model, newScoringAlgorithm, topN, scoreThreshold);
+    props.onChange(key, dataType, operator, value, model, newScoringAlgorithm, topN, scoreThreshold);
   };
 
   const handleTopNChange = (event) => {
     const newTopN = event.target.value;
     setTopN(newTopN);
-    props.onChange(key, operator, value, model, scoringAlgorithm, newTopN, scoreThreshold);
+    props.onChange(key, dataType, operator, value, model, scoringAlgorithm, newTopN, scoreThreshold);
   };
 
   const handleScoreThresholdChange = (event) => {
     const newScoreThreshold = event.target.value;
     setScoreThreshold(newScoreThreshold);
-    props.onChange(key, operator, value, model, scoringAlgorithm, topN, newScoreThreshold);
+    props.onChange(key, dataType, operator, value, model, scoringAlgorithm, topN, newScoreThreshold);
   };
+
+  const getTypeOfKey = () => {
+    const type = filterOption.filter_type_option.find((option) => option.value === key);
+    return type ? type.label : '';
+  }
+
+  const getOperatorOfKey = () => {
+    const operator = filterOption.filter_operator_option.find((option) => option.value === key);
+    console.log(operator)
+    return operator ? operator.label : [{value: '', label: 'None'}];
+  }
 
   return (
     <Box 
@@ -124,7 +140,7 @@ export default function FilterCard(props) {
         label="Filter"
         placeholder="Select a filter.."
         value={props.filter.key}
-        options={filterOption}
+        options={filterOption.filter_key_option}
         defaultValue={''}
         onChange={handleKeyChange}
         required={true}
@@ -133,7 +149,7 @@ export default function FilterCard(props) {
         label="Operator"
         placeholder="Select an operator.."
         value={props.filter.operator}
-        options={operatorOption}
+        options={getOperatorOfKey()}
         defaultValue={''}
         onChange={handleOperatorChange}
         required={true}
