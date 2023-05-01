@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
+import { DataGrid } from '@mui/x-data-grid';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -11,6 +12,8 @@ import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
 import ManageDocumentsTabs from '@/component/tabs/manage-documents';
+import { getMonitorDataSuccess } from '@/state/actions/monitorActions';
+import { formatDateTable } from '@/utils/date';
 
 export default function ManageDocumentsMonitor() {
   const theme = useTheme();
@@ -21,24 +24,78 @@ export default function ManageDocumentsMonitor() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
-  const [alertLabel, setAlertLabel] = useState('Your changes to the repository settings have been successfully saved');
+  const [alertLabel, setAlertLabel] = useState('Your documents has been successfully uploaded');
   const repositoryData = useSelector(state => state.repository);
+  const monitorData = useSelector(state => state.monitor);
+  const [page, setPage] = useState(1)
+  const [rows, setRows] = useState(10)
+  const [search, setSearch] = useState('')
+  const [status, setStatus] = useState('ALL')
+
+  const columns = [
+    { 
+      field: 'id', 
+      headerName: 'Index', 
+      width: 100
+    },
+    {
+      field: 'title',
+      headerName: 'Document Name',
+      width: 350,
+    },
+    {
+      field: 'updated_at',
+      headerName: 'Updated At',
+      width: 150,
+      valueGetter: (params) => {
+        return formatDateTable(params.row.updated_at);
+      },
+    },
+    {
+      field: 'index',
+      headerName: 'Status',
+      width: 120,
+      valueGetter: (params) => {
+        return params.row.index.status;
+      },
+    },
+    { 
+      field: 'button',
+      headerName: 'Action', 
+      width: 120, 
+      renderCell: (params) => (
+        <button onClick={() => console.log(`Clicked row ${params.row.id}`)}>Click me</button>
+      )
+    }
+  ];
   
   useEffect(() => {
     setIsLoading(true);
+    const fetchMonitor = async () =>  {
+      const token =  Cookies.get('access_token');
+      const data = {
+        status: status,
+        page_no: page? page : 1,
+        page_size: rows,
+      }
+      try {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/monitor`, {
+          params : data,
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        console.log(response.data);
+        dispatch(getMonitorDataSuccess(response.data))
+      } catch (error){
+        setAlertSeverity('error');
+        setAlertLabel(`Network Error, Please try again`);
+        setShowAlert(true);
+      }
+    }
+    fetchMonitor()
     setIsLoading(false);
-  }, []);
-
-  const formik = useFormik({
-    initialValues: {
-      name: repositoryData.name,
-      description: repositoryData.description,
-    },
-    onSubmit: () => {
-      setIsLoading(true);
-      setIsLoading(false);
-    } ,
-  });
+  }, [dispatch, id, page, rows, search, status]);
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
@@ -154,6 +211,22 @@ export default function ManageDocumentsMonitor() {
                     Monitor Documents
                   </Typography>
                   <Box sx={{ backgroundColor: 'light_gray.main', width: '100%', height: '1px',}}/>
+                  <Box sx={{ width: '100%' }}>
+                    <DataGrid
+                      rows={monitorData.results}
+                      columns={columns}
+                      initialState={{
+                        pagination: {
+                          paginationModel: {
+                            pageSize: 10,
+                          },
+                        },
+                      }}
+                      pageSizeOptions={[10]}
+                      columnBuffer={24}
+                      disableRowSelectionOnClick
+                    />
+                  </Box>
                 </Box>
               </Box>
             </Box>

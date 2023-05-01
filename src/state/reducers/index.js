@@ -7,6 +7,7 @@ import joinedRepositoryReducer from './joinedRepositoryReducer';
 import singleRepositoryReducer from './singleRepositoryReducer';
 import publicRepositoryReducer from './publicRepositoryReducer';
 import filterReducer from './filterReducer';
+import monitorReducer from './monitorReducer';
 
 const reducers = combineReducers({
   user: userReducer,
@@ -15,6 +16,7 @@ const reducers = combineReducers({
   singleRepository: singleRepositoryReducer,
   publicRepository: publicRepositoryReducer,
   filter: filterReducer,
+  monitor: monitorReducer,
 })
 
 export default reducers;

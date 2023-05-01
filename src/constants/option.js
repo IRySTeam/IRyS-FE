@@ -70,3 +70,19 @@ export const scoringAlgorithmOption = [
   { value: 'dot', label: 'DOT'},
   { value: 'okapi_bm', label: 'OKAPI BM'},
 ]
+
+export const rowOption = [
+  { value: '5', label: '5'},
+  { value: '10', label: '10'},
+  { value: '20', label: '20'},
+]
+
+export const statusOption = [
+  { value: 'ALL', label: 'ALL'},
+  { value: 'READY', label: 'READY'},
+  { value: 'PARSING', label: 'PARSING'},
+  { value: 'EXTRACTING', label: 'EXTRACTING'},
+  { value: 'INDEXING', label: 'INDEXING'},
+  { value: 'SUCCESS', label: 'SUCCESS'},
+  { value: 'FAILED', label: 'FAILED'},
+]
