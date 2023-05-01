@@ -159,7 +159,9 @@ export default function ManageDocumentsUpload() {
                     setShowAlert={setShowAlert}
                     setAlertSeverity={setAlertSeverity}
                     setAlertLabel={setAlertLabel}
+                    setIsLoading={setIsLoading}
                     page={'upload-file'}
+                    repoId={id}
                   />
                 </Box>
               </Box>

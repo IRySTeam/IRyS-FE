@@ -1,15 +1,21 @@
 import { useCallback, useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { useDropzone } from 'react-dropzone'
 import { useTheme } from '@mui/material/styles';
 import { useFormik } from 'formik';
+import axios from 'axios';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
+import Cookies from 'js-cookie';
 import { Box, Typography, Button } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FileCard from './file-card';
 import ErrorFileCard from './error-file-card';
 import SearchIcon from '@mui/icons-material/Search';
+import { refresh } from '@/utils/token';
 
 export default function Uploader(props) {
   const theme = useTheme();
+  const router = useRouter()
 
   const [files, setFiles] = useState([]);
   const [isUploadError, setIsUploadError] = useState(false);
@@ -53,6 +59,71 @@ export default function Uploader(props) {
     newFiles.splice(index, 1);
     setFiles(newFiles);
   };
+
+  const uploadFileToRepo = async () => {
+    props.setIsLoading(true);
+    const data = new FormData();
+    if(files.length === 1){
+      const file = files[0].file;
+      console.log('file',file)
+      data.append('file', file);
+    } else {
+      const fileArray = files
+      .filter((fileWrapper) => fileWrapper.errors.length === 0)
+      .map((fileWrapper) => fileWrapper.file);
+      for (var i = 0; i < fileArray.length; i++){
+        data.append('files', fileArray[i])
+      }
+    }
+
+    const token =  Cookies.get('access_token');
+    const refresh_token =  Cookies.get('refresh_token');
+
+    if(token && refresh_token){
+      try {
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${props.repoId}/documents/upload${files.length === 1 ? '' : 's'}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        })
+        props.setAlertSeverity('success');
+        props.setAlertLabel('Upload success');
+        props.setShowAlert(true);
+      } catch (error) {
+        props.setAlertSeverity('error');
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 400:
+              props.setAlertLabel('Bad request syntax or unsupported method');
+              props.setShowAlert(true);
+              break;
+            case 401:
+              refresh('access_token', 'refresh_token', router);
+              props.setIsLoading(false);
+              break;
+            case 'USER__NOT_ALLOWED':
+              props.setAlertLabel('You are not allowed to perform this action');
+              props.setShowAlert(true);
+              break;
+            case 404:
+              props.setAlertLabel('Nothing matches the given URI');
+              props.setShowAlert(true);
+              break;
+            default :
+              props.setAlertLabel('Network Error, Please Try Again.');
+              props.setShowAlert(true);
+              break;
+          }
+        } else{
+          props.setAlertLabel('Network Error, Please Try Again.');
+          props.setShowAlert(true);
+        }
+        props.setIsLoading(false);
+      }
+    }
+    props.setIsLoading(false)
+  }
 
   const {getRootProps, getInputProps} = useDropzone({
     onDrop,
@@ -257,6 +328,7 @@ export default function Uploader(props) {
             }
           }}
           disabled={isUploadError}
+          onClick={() => uploadFileToRepo()}
         >
           Upload
         </Button> 
