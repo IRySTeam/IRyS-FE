@@ -560,9 +560,19 @@ export default function ManageDocumentsMonitor() {
                       disableColumnMenu={true}
                       sx={{
                         '& .nowrap': {
+                          typography: theme.typography.paragraph_h6,
+                          color: theme.palette.black.main,
+                          whiteSpace: 'normal !important',
+                          padding: '8px 0',
                           borderBottom: '0'
                         },
                         '& .center': {
+                          typography: theme.typography.paragraph_h6,
+                          color: theme.palette.black.main,
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          padding: '8px 0',
                           borderBottom: '0'
                         }, 
                       }}
