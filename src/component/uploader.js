@@ -65,7 +65,6 @@ export default function Uploader(props) {
     const data = new FormData();
     if(files.length === 1){
       const file = files[0].file;
-      console.log('file',file)
       data.append('file', file);
     } else {
       const fileArray = files

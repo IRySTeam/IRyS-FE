@@ -34,7 +34,6 @@ export default function ForgotPassword() {
         setShowAlert(false);
         setIsLoading(false);
       } catch (error) {
-        console.log(error)
         setAlertSeverity('error')
         if(error.response){
           switch (error.response.data.error_code){
@@ -45,7 +44,6 @@ export default function ForgotPassword() {
                 Cookies.set('register_refresh_token', result.data.refresh_token, { expires: 1 });
                 router.push({ pathname: '/otp',  query: { from : 'login' }  })
               } catch (error) {
-                console.log(error)
                 setAlertLabel('Network Error, Please Try Again.');
                 setShowAlert(true);
               }
