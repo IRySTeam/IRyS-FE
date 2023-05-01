@@ -50,7 +50,6 @@ export default function Uploader(props) {
   }, [])
 
   useEffect(() => {
-    console.log(files);
     setIsUploadError(files.some((file) => file.errors && file.errors.length > 0) || files.length === 0);
   }, [files]);
 

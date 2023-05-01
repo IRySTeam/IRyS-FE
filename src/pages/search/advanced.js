@@ -120,6 +120,10 @@ export default function AdvancedSearch() {
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
+  const removeEmptyFilters = (arr) => {
+    return arr.filter(obj => obj.key !== '' && obj.value !== '' && obj.operator !== '');
+  }
+
   useEffect(() => {
     const { from, origin } = router.query;
     if(from && origin) {
@@ -166,10 +170,8 @@ export default function AdvancedSearch() {
     const fetchDomainFilter = async () =>  {
       try {
         const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/information/${domain === ''? 'general' : domain}`,)
-        console.log(response)
         dispatch(getFilterOptionSuccess(response.data))
       } catch (error){
-        console.log(error)
         setAlertSeverity('error');
         setAlertLabel(`Network Error, Please try again`);
         setShowAlert(true);

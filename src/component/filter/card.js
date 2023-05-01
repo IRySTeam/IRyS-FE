@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import FilterDropdown from './dropdown';
-import { modelOption, operatorOption, scoringAlgorithmOption } from '@/constants/option';
+import { modelOption, scoringAlgorithmOption } from '@/constants/option';
 import FilterInput from './input';
 
 export default function FilterCard(props) {
@@ -81,7 +81,6 @@ export default function FilterCard(props) {
 
   const getOperatorOfKey = () => {
     const operator = filterOption.filter_operator_option.find((option) => option.value === key);
-    console.log(operator)
     return operator ? operator.label : [{value: '', label: 'None'}];
   }
 

@@ -233,7 +233,6 @@ export default function ManageDocumentsDatabases() {
             Authorization: `Bearer ${token}`
           }
         })
-        console.log(response.data);
         dispatch(getMonitorDataSuccess(response.data))
       } catch (error){
         setAlertSeverity('error');

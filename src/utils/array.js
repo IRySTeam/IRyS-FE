@@ -3,8 +3,6 @@ export const convertExtractionDomainArray= (arr) => {
     value: el === 'general'? '' : el,
     label: el.charAt(0).toUpperCase() + el.slice(1),
   }));
-
-  console.log('new', newArray);
   return newArray
 }
 

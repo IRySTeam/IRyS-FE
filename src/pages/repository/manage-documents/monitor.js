@@ -175,7 +175,6 @@ export default function ManageDocumentsMonitor() {
             Authorization: `Bearer ${token}`
           }
         })
-        console.log(response.data);
         dispatch(getMonitorDataSuccess(response.data))
       } catch (error){
         setAlertSeverity('error');
