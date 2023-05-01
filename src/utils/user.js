@@ -2,6 +2,7 @@ import axios from 'axios';
 import { getUserDetailSuccess, getUserDetailFailed } from '@/state/actions/userActions';
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import Cookies from 'js-cookie';
+import { refresh } from './token';
 
 export const getUserDetail = async (token, dispatch, router) => {
   try {
@@ -13,26 +14,16 @@ export const getUserDetail = async (token, dispatch, router) => {
     dispatch(getUserDetailSuccess(response.data))
   } catch (error) {
     if(error.response && error.response.status === 401){
-      const token = Cookies.get('access_token');
-      const refresh_token = Cookies.get('refresh_token');
-      const refreshData = {
-        token: token,
-        refresh_token: refresh_token
-      }
       try {
-        const new_token = await axios.post(`${NEXT_PUBLIC_API_URL}/auth/refresh`, refreshData);
-        console.log(new_token);
-        Cookies.set('access_token', new_token.data.token, { expires: 1 });
-        Cookies.set('refresh_token', new_token.data.refresh_token, { expires: 1 });
-        getUserDetail(new_token.data.token, dispatch)
+        refresh('access_token', 'refresh_token', router);
+        const token = Cookies.get('access_token');
+        getUserDetail(token, dispatch, router)
       }catch (error){
-        console.log(error)
-        dispatch(getUserDetailFailed(error.response.data))
-        Cookies.remove('access_token');
-        Cookies.remove('refresh_token');
-        router.replace({ pathname: "/login" });
-      }
-      dispatch(getUserDetailFailed(error.response.data))
-    } 
+        if(error.response && error.response.status !== 500){
+          dispatch(getUserDetailFailed(error.response.data))
+        }
+      } 
+    }
+    dispatch(getUserDetailFailed('Network Error')) 
   }
 }

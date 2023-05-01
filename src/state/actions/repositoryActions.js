@@ -1,13 +1,63 @@
-export const getRepoListSuccess = (data) => {
+export const getRepoDetailSuccess = (data) => {
   return {
-    type: "repoListSuccess",
+    type: 'repoDetailSuccess',
     payload: data,
   }
 }
 
-export const getRepoListFailed = (data) => {
+export const getRepoCollaboratorListSuccess = (data) => {
   return {
-    type: "repoListFailed",
+    type: 'repoCollaboratorListSuccess',
+    payload: data,
+  }
+}
+
+export const changeRepoDetailSuccess = (data) => {
+  return {
+    type: 'changeRepoDetailSuccess',
+    payload: data,
+  }
+}
+
+export const changeRepoVisibilitySuccess = (data) => {
+  return {
+    type: 'changeRepoVisibilitySuccess',
+    payload: data,
+  }
+}
+
+export const getRepoDetailFailed = (data) => {
+  return {
+    type: 'repoDetailFailed',
+    payload: data,
+  }
+}
+
+export const getRepoCollaboratorListFailed = (data) => {
+  return {
+    type: 'repoCollaboratorListFailed',
+    payload: data,
+  }
+}
+
+
+export const addNewCollaboratorToRepo = (data) => {
+  return {
+    type: 'addCollaboratorToRepo',
+    payload: data,
+  }
+}
+
+export const changeCollaboratorRoleInRepo = (data) => {
+  return {
+    type: 'changeCollaboratorRoleInRepo',
+    payload: data,
+  }
+}
+
+export const removeCollaboratorInRepo = (data) => {
+  return {
+    type: 'removeCollaborator',
     payload: data,
   }
 }
