@@ -16,11 +16,11 @@ import AddIcon from '@mui/icons-material/Add';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Dropdown from '@/component/dropdown';
-import { documentList } from '@/data/documents';
-import { getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
+import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import DocumentCard from '@/component/document-card';
 import { sortOption } from '@/constants/option';
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
+import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
 
 export default function Repository() {
   const theme = useTheme();
@@ -37,10 +37,10 @@ export default function Repository() {
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
   const singleRepositoryData = useSelector(state => state.singleRepository);
   const repositoryData = useSelector(state => state.repository);
+  const filterDocument = useSelector(state => state.filter);
 
   const handleChangeSortQuery = (event) => {
     setSortQuery(event.target.value);
-    handleSearch(searchQuery, event.target.value);
   };
 
   const handleKeyPress = (event) => {
@@ -50,9 +50,9 @@ export default function Repository() {
     }
   };
 
-  const handleSearch = (searchFilter = searchQuery, sortFilter = sortQuery) => {
+  const handleSearch = () => {
     const { id } = router.query;
-    router.push({ pathname: '/repository', query: { id: id, search: searchFilter, sort: sortFilter } })
+    router.push({ pathname: '/repository', query: { id: id,} })
   }
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
@@ -77,29 +77,9 @@ export default function Repository() {
     router.push({ pathname: '/repository/manage-documents/upload', query: { id: id} })
   }
 
-  useEffect(() => {
-    setIsLoadingDocs(true);
-    const filterArrayRepo = (array) => {
-      const searchFilter = !search ? array : array.filter((repo) => repo.name.toLowerCase().includes(search.toLowerCase()))
-      const sortFilter = sortQuery === ''? searchFilter: searchFilter.sort((a, b) => {
-        if (sortQuery === 'updated_at') {
-          return b.last_updated - a.last_updated;
-        } else if (sortQuery === 'name') {
-          return a.name.localeCompare(b.name);
-        }
-      });
-      return sortFilter
-    }
-  
-    setTimeout(() => {
-      const result = {
-        documents: filterArrayRepo(documentList),
-        isEmpty : false,
-      }
-      dispatch(getSingleRepoSuccess(result))
-      setIsLoadingDocs(false);
-    }, 1000);
-  }, [dispatch, search, sortQuery]);
+  const removeEmptyFilters = (arr) => {
+    return arr.filter(obj => obj.key !== '' && obj.operator !== '');
+  }
 
   useEffect(() => {
     setIsLoading(true);
@@ -141,14 +121,74 @@ export default function Repository() {
         }
       }
 
+      const fetchDocument = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getSingleRepoSuccess(response.data))
+        } catch (error){
+          dispatch(getSingleRepoFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+        }
+      }
+      
       if(!repositoryData.id || repositoryData.id !== id){
         fetchDetailRepo()
         fetchRepoCollaborator()
+        fetchDocument()
       }
 
       setIsLoading(false);
     }
   }, [dispatch, router, repositoryData.id]);
+
+  useEffect(() => {
+    setIsLoadingDocs(true);
+    const { id } = router.query;
+    if(!id){
+      router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
+    }else{
+      const token =  Cookies.get('access_token');
+      const fetchSearchDocumentBasic = async () =>  {
+        const data = {
+          query: filterDocument.mode === 'basic' ? filterDocument.keyword : filterDocument.cliQuery,
+          domain: filterDocument.domain === '' ? 'general' : filterDocument.domain,
+          advanced_filter: {
+            match: filterDocument.mode === 'basic' ? removeEmptyFilters(filterDocument.filters) : [],
+          }
+        }
+        try {
+          const response = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/search/repository/${id}`, data, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          console.log('search', response)
+          dispatch(getSearchDocumentSuccess(response.data))
+        } catch (error){
+          console.log(error)
+          dispatch(getSearchDocumentFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+        }
+      }
+
+      if(filterDocument.mode === 'basic' || filterDocument.mode === 'cli' ){
+        fetchSearchDocumentBasic()
+      }else if(filterDocument.mode === 'file' ) {
+        //
+      }
+      
+      setIsLoadingDocs(false);
+    }
+  }, [dispatch, router, repositoryData.id, filterDocument]);
 
   return (
     <>
@@ -403,13 +443,13 @@ export default function Repository() {
                       width: '100%'
                     }}
                   >
-                    { singleRepositoryData.documents.map((docs, index) => (
+                    {/* { singleRepositoryData.documents.map((docs, index) => (
                       <DocumentCard
                         key={index}
                         item={docs}
                         query={search}
                       />
-                    ))}
+                    ))} */}
                   </Box> 
                 }
               </Box>
@@ -519,8 +559,8 @@ export default function Repository() {
                       color: theme.palette.primary.main,
                     }}
                   />
-                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6_bold', marginLeft: '12px' }}>20</Typography>
-                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6' }}>Documents</Typography>
+                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6_bold', marginLeft: '12px' }}>{singleRepositoryData.documents.length}</Typography>
+                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6' }}>Document{singleRepositoryData.documents.length > 1? 's':''}</Typography>
                 </Box>
                 <Button 
                   color='primary' 

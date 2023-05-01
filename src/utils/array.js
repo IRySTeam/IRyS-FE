@@ -24,7 +24,7 @@ const convertOperatorArray= (arr) => {
 export const convertFilterKeyArray = (arr) => {
   const keyArray = arr.map((el) => ({
     value: el.name,
-    label: el.name.charAt(0).toUpperCase() + el.name.slice(1),
+    label: convertOperatorValue(el.name),
   }));
   keyArray.unshift({ value: '', label: 'None' });
   return keyArray

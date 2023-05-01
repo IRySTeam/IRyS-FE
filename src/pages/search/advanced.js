@@ -14,7 +14,6 @@ import NavBar from '@/component/navbar';
 import FilterInput from '@/component/filter/input';
 import FilterDropdown from '@/component/filter/dropdown';
 import FilterCard from '@/component/filter/card';
-import { domainOption } from '@/constants/option';
 import { resetFilterAdvancedSearch, saveAdvancedSearchBasic, saveAdvancedSearchCli } from '@/state/actions/filterAction';
 import Uploader from '@/component/uploader';
 import CustomAlert from '@/component/custom-alert';
@@ -26,8 +25,9 @@ export default function AdvancedSearch() {
   const dispatch = useDispatch();
   const advancedSearch = useSelector(state => state.filter);
   const filterOption = useSelector(state => state.filterOption);
+  const repositoryData = useSelector(state => state.repository);
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState('basic');
+  const [mode, setMode] = useState(advancedSearch.mode ?? 'basic');
   const [path, setPath] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('error');
@@ -42,8 +42,8 @@ export default function AdvancedSearch() {
       value: '',
       model: '',
       scoring_algorithm: '',
-      top_n: '',
-      score_threshold: '',
+      top_n: 0,
+      score_threshold: 0,
     },
   ])
   const [cliQuery, setCliQuery] = useState(advancedSearch.cliQuery ?? '');
@@ -56,8 +56,8 @@ export default function AdvancedSearch() {
       value: '',
       model: '',
       scoring_algorithm: '',
-      top_n: '',
-      score_threshold: '',
+      top_n: 0,
+      score_threshold: 0,
     }
     setFilters([...filters, newFilter]);
   };
@@ -120,10 +120,6 @@ export default function AdvancedSearch() {
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
-  const removeEmptyFilters = (arr) => {
-    return arr.filter(obj => obj.key !== '' && obj.value !== '' && obj.operator !== '');
-  }
-
   useEffect(() => {
     const { from, origin } = router.query;
     if(from && origin) {
@@ -141,8 +137,8 @@ export default function AdvancedSearch() {
           value: '',
           model: '',
           scoring_algorithm: '',
-          top_n: '',
-          score_threshold: '',
+          top_n: 0,
+          score_threshold: 0,
         }])
         setCliQuery('')
       }
@@ -231,7 +227,7 @@ export default function AdvancedSearch() {
                   }, 
                 }}
               >
-                { path.includes('repository') ? 'Repository XYZ' : 'Public Databases'} 
+                { path.includes('repository') ? repositoryData.name : 'Public Databases'} 
               </Typography>
             </Box>
             <Box

@@ -21,16 +21,16 @@ export default function FilterCard(props) {
 
   const handleKeyChange = (event) => {
     const newKey = event.target.value;
-    const newDataType = getTypeOfKey();
+    const newDataType = getTypeOfKey(newKey);
     setKey(newKey);
     setDataType(newDataType);
     setOperator('');
     setValue('');
     setModel('');
     setScoringAlgorithm('');
-    setTopN('');
-    setScoreThreshold('');
-    props.onChange(newKey, newDataType, '', '', '', '', '', '');
+    setTopN(0);
+    setScoreThreshold(0);
+    props.onChange(newKey, newDataType, '', '', '', '', 0, 0);
   };
 
   const handleOperatorChange = (event) => {
@@ -39,9 +39,9 @@ export default function FilterCard(props) {
     setValue('');
     setModel('');
     setScoringAlgorithm('');
-    setTopN('');
-    setScoreThreshold('');
-    props.onChange(key, dataType, newOperator, '', '', '', '', '');
+    setTopN(0);
+    setScoreThreshold(0);
+    props.onChange(key, dataType, newOperator, '', '', '', 0, 0);
   };
 
   const handleValueChange = (event) => {
@@ -63,18 +63,18 @@ export default function FilterCard(props) {
   };
 
   const handleTopNChange = (event) => {
-    const newTopN = event.target.value;
+    const newTopN = parseInt(event.target.value);
     setTopN(newTopN);
     props.onChange(key, dataType, operator, value, model, scoringAlgorithm, newTopN, scoreThreshold);
   };
 
   const handleScoreThresholdChange = (event) => {
-    const newScoreThreshold = event.target.value;
+    const newScoreThreshold = parseFloat(event.target.value);
     setScoreThreshold(newScoreThreshold);
     props.onChange(key, dataType, operator, value, model, scoringAlgorithm, topN, newScoreThreshold);
   };
 
-  const getTypeOfKey = () => {
+  const getTypeOfKey = (key) => {
     const type = filterOption.filter_type_option.find((option) => option.value === key);
     return type ? type.label : '';
   }
