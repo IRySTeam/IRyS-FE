@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { Container, Button, Typography, Box, OutlinedInput, Link, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
@@ -14,10 +17,10 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Dropdown from '@/component/dropdown';
 import { documentList } from '@/data/documents';
-import { repositoryFilled } from '@/data/repository';
 import { getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import DocumentCard from '@/component/document-card';
 import { sortOption } from '@/constants/option';
+import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 
 export default function Repository() {
   const theme = useTheme();
@@ -33,6 +36,7 @@ export default function Repository() {
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
   const singleRepositoryData = useSelector(state => state.singleRepository);
+  const repositoryData = useSelector(state => state.repository);
 
   const handleChangeSortQuery = (event) => {
     setSortQuery(event.target.value);
@@ -56,6 +60,11 @@ export default function Repository() {
   const goToSetting = () => {
     const { id } = router.query;
     router.push({ pathname: '/repository/setting/general', query: { id: id} })
+  }
+
+  const goToCollaboratorSetting = () => {
+    const { id } = router.query;
+    router.push({ pathname: '/repository/setting/collaborators', query: { id: id} })
   }
 
   useEffect(() => {
@@ -88,9 +97,48 @@ export default function Repository() {
     if(!id){
       router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
     }else{
+      const fetchDetailRepo = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getRepoDetailSuccess(response.data))
+        } catch (error){
+          dispatch(getRepoDetailFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+        }
+      }
+
+      const fetchRepoCollaborator = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getRepoCollaboratorListSuccess(response.data))
+        } catch (error){
+          dispatch(getRepoCollaboratorListFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+        }
+      }
+
+      if(!repositoryData.id || repositoryData.id !== id){
+        fetchDetailRepo()
+        fetchRepoCollaborator()
+      }
+
       setIsLoading(false);
     }
-  }, [router]);
+  }, [dispatch, router, repositoryData.id]);
 
   return (
     <>
@@ -134,7 +182,7 @@ export default function Repository() {
               }, 
             }}
           >
-            Repository XYZ
+            {repositoryData.name}
           </Typography>
           <Box
             sx={{
@@ -406,7 +454,7 @@ export default function Repository() {
                 }}
               >
                 <Typography sx={{ color: 'black.main', typography: 'heading_h4' }}>About</Typography>
-                <Typography sx={{ color: 'dark_gray.main', typography: 'paragraph_h6' }}>These repositories are collections of books, that are organized and stored for the needs of Myself</Typography>
+                <Typography sx={{ color: 'dark_gray.main', typography: 'paragraph_h6' }}>{repositoryData.description ?? 'No description provided.'}</Typography>
               </Box>
               <Box
                 sx={{
@@ -495,8 +543,8 @@ export default function Repository() {
                     gap: '8px',
                   }}
                 >
-                  { repositoryFilled.collaborators &&
-                   repositoryFilled.collaborators .map((person, index) => (
+                  { repositoryData.collaborators &&
+                   repositoryData.collaborators.map((person, index) => (
                     <Box
                       key={index}
                       sx={{
@@ -514,7 +562,7 @@ export default function Repository() {
                           color: theme.palette.primary.main
                         }}
                       />
-                      <Typography sx={{ color: 'black.main', typography: 'paragraph_h6',}}>{person.name}</Typography>
+                      <Typography sx={{ color: 'black.main', typography: 'paragraph_h6',}}>{`${person.first_name} ${person.last_name}`}</Typography>
                     </Box>
                    ))
                   }
@@ -527,6 +575,7 @@ export default function Repository() {
                     width: '100%',
                     typography: theme.typography.heading_h6,
                   }}
+                  onClick={() => goToCollaboratorSetting()}
                 >
                   <Typography sx={{ color: 'white.main', typography: 'heading_h6',}}> Manage Collaborators </Typography>
                 </Button>

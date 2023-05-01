@@ -1,11 +1,13 @@
 import {useState, useEffect} from 'react';
+import axios from 'axios';
+import Cookies from 'js-cookie'
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { useTheme } from '@mui/material/styles';
 import { Box, Typography, } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import PersonIcon from '@mui/icons-material/Person';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
-import { users } from '@/data/users';
 
 function sleep(delay = 0) {
   return new Promise((resolve) => {
@@ -17,33 +19,36 @@ export default function SearchableSelect(props) {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const [options, setOptions] = useState([]);
-  const loading = open && options.length === 0;
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    let active = true;
+    let abortController = new AbortController();
 
-    if (!loading) {
-      return undefined;
-    }
-
-    (async () => {
-      await sleep(1000);
-
-      if (active) {
-        setOptions([...users]);
+    setLoading(true);
+    const fetchUsers = async () =>  {
+      const token =  Cookies.get('access_token');
+      const data = {
+        query: props.inputValue,
+        page_no: 1,
+        page_size: 10,
       }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [loading]);
-
-  useEffect(() => {
-    if (!open) {
-      setOptions([]);
+      try {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${props.repoId}/members/add/search`, {
+          params : data,
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          signal: abortController.signal
+        })
+        setOptions(response.data.results)
+      } catch (error){
+        if(error.code !== 'ERR_CANCELED')console.log(error)
+      }
     }
-  }, [open]);
+    fetchUsers()
+    setLoading(false)
+    return () => abortController.abort();
+  }, [props.inputValue, props.repoId]);
 
   return (
     <Autocomplete
@@ -62,6 +67,7 @@ export default function SearchableSelect(props) {
       onClose={() => {
         setOpen(false);
       }}
+      filterOptions={(x) => x}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       getOptionLabel={(option) => {
         if (!option) {

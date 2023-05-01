@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
+import axios from 'axios';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
+import { useSelector, useDispatch } from 'react-redux';
 import { Container, Box, Typography, Button, IconButton} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -13,14 +15,16 @@ import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import SettingRepositoryTabs from '@/component/tabs/setting-repository';
 import CustomAlert from '@/component/custom-alert';
-import { collaborators } from '@/data/collaborators';
 import CollaboratorCard from '@/component/collaborator-card';
 import SearchableSelect from '@/component/searchable-select';
 import NewCollaboratorCard from '@/component/new-collaborator-card';
+import Cookies from 'js-cookie';
+import { addNewCollaboratorToRepo, changeCollaboratorRoleInRepo, removeCollaboratorInRepo } from '@/state/actions/repositoryActions';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
   const router = useRouter();
+  const dispatch = useDispatch();
   const { id } = router.query;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -29,50 +33,138 @@ export default function CollaboratorsSettingRepository() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Role updated successfully');
-  const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(1);
+  const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(0);
   const repositoryName = 'Repository XYZ'
   const [newCollaborator, setNewCollaborator] = useState(null);
-  const [newCollaboratorRole, setNewCollaboratorRole] = useState('viewer');
+  const [newCollaboratorRole, setNewCollaboratorRole] = useState('Viewer');
   const [searchUsers, setSearchUsers] = useState('');
+  const repositoryData = useSelector(state => state.repository);
   
   useEffect(() => {
     setIsLoading(true);
     const { id } = router.query;
-    if(!id){
-      // router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
-    }else{
-      setIsLoading(false);
-    }
+    if(id) setIsLoading(false);
   }, [router]);
 
-  const handleClickOpenRemoveAccess = (id) => {
-    setCurrentRemoveAccessId(id);
+  const handleClickOpenRemoveAccess = (index) => {
+    setCurrentRemoveAccessId(index);
     setIsRemoveAccessModalOpen(true);
   };
   const handleCloseRemoveAccess = () => {setIsRemoveAccessModalOpen(false);};
   const handleClickOpenAddCollaborator = () => {setIsAddCollaboratorModalOpen(true);};
   const handleCloseAddCollaborator = () => {setIsAddCollaboratorModalOpen(false);};
-  const handleChangeRemoveAccess = () => {
-    setAlertSeverity('success')
-    setAlertLabel(`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name} has been removed`)
-    setShowAlert(true)
+  const handleChangeRemoveAccess = async () => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : repositoryData.collaborators[currentRemoveAccessId].id,
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members/remove`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const newData = {
+        index: currentRemoveAccessId,
+      }
+      dispatch(removeCollaboratorInRepo(newData));
+      setCurrentRemoveAccessId(0);
+      setAlertSeverity('success')
+      setAlertLabel(`${repositoryData.collaborators[currentRemoveAccessId].first_name} ${repositoryData.collaborators[currentRemoveAccessId].last_name} has been removed`)
+      setShowAlert(true)
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found. Please try again.');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Failed to remove collaborator');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Failed to remove collaborator');
+        setShowAlert(true);
+      }
+    }
+    setIsLoading(false);
     handleCloseRemoveAccess();
   }
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
-  const handleRoleChanged = (event, id) => {
-    if(id !== 3){
-      console.log(`Change collaborators with id ${id} role to ${event.target.value}`)
+  const handleRoleChanged = async (event, index) => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : repositoryData.collaborators[index].id,
+        role : event.target.value
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members/edit`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const newData = {
+        order: index,
+        newCollaborator: repositoryData.collaborators[index],
+        role: event.target.value,
+      }
+      dispatch(changeCollaboratorRoleInRepo(newData));
       setAlertSeverity('success')
       setAlertLabel('Role updated successfully')
       setShowAlert(true)
-    } else {
-      console.log(`Failed to change collaborators with id ${id}`)
-      setAlertSeverity('error')
-      setAlertLabel('Failed to update role')
       setShowAlert(true)
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found. Please try again.');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__INVALID_COLLABORATOR':
+            setAlertLabel('Invalid collaborator.');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Failed to update role');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Failed to update role');
+        setShowAlert(true);
+      }
     }
+    setIsLoading(false);
   }
 
   const handleNewCollaboratorRoleChange = (event, id) => {
@@ -84,13 +176,63 @@ export default function CollaboratorsSettingRepository() {
     setNewCollaboratorRole('viewer')
   }
 
-  const addToRepo = () => {
-    console.log(`Added ${newCollaborator.first_name} ${newCollaborator.last_name} to my repository`)
-    setNewCollaborator(null)
-    setNewCollaborator('viewer')
-    setAlertSeverity('success')
-    setAlertLabel('A new collaborator has been successfully added')
-    setShowAlert(true)
+  const addToRepo = async () => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : newCollaborator.id,
+        role : newCollaboratorRole
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members/add`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const newData = {
+        newCollaborator: newCollaborator,
+        role: newCollaboratorRole,
+      }
+      dispatch(addNewCollaboratorToRepo(newData));
+      setNewCollaborator(null)
+      setNewCollaboratorRole('Viewer')
+      setAlertSeverity('success')
+      setAlertLabel('A new collaborator has been successfully added')
+      setShowAlert(true)
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found. Please try again.');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__DUPLICATE_COLLABORATOR':
+            setAlertLabel('User is already a collaborator of this repository');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
+    }
+    setIsLoading(false);
     handleCloseAddCollaborator()
   }
 
@@ -249,9 +391,10 @@ export default function CollaboratorsSettingRepository() {
                       }, 
                     }}
                   >
-                    {collaborators.map((collaborator, index) => (
+                    {repositoryData.collaborators.map((collaborator, index) => (
                       <CollaboratorCard 
                         key={index}
+                        order={index}
                         item={collaborator}
                         onRoleChange={handleRoleChanged}
                         onRemoveAccess={() => handleClickOpenRemoveAccess(index)}
@@ -313,7 +456,7 @@ export default function CollaboratorsSettingRepository() {
                   color: theme.palette.dark_gray.main
                 }}
               />  
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>Remove {`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name}`} from this repository</Typography>
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>Remove {`${repositoryData.collaborators[currentRemoveAccessId].first_name} ${repositoryData.collaborators[currentRemoveAccessId].last_name}`} from this repository</Typography>
               <Typography 
                 variant='form_sublabel_small' 
                 color='black.main'
@@ -324,7 +467,7 @@ export default function CollaboratorsSettingRepository() {
                   }
                 }}
               >
-                Once removed, <span className='bold'>{`${collaborators[currentRemoveAccessId].first_name} ${collaborators[currentRemoveAccessId].last_name}`}</span> will no longer have direct access to this repository.
+                Once removed, <span className='bold'>{`${repositoryData.collaborators[currentRemoveAccessId].first_name} ${repositoryData.collaborators[currentRemoveAccessId].last_name}`}</span> will no longer have direct access to this repository.
               </Typography>
               <Button 
                 color='danger_button' 
@@ -396,6 +539,7 @@ export default function CollaboratorsSettingRepository() {
               /> 
               <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Add a collaborator to ${repositoryName}`}</Typography>
               <SearchableSelect 
+                repoId={id}
                 value={newCollaborator}
                 onChange={(event, newValue) => {
                   setNewCollaborator(newValue);

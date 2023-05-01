@@ -2,7 +2,7 @@ import { useTheme } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import Dropdown from './dropdown';
-import { roleOption } from '@/constants/option';
+import { newRoleOption, roleOption } from '@/constants/option';
 
 export default function CollaboratorCard(props) {
   const theme = useTheme();
@@ -84,11 +84,12 @@ export default function CollaboratorCard(props) {
       >
         <Dropdown
           label={'Role'}
-          placeholder={'Role'} 
+          placeholder={'Role'}
+          disableOwner={true} 
           value={props.item.role}
-          id={props.item.id}
+          id={props.order}
           handleChange={props.onRoleChange}
-          options={roleOption}
+          options={props.item.role === 'Owner' ? roleOption : newRoleOption}
           width='150px'
           backgroundColor={theme.palette.white.main}
         />
@@ -106,7 +107,7 @@ export default function CollaboratorCard(props) {
               color: theme.palette.white.main,
             },
           }}
-          disabled={props.item.role === 'owner'}
+          disabled={props.item.role === 'Owner'}
           onClick={props.onRemoveAccess}
         >
           Remove Access

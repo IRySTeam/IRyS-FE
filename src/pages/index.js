@@ -15,7 +15,7 @@ import NavBar from '@/component/navbar';
 import SearchIcon from '@mui/icons-material/Search';
 import Dropdown from '@/component/dropdown';
 import RepositoryCard from '@/component/repository-card';
-import { getRepoListSuccess } from '@/state/actions/repositoryActions';
+import { getJoinedRepoListSuccess } from '@/state/actions/joinedRepositoryActions';
 import { typeOption, sortOption } from '@/constants/option';
 
 export default function Home() {
@@ -36,7 +36,7 @@ export default function Home() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
-  const repositoryData = useSelector(state => state.repository);
+  const joinedRepositoryData = useSelector(state => state.joinedRepository);
 
   const handleChangeTypeQuery = (event) => {
     setTypeQuery(event.target.value);
@@ -84,7 +84,7 @@ export default function Home() {
             Authorization: `Bearer ${token}`
           }
         })
-        dispatch(getRepoListSuccess(response.data))
+        dispatch(getJoinedRepoListSuccess(response.data))
       } catch (error){
         setAlertSeverity('error');
         setAlertLabel(`Network Error, Please try again`);
@@ -297,7 +297,7 @@ export default function Home() {
             { isLoadingRepo &&
               <Loading transparent={true} centered={false}/>
             }
-            { !isLoadingRepo && (repositoryData.repositories.length === 0) &&
+            { !isLoadingRepo && (joinedRepositoryData.repositories.length === 0) &&
               <Box
                 sx={{
                   width: '100%', 
@@ -307,9 +307,9 @@ export default function Home() {
                   alignItem: 'center'
                 }}
               >
-                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>{repositoryData.does_user_have_any_repos ? 'No repositories found.' : 'No repository.'}</Typography>
+                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>{joinedRepositoryData.does_user_have_any_repos ? 'No repositories found.' : 'No repository.'}</Typography>
                 <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>
-                  {repositoryData.does_user_have_any_repos ?
+                  {joinedRepositoryData.does_user_have_any_repos ?
                   'Please check for typos, or use fewer terms or fields.'
                   :
                   <>
@@ -327,10 +327,10 @@ export default function Home() {
                 </Typography>
               </Box>
             }
-            { !isLoadingRepo && repositoryData.repositories.length > 0 && 
+            { !isLoadingRepo && joinedRepositoryData.repositories.length > 0 && 
               <>
               <Grid container columns={{ mobile: 4, tablet: 6, small: 12 }} rowSpacing={5} columnSpacing={{ mobile: 5, tablet: 6, small: 7 }}>
-              { repositoryData.repositories.map((repo, index) => (
+              { joinedRepositoryData.repositories.map((repo, index) => (
                 <Grid mobile={4} tablet={3} small={4} desktop={3} large={2}  key={index}>
                   <RepositoryCard 
                     item={repo}
@@ -339,7 +339,7 @@ export default function Home() {
               ))}
               </Grid>
               {
-                repositoryData.total_page > 1 && 
+                joinedRepositoryData.total_page > 1 && 
                 <Box
                   sx={{
                     width: '100%',
@@ -350,7 +350,7 @@ export default function Home() {
                   }}
                 >
                   <Pagination 
-                    count={repositoryData.total_page} 
+                    count={joinedRepositoryData.total_page} 
                     page={parseInt(pagination)} 
                     onChange={handleChangePage} 
                     shape="rounded" 
