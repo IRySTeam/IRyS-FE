@@ -34,7 +34,6 @@ export default function CollaboratorsSettingRepository() {
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Role updated successfully');
   const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(0);
-  const repositoryName = 'Repository XYZ'
   const [newCollaborator, setNewCollaborator] = useState(null);
   const [newCollaboratorRole, setNewCollaboratorRole] = useState('Viewer');
   const [searchUsers, setSearchUsers] = useState('');
@@ -275,7 +274,7 @@ export default function CollaboratorsSettingRepository() {
                 }, 
               }}
             >
-              Repository XYZ
+              {repositoryData.name}
             </Typography>
             <Box
               sx={{
@@ -537,7 +536,7 @@ export default function CollaboratorsSettingRepository() {
                   color: theme.palette.dark_gray.main
                 }}
               /> 
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Add a collaborator to ${repositoryName}`}</Typography>
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Add a collaborator to ${repositoryData.name}`}</Typography>
               <SearchableSelect 
                 repoId={id}
                 value={newCollaborator}

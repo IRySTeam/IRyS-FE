@@ -125,10 +125,41 @@ export default function GeneralSettingRepository() {
       real_name: repositoryData.name,
     },
     validationSchema: deleteRepositoryValidation,
-    onSubmit: (values) => {
-      setIsLoading(true);
-      router.push({ pathname: '/', query: { deleteRepository : values.name }})
-      setIsLoading(false);
+    onSubmit: async (values) => {
+      setIsLoading(true)
+      try {
+        const token = Cookies.get('access_token');
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${repositoryData.id}/delete`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        router.push({ pathname: '/', query: { deleteRepository : values.name }})
+      } catch (error) {
+        setAlertSeverity('error')
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 401:
+              refresh('access_token', 'refresh_token', router)
+              setAlertLabel('Your session has been restored. Please Try Again.');
+              setShowAlert(true);
+              setIsLoading(false);
+              break;
+            case 'USER__EMAIL_NOT_VERIFIED':
+              setAlertLabel('Email is not verified.');
+              setShowAlert(true);
+              break;
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
+        } else{
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
+        }
+        setIsLoading(false);
+      }
     } ,
   });
 

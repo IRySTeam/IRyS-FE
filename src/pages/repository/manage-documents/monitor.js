@@ -167,6 +167,7 @@ export default function ManageDocumentsMonitor() {
         status: status,
         page_no: 1,
         page_size: 100,
+        find_document: search
       }
       try {
         const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/monitor`, {
@@ -184,7 +185,7 @@ export default function ManageDocumentsMonitor() {
     }
     fetchMonitor()
     setIsLoading(false);
-  }, [dispatch, id, status]);
+  }, [dispatch, id, search, status]);
 
   const fetchMonitor = async () =>  {
     const token =  Cookies.get('access_token');
@@ -192,6 +193,7 @@ export default function ManageDocumentsMonitor() {
       status: status,
       page_no: 1,
       page_size: 100,
+      find_document: search
     }
     try {
       const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/monitor`, {
