@@ -30,6 +30,12 @@ const filterReducer = (state = initialState, action) => {
         mode: 'file',
         file: action.payload.file, 
       };
+    case 'navbar':
+      return {
+        ...state,
+        mode: 'basic',
+        keyword: action.payload,
+      }; 
     case 'reset': 
       return { 
         ...state,

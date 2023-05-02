@@ -85,7 +85,7 @@ export default function EmptySearch(props) {
               marginLeft: {mobile: 0, small:'16px'},
               marginTop: {mobile: 0, small:'6px'},
             }}
-            onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath, origin: router.pathname } })}
+            onClick={() => router.push({ pathname: '/search/advanced',  query: { from: router.asPath, origin: router.pathname, q: props.query } })}
           >
             <Typography
               sx={{ 

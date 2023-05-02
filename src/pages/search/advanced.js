@@ -121,7 +121,7 @@ export default function AdvancedSearch() {
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
   useEffect(() => {
-    const { from, origin } = router.query;
+    const { from, origin, q } = router.query;
     if(from && origin) {
       const decodedPath = decodeURIComponent(from)
       setPath(decodedPath)
@@ -141,6 +141,9 @@ export default function AdvancedSearch() {
           score_threshold: 0,
         }])
         setCliQuery('')
+      }
+      if( origin === '/search'){
+        setKeyword(q)
       }
     }
   }, [advancedSearch.path, dispatch, router]);

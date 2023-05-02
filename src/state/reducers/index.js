@@ -10,6 +10,7 @@ import filterReducer from './filterReducer';
 import monitorReducer from './monitorReducer';
 import filterOptionReducer from './filterOptionReducer';
 import searchDocumentReducer from './searchDocumentReducer';
+import searchDocumentPublicReducer from './searchDocumentPublicReducer';
 
 const reducers = combineReducers({
   user: userReducer,
@@ -21,6 +22,7 @@ const reducers = combineReducers({
   monitor: monitorReducer,
   filterOption: filterOptionReducer,
   searchDocument: searchDocumentReducer,
+  searchDocumentPublic : searchDocumentPublicReducer
 })
 
 export default reducers;

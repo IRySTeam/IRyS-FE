@@ -14,6 +14,8 @@ import SuccessSearch from '@/component/search/success-search';
 import { documentList } from '@/data/documents';
 import { getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import { getPublicRepoListSuccess } from '@/state/actions/publicRepositoryActions';
+import { removeEmptyFilters } from '@/utils/array';
+import { getSearchDocumentPublicFailed, getSearchDocumentPublicSuccess } from '@/state/actions/searchDocumentPublicActions';
 
 export default function Search() {
   const theme = useTheme();
@@ -29,7 +31,8 @@ export default function Search() {
   const [searchQuery, setSearchQuery] = useState(q? q: '');
   const [categoryQuery, setCategoryQuery] = useState(category? category : 'repo');
   const publicRepositoryData = useSelector(state => state.publicRepository);
-  const singleRepositoryData = useSelector(state => state.singleRepository);
+  const filterDocument = useSelector(state => state.filter);
+  const searchDocumentPublicData = useSelector(state => state.searchDocumentPublic);
 
   useEffect(() => {
     setIsLoading(true);
@@ -38,14 +41,10 @@ export default function Search() {
     setCategoryQuery(category? category : 'repo')
     setPagination(page ? page : 1)
 
-    const filterArrayRepo = (array) => {
-      const searchFilter = !q ? array : array.filter((repo) => repo.name.toLowerCase().includes(q.toLowerCase()))
-      const visibilityFilter = searchFilter.filter((repo) => (repo.visibility === 'public'))
-      return visibilityFilter
-    }
+    const token =  Cookies.get('access_token');
 
     const fetchRepo = async () =>  {
-      const token =  Cookies.get('access_token');
+      
       const data = {
         name: q,
         page_no: page? page : 1,
@@ -63,19 +62,70 @@ export default function Search() {
         console.log(error)
       }
     }
+
+    const fetchSearchDocumentBasic = async () =>  {
+      const data = {
+        query: filterDocument.mode === 'basic' ? filterDocument.keyword : filterDocument.cliQuery,
+        domain: filterDocument.domain === '' ? 'general' : filterDocument.domain,
+        advanced_filter: {
+          match: filterDocument.mode === 'basic' ? removeEmptyFilters(filterDocument.filters) : [],
+        }
+      }
+      try {
+        const response = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/search/public`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        dispatch(getSearchDocumentPublicSuccess(response.data))
+        setIsLoading(false);
+      } catch (error){
+        console.log(error)
+        dispatch(getSearchDocumentPublicFailed(error.response.data))
+        setAlertSeverity('error');
+        setAlertLabel(`Network Error, Please try again`);
+        setShowAlert(true);
+        setIsLoading(false);
+      }
+    }
+
+    const fetchSearchDocumentFile = async () =>  {
+      const data = new FormData();
+      data.append('file', filterDocument.file)
+      const params = {
+        domain: filterDocument.domain === '' ? 'general' : filterDocument.domain
+      }
+      try {
+        const response = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/search/public/file`, data, {
+          params: params,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        })
+        dispatch(getSearchDocumentPublicSuccess(response.data))
+        setIsLoading(false);
+      } catch (error){
+        console.log(error)
+        dispatch(getSearchDocumentPublicFailed(error.response.data))
+        setAlertSeverity('error');
+        setAlertLabel(`Network Error, Please try again`);
+        setShowAlert(true);
+        setIsLoading(false);
+      }
+    }
+
     if(category === 'repo' || !category){
       fetchRepo()
     } else{
-      setTimeout(() => {
-        const result = {
-          documents: filterArrayRepo(documentList),
-          isEmpty : false,
-        }
-        dispatch(getSingleRepoSuccess(result))
-      }, 1000);
+      if(filterDocument.mode === 'basic' || filterDocument.mode === 'cli' ){
+        fetchSearchDocumentBasic()
+      }else if(filterDocument.mode === 'file' ) {
+        fetchSearchDocumentFile()
+      }
     }
     setIsLoading(false);
-  }, [dispatch, mobile, router, small, tablet]);
+  }, [dispatch, filterDocument, mobile, router, small, tablet]);
 
   const handleChangePage = (event, value) => {
     setPagination(value);
@@ -90,17 +140,17 @@ export default function Search() {
           <NavBar 
             setIsLoading={setIsLoading}
           />
-          { q && (( categoryQuery === 'repo' && publicRepositoryData.total_items === 0) || ( categoryQuery === 'docs' && singleRepositoryData.documents.length === 0)) &&
+          { q && (( categoryQuery === 'repo' && publicRepositoryData.total_items === 0) || ( categoryQuery === 'docs' && searchDocumentPublicData.count === 0)) &&
             <EmptySearch
               query={searchQuery} 
               category={categoryQuery}
             />
           }
-          { q && (( categoryQuery === 'repo' && publicRepositoryData.total_items > 0) || ( categoryQuery === 'docs' && singleRepositoryData.documents.length > 0)) &&
+          { q && (( categoryQuery === 'repo' && publicRepositoryData.total_items > 0) || ( categoryQuery === 'docs' && searchDocumentPublicData.count > 0)) &&
             <SuccessSearch
               query={searchQuery} 
               category={categoryQuery}
-              data={categoryQuery === 'repo' ? publicRepositoryData.repositories : singleRepositoryData.documents}
+              data={categoryQuery === 'repo' ? publicRepositoryData.repositories : searchDocumentPublicData.documents}
               page={pagination}
               onChangePage={handleChangePage}
               total_page={categoryQuery === 'repo' ? publicRepositoryData.total_page : 1}

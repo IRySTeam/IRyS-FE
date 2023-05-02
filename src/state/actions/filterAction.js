@@ -1,3 +1,10 @@
+export const saveAdvancedSearchNavbar = (data) => {
+  return {
+    type: 'navbar',
+    payload: data,
+  }
+}
+
 export const saveAdvancedSearchBasic = (data) => {
   return {
     type: 'basic',
