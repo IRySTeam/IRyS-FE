@@ -119,6 +119,7 @@ export default function DocumentCard(props) {
             gap: '8px'
           }}
         >
+          { props.item.details.is_public &&
           <Box
             sx={{
               width: '100px',
@@ -131,7 +132,7 @@ export default function DocumentCard(props) {
             }}
           >
             <Typography variant='heading_h6' color='white.main'>{props.item.details.is_public ? 'Public' : 'Private' }</Typography>
-          </Box>
+          </Box>}
           <Box 
             sx={{ height: '20px',
                 display: {mobile: 'flex', tablet: 'none'},
@@ -146,6 +147,9 @@ export default function DocumentCard(props) {
             }
             { ( props.item.details.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.item.details.mimetype === 'application/msword' ) &&
               <Image src={'/doc-icon.svg'} alt='doc-icon' width={20} height={20}/>
+            }
+            { !( props.item.details.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.item.details.mimetype === 'application/msword' || props.item.details.mimetype === 'text/plain' || props.item.details.mimetype === 'application/pdf') &&
+              <Image src={'/unknown-icon.svg'} alt='unknown-icon' width={20} height={20}/>
             }
           </Box>
         </Box>
@@ -179,6 +183,7 @@ export default function DocumentCard(props) {
               gap: '8px'
             }}
           >
+            { props.item.details.is_public &&
             <Box
               sx={{
                 width: '100px',
@@ -191,7 +196,7 @@ export default function DocumentCard(props) {
               }}
             >
               <Typography variant='heading_h6' color='white.main'>{props.item.details.is_public ? 'Public' : 'Private' }</Typography>
-            </Box>
+            </Box>}
             <Box sx={{ height: '32px' }}>
               { props.item.details.mimetype === 'application/pdf' &&
                 <Image src={'/pdf-icon.svg'} alt='pdf-icon' width={32} height={32}/>
@@ -201,6 +206,9 @@ export default function DocumentCard(props) {
               }
               { ( props.item.details.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.item.details.mimetype === 'application/msword' ) &&
                 <Image src={'/doc-icon.svg'} alt='doc-icon' width={32} height={32}/>
+              }
+              { !( props.item.details.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.item.details.mimetype === 'application/msword' || props.item.details.mimetype === 'text/plain' || props.item.details.mimetype === 'application/pdf') &&
+                <Image src={'/unknown-icon.svg'} alt='unknown-icon' width={32} height={32}/>
               }
             </Box>
           </Box>
@@ -247,6 +255,7 @@ export default function DocumentCard(props) {
             gap: {mobile: '8px', laptop:'16px'}
           }}
         >
+          { !props.hideFolder && 
           <Box
             sx={{
               display: 'flex',
@@ -271,7 +280,7 @@ export default function DocumentCard(props) {
             >
               {repositoryData.name ?? ''}
             </Typography>
-          </Box>
+          </Box>}
           <Box
             sx={{
               display: 'flex',

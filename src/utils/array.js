@@ -45,3 +45,7 @@ export const convertFilterKeyOperatorArray = (arr) => {
   operatorArray.unshift({ value: '', label: [{value: '', label: 'None'}] });
   return operatorArray
 }
+
+export const removeEmptyFilters = (arr) => {
+  return arr.filter(obj => obj.key !== '' && obj.operator !== '');
+}

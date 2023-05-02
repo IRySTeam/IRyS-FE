@@ -21,6 +21,7 @@ import DocumentCard from '@/component/document-card';
 import { sortOption } from '@/constants/option';
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
+import { removeEmptyFilters } from '@/utils/array';
 
 export default function Repository() {
   const theme = useTheme();
@@ -78,10 +79,6 @@ export default function Repository() {
     router.push({ pathname: '/repository/manage-documents/upload', query: { id: id} })
   }
 
-  const removeEmptyFilters = (arr) => {
-    return arr.filter(obj => obj.key !== '' && obj.operator !== '');
-  }
-
   useEffect(() => {
     setIsLoading(true);
     const { id } = router.query;
@@ -132,7 +129,9 @@ export default function Repository() {
           })
           dispatch(getSingleRepoSuccess(response.data))
         } catch (error){
-          dispatch(getSingleRepoFailed(error.response.data))
+          // TODO CHANGE TO NEW ENDPOINT
+          // dispatch(getSingleRepoFailed(error.response.data))
+          dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
           setAlertSeverity('error');
           setAlertLabel(`Network Error, Please try again`);
           setShowAlert(true);
@@ -170,7 +169,32 @@ export default function Repository() {
               Authorization: `Bearer ${token}`
             }
           })
-          console.log('search', response)
+          dispatch(getSearchDocumentSuccess(response.data))
+          setIsLoadingDocs(false);
+        } catch (error){
+          console.log(error)
+          dispatch(getSearchDocumentFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+          setIsLoadingDocs(false);
+        }
+      }
+
+      const fetchSearchDocumentFile = async () =>  {
+        const data = new FormData();
+        data.append('file', filterDocument.file)
+        const params = {
+          domain: filterDocument.domain === '' ? 'general' : filterDocument.domain
+        }
+        try {
+          const response = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/search/repository/${id}/file`, data, {
+            params: params,
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
+            }
+          })
           dispatch(getSearchDocumentSuccess(response.data))
           setIsLoadingDocs(false);
         } catch (error){
@@ -186,7 +210,7 @@ export default function Repository() {
       if(filterDocument.mode === 'basic' || filterDocument.mode === 'cli' ){
         fetchSearchDocumentBasic()
       }else if(filterDocument.mode === 'file' ) {
-        setIsLoadingDocs(false);
+        fetchSearchDocumentFile()
       }
     }
   }, [dispatch, router, repositoryData.id, filterDocument]);

@@ -21,6 +21,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Badge from '@mui/material/Badge';
 import { useTheme } from '@mui/material/styles';
 import Logo from './logo';
+import { saveAdvancedSearchNavbar } from '@/state/actions/filterAction';
 
 const pages = [
   {
@@ -33,12 +34,13 @@ const pages = [
 
 function NavBar(props) {
   const userDetail = useSelector(state => state.user);
+  const advancedSearch = useSelector(state => state.filter);
   const dispatch = useDispatch();
   const router = useRouter();
   const theme = useTheme();
   const { q, category } = router.query;
 
-  const [search, setSearch] = useState(q? q: '');
+  const [search, setSearch] = useState(q? q: category ? advancedSearch.keyword : '');
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
@@ -66,6 +68,7 @@ function NavBar(props) {
   };
 
   const handleSearch = () => {
+    dispatch(saveAdvancedSearchNavbar(search))
     router.push({ pathname: '/search', query: { q : search, category : category? category : 'repo'} })
   }
 
