@@ -14,10 +14,9 @@ import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
 import ManageDocumentsTabs from '@/component/tabs/manage-documents';
-import { getMonitorDataSuccess } from '@/state/actions/monitorActions';
 import Dropdown from '@/component/dropdown';
 import { statusOption } from '@/constants/option';
-import { refresh } from '@/utils/token';
+import { getDatabasesDataSuccess } from '@/state/actions/databasesActions';
 
 export default function ManageDocumentsDatabases() {
   const theme = useTheme();
@@ -31,13 +30,8 @@ export default function ManageDocumentsDatabases() {
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Your documents has been successfully uploaded');
   const repositoryData = useSelector(state => state.repository);
-  const monitorData = useSelector(state => state.monitor);
+  const databasesData = useSelector(state => state.databases);
   const [search, setSearch] = useState('')
-  const [status, setStatus] = useState('ALL')
-
-  const handleChangeStatus = (event) => {
-    setStatus(event.target.value);
-  };
 
   const CustomNoRowsOverlay = () => (
     <div style={{ width: '100%', padding: '20px' }} />
@@ -219,30 +213,30 @@ export default function ManageDocumentsDatabases() {
   
   useEffect(() => {
     setIsLoading(true);
-    const fetchMonitor = async () =>  {
+    const fetchDatabases = async () =>  {
       const token =  Cookies.get('access_token');
       const data = {
-        status: status,
         page_no: 1,
         page_size: 100,
+        find_document: search,
       }
       try {
-        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/monitor`, {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/database`, {
           params : data,
           headers: {
             Authorization: `Bearer ${token}`
           }
         })
-        dispatch(getMonitorDataSuccess(response.data))
+        dispatch(getDatabasesDataSuccess(response.data))
       } catch (error){
         setAlertSeverity('error');
         setAlertLabel(`Network Error, Please try again`);
         setShowAlert(true);
       }
     }
-    fetchMonitor()
+    fetchDatabases()
     setIsLoading(false);
-  }, [dispatch, id, status]);
+  }, [dispatch, id, search]);
 
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
@@ -441,14 +435,6 @@ export default function ManageDocumentsDatabases() {
                           },
                         }}
                       />
-                      <Dropdown
-                        label={'Status'}
-                        placeholder={'Status'} 
-                        value={status}
-                        handleChange={handleChangeStatus}
-                        options={statusOption}
-                        defaultValue={'ALL'}
-                      />
                     </Box>
                     <Box
                       sx={{
@@ -489,7 +475,7 @@ export default function ManageDocumentsDatabases() {
                     }}
                   >
                     <DataGrid
-                      rows={rows}
+                      rows={databasesData.results}
                       columns={columns}
                       initialState={{
                         pagination: {
