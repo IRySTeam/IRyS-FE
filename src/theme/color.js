@@ -148,5 +148,13 @@ export const palette = {
   },
   danger_button:{
     main: danger[70],
+  },
+  status:{
+    failed: danger[50],
+    ready: white[50],
+    parsing: warning[50],
+    extracting: secondary[50],
+    indexing: primary[50],
+    success: success[50]
   }
 }

@@ -1,14 +1,15 @@
-import Image from 'next/image'
+import Image from 'next/image';
+import { useSelector } from 'react-redux';
 import { Button, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { formatDate } from '@/utils/date';
-import { formatAuthor } from '@/utils/document';
 
 export default function DocumentCard(props) {
   const theme = useTheme();
+  const repositoryData = useSelector(state => state.repository);
   
   const handleClickBox = (id) => {
     console.log(`Open Document with Index ${id}`)
@@ -16,8 +17,19 @@ export default function DocumentCard(props) {
 
   const handleClickDownload = (event) => {
     event.stopPropagation();
-    console.log(`Download Document with Index ${props.item.id}`)
+    console.log(`Download Document with Index ${props.item.details.id}`)
   };
+
+  const boldHighlightedText = (preview, highlighted) => {
+    const words = preview.split(' ');
+    const boldedWords = words.map((word, index) => {
+      if (highlighted.some((highlight) => word.includes(highlight))) {
+        return <span key={index} className='bold'>{word} </span>;
+      }
+      return word+' ';
+    });
+    return boldedWords
+  }
 
   return (
     <Box
@@ -34,7 +46,7 @@ export default function DocumentCard(props) {
         alignItems: 'flex-start',
         cursor: 'pointer'
       }}
-      onClick={()=> handleClickBox(props.item.id)}
+      onClick={()=> handleClickBox(props.item.details.id)}
     >
       <Box
         sx={{
@@ -66,7 +78,7 @@ export default function DocumentCard(props) {
               WebkitBoxOrient: 'vertical',
             }}
           >
-            {props.item.name}
+            {props.item.details.title}
           </Typography>
           <Typography 
             variant='paragraph_h6' 
@@ -77,9 +89,12 @@ export default function DocumentCard(props) {
               display: '-webkit-box',
               WebkitLineClamp: {mobile: 3, tablet: 2},
               WebkitBoxOrient: 'vertical',
+              '& .bold':{
+                typography: theme.typography.paragraph_h6_bold,
+              },
             }}
           >
-            {props.item.highlighted_text}
+            {boldHighlightedText(props.item.preview, props.item.highlights)}
           </Typography>
           <Typography 
             variant='paragraph_h6' 
@@ -92,7 +107,7 @@ export default function DocumentCard(props) {
               WebkitBoxOrient: 'vertical',
             }}
           >
-            {formatAuthor(props.item.author)}
+            {props.item.details.uploaded_by ?? ''}
           </Typography>
         </Box>
         <Box
@@ -104,6 +119,7 @@ export default function DocumentCard(props) {
             gap: '8px'
           }}
         >
+          { props.item.details.is_public &&
           <Box
             sx={{
               width: '100px',
@@ -115,22 +131,25 @@ export default function DocumentCard(props) {
               borderRadius: '10px'
             }}
           >
-            <Typography variant='heading_h6' color='white.main' sx={{ textTransform: 'capitalize' }}>{props.item.visibility}</Typography>
-          </Box>
+            <Typography variant='heading_h6' color='white.main'>{props.item.details.is_public ? 'Public' : 'Private' }</Typography>
+          </Box>}
           <Box 
             sx={{ height: '20px',
                 display: {mobile: 'flex', tablet: 'none'},
               }}
           
           >
-            { props.item.type === 'pdf' &&
+            { props.item.details.mimetype === 'application/pdf' &&
               <Image src={'/pdf-icon.svg'} alt='pdf-icon' width={20} height={20}/>
             }
-            { props.item.type === 'txt' &&
+            { props.item.details.mimetype === 'text/plain' &&
               <Image src={'/txt-icon.svg'} alt='txt-icon' width={20} height={20}/>
             }
-            { props.item.type === 'docx' &&
+            { ( props.item.details.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.item.details.mimetype === 'application/msword' ) &&
               <Image src={'/doc-icon.svg'} alt='doc-icon' width={20} height={20}/>
+            }
+            { !( props.item.details.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.item.details.mimetype === 'application/msword' || props.item.details.mimetype === 'text/plain' || props.item.details.mimetype === 'application/pdf') &&
+              <Image src={'/unknown-icon.svg'} alt='unknown-icon' width={20} height={20}/>
             }
           </Box>
         </Box>
@@ -164,6 +183,7 @@ export default function DocumentCard(props) {
               gap: '8px'
             }}
           >
+            { props.item.details.is_public &&
             <Box
               sx={{
                 width: '100px',
@@ -175,17 +195,20 @@ export default function DocumentCard(props) {
                 borderRadius: '10px'
               }}
             >
-              <Typography variant='heading_h6' color='white.main' sx={{ textTransform: 'capitalize' }}>{props.item.visibility}</Typography>
-            </Box>
+              <Typography variant='heading_h6' color='white.main'>{props.item.details.is_public ? 'Public' : 'Private' }</Typography>
+            </Box>}
             <Box sx={{ height: '32px' }}>
-              { props.item.type === 'pdf' &&
+              { props.item.details.mimetype === 'application/pdf' &&
                 <Image src={'/pdf-icon.svg'} alt='pdf-icon' width={32} height={32}/>
               }
-              { props.item.type === 'txt' &&
+              { props.item.details.mimetype === 'text/plain' &&
                 <Image src={'/txt-icon.svg'} alt='txt-icon' width={32} height={32}/>
               }
-              { props.item.type === 'docx' &&
+              { ( props.item.details.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.item.details.mimetype === 'application/msword' ) &&
                 <Image src={'/doc-icon.svg'} alt='doc-icon' width={32} height={32}/>
+              }
+              { !( props.item.details.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || props.item.details.mimetype === 'application/msword' || props.item.details.mimetype === 'text/plain' || props.item.details.mimetype === 'application/pdf') &&
+                <Image src={'/unknown-icon.svg'} alt='unknown-icon' width={32} height={32}/>
               }
             </Box>
           </Box>
@@ -203,7 +226,7 @@ export default function DocumentCard(props) {
               justifyContent: 'center',
               alignItems: 'center',
             }}
-            onClick={() => handleClickDownload(props.item.id)}
+            onClick={() => handleClickDownload(props.item.details.id)}
           >
             <Typography
               sx={{ 
@@ -232,6 +255,7 @@ export default function DocumentCard(props) {
             gap: {mobile: '8px', laptop:'16px'}
           }}
         >
+          { !props.hideFolder && 
           <Box
             sx={{
               display: 'flex',
@@ -254,9 +278,9 @@ export default function DocumentCard(props) {
                 WebkitBoxOrient: 'vertical',
               }}
             >
-              {props.item.repository.name}
+              {repositoryData.name ?? ''}
             </Typography>
-          </Box>
+          </Box>}
           <Box
             sx={{
               display: 'flex',
@@ -279,7 +303,7 @@ export default function DocumentCard(props) {
                 WebkitBoxOrient: 'vertical',
               }}
             >
-              {`Updated on ${formatDate(props.item.last_updated)}`}
+              {`Updated on ${formatDate(props.item.details.updated_at)}`}
             </Typography>
           </Box>
         </Box>

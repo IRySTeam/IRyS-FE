@@ -60,13 +60,29 @@ export const operatorOption = [
 
 export const modelOption = [
   { value: '', label: 'None'},
-  { value: 'ner', label: 'NER'},
-  { value: 'bert', label: 'BERT'},
+  { value: 'BERT_BASE', label: 'BERT BASE'},
+  { value: 'SBERT_MSMARCO', label: 'SBERT_MSMARCO'},
 ]
 
 export const scoringAlgorithmOption = [
   { value: '', label: 'None'},
-  { value: 'cosine', label: 'COSINE'},
-  { value: 'dot', label: 'DOT'},
-  { value: 'okapi_bm', label: 'OKAPI BM'},
+  { value: 'COSINE_SIMILARITY', label: 'COSINE SIMILARITY'},
+  { value: 'DOT_PRODUCT', label: 'DOT PRODUCT'},
+  { value: 'OKAPI_BM', label: 'OKAPI BM'},
+]
+
+export const rowOption = [
+  { value: 5, label: '5'},
+  { value: 10, label: '10'},
+  { value: 25, label: '25'},
+]
+
+export const statusOption = [
+  { value: 'ALL', label: 'ALL'},
+  { value: 'READY', label: 'READY'},
+  { value: 'PARSING', label: 'PARSING'},
+  { value: 'EXTRACTING', label: 'EXTRACTING'},
+  { value: 'INDEXING', label: 'INDEXING'},
+  { value: 'SUCCESS', label: 'SUCCESS'},
+  { value: 'FAILED', label: 'FAILED'},
 ]

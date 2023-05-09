@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import Cookies from 'js-cookie'
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { Container, Button, Typography, Box, OutlinedInput } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -11,18 +14,20 @@ import NavBar from '@/component/navbar';
 import FilterInput from '@/component/filter/input';
 import FilterDropdown from '@/component/filter/dropdown';
 import FilterCard from '@/component/filter/card';
-import { domainOption } from '@/constants/option';
 import { resetFilterAdvancedSearch, saveAdvancedSearchBasic, saveAdvancedSearchCli } from '@/state/actions/filterAction';
 import Uploader from '@/component/uploader';
 import CustomAlert from '@/component/custom-alert';
+import { getDomainOptionSuccess, getFilterOptionSuccess } from '@/state/actions/filterOption';
 
 export default function AdvancedSearch() {
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useDispatch();
   const advancedSearch = useSelector(state => state.filter);
+  const filterOption = useSelector(state => state.filterOption);
+  const repositoryData = useSelector(state => state.repository);
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState('basic');
+  const [mode, setMode] = useState(advancedSearch.mode ?? 'basic');
   const [path, setPath] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('error');
@@ -32,12 +37,13 @@ export default function AdvancedSearch() {
   const [filters, setFilters] = useState( advancedSearch.filters ?? [
     {
       key: '',
+      data_type: '',
       operator: '',
       value: '',
       model: '',
       scoring_algorithm: '',
-      top_n: '',
-      score_threshold: '',
+      top_n: 0,
+      score_threshold: 0,
     },
   ])
   const [cliQuery, setCliQuery] = useState(advancedSearch.cliQuery ?? '');
@@ -45,12 +51,13 @@ export default function AdvancedSearch() {
   const addFilter = () => {
     const newFilter = {
       key: '',
+      data_type: '',
       operator: '',
       value: '',
       model: '',
       scoring_algorithm: '',
-      top_n: '',
-      score_threshold: '',
+      top_n: 0,
+      score_threshold: 0,
     }
     setFilters([...filters, newFilter]);
   };
@@ -61,10 +68,11 @@ export default function AdvancedSearch() {
     setFilters(newFilters);
   };
 
-  const updateFilter = (index, key, operator, value, model, scoring_algorithm, top_n, score_threshold ) => {
+  const updateFilter = (index, key, data_type, operator, value, model, scoring_algorithm, top_n, score_threshold ) => {
     const newFilters = [...filters];
     newFilters[index] = { 
       key: key,
+      data_type: data_type,
       operator: operator,
       value: value,
       model: model,
@@ -113,7 +121,7 @@ export default function AdvancedSearch() {
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
   useEffect(() => {
-    const { from, origin } = router.query;
+    const { from, origin, q } = router.query;
     if(from && origin) {
       const decodedPath = decodeURIComponent(from)
       setPath(decodedPath)
@@ -124,17 +132,53 @@ export default function AdvancedSearch() {
         setDomain('')
         setFilters([{
           key: '',
+          data_type: '',
           operator: '',
           value: '',
           model: '',
           scoring_algorithm: '',
-          top_n: '',
-          score_threshold: '',
+          top_n: 0,
+          score_threshold: 0,
         }])
         setCliQuery('')
       }
+      if( origin === '/search'){
+        setKeyword(q)
+      }
     }
   }, [advancedSearch.path, dispatch, router]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchDomain = async () =>  {
+      try {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/domains`,)
+        dispatch(getDomainOptionSuccess(response.data))
+      } catch (error){
+        setAlertSeverity('error');
+        setAlertLabel(`Network Error, Please try again`);
+        setShowAlert(true);
+      }
+    }
+    fetchDomain()
+    setIsLoading(false);
+  }, [dispatch]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchDomainFilter = async () =>  {
+      try {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/information/${domain === ''? 'general' : domain}`,)
+        dispatch(getFilterOptionSuccess(response.data))
+      } catch (error){
+        setAlertSeverity('error');
+        setAlertLabel(`Network Error, Please try again`);
+        setShowAlert(true);
+      }
+    }
+    fetchDomainFilter()
+    setIsLoading(false);
+  }, [dispatch, domain]);
 
   return (
     <>
@@ -186,7 +230,7 @@ export default function AdvancedSearch() {
                   }, 
                 }}
               >
-                { path.includes('repository') ? 'Repository XYZ' : 'Public Databases'} 
+                { path.includes('repository') ? repositoryData.name : 'Public Databases'} 
               </Typography>
             </Box>
             <Box
@@ -306,7 +350,7 @@ export default function AdvancedSearch() {
                     placeholder="Select a domain.."
                     defaultValue=''
                     value={domain}
-                    options={domainOption}
+                    options={filterOption.domain_option}
                     onChange={handleChangeDomain}
                   />
                 </>
@@ -348,7 +392,7 @@ export default function AdvancedSearch() {
                     order={index}
                     onRemove={() => removeFilter(index)}
                     onChange={
-                      (key, operator, value, model, scoring_algorithm, top_n, score_threshold) => updateFilter(index, key, operator, value, model, scoring_algorithm, top_n, score_threshold)
+                      (key, data_type, operator, value, model, scoring_algorithm, top_n, score_threshold) => updateFilter(index, key, data_type, operator, value, model, scoring_algorithm, top_n, score_threshold)
                     }
                   />
                 ))}
