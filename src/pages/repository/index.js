@@ -173,11 +173,12 @@ export default function Repository() {
           dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
           setIsLoadingDocs(false);
         } catch (error){
-          console.log(error)
-          dispatch(getSearchDocumentFailed(error.response.data))
-          setAlertSeverity('error');
-          setAlertLabel(`Network Error, Please try again`);
-          setShowAlert(true);
+          if(error.response.data.error_code !== 404){
+            dispatch(getSearchDocumentFailed(error.response.data))
+            setAlertSeverity('error');
+            setAlertLabel(`Network Error, Please try again`);
+            setShowAlert(true);        
+          }
           setIsLoadingDocs(false);
         }
       }
@@ -195,10 +196,12 @@ export default function Repository() {
           setIsLoadingDocs(false);
         } catch (error){
           console.log(error)
-          dispatch(getSearchDocumentFailed(error.response.data))
-          setAlertSeverity('error');
-          setAlertLabel(`Network Error, Please try again`);
-          setShowAlert(true);
+          if(error.response.data.error_code !== 404){
+            dispatch(getSearchDocumentFailed(error.response.data))
+            setAlertSeverity('error');
+            setAlertLabel(`Network Error, Please try again`);
+            setShowAlert(true);
+          }
           setIsLoadingDocs(false);
         }
       }
@@ -220,11 +223,12 @@ export default function Repository() {
           dispatch(getSearchDocumentSuccess(response.data))
           setIsLoadingDocs(false);
         } catch (error){
-          console.log(error)
-          dispatch(getSearchDocumentFailed(error.response.data))
-          setAlertSeverity('error');
-          setAlertLabel(`Network Error, Please try again`);
-          setShowAlert(true);
+          if(error.response.data.error_code !== 404){
+            dispatch(getSearchDocumentFailed(error.response.data))
+            setAlertSeverity('error');
+            setAlertLabel(`Network Error, Please try again`);
+            setShowAlert(true);        
+          }
           setIsLoadingDocs(false);
         }
       }
