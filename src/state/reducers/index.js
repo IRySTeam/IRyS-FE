@@ -12,6 +12,7 @@ import filterOptionReducer from './filterOptionReducer';
 import searchDocumentReducer from './searchDocumentReducer';
 import searchDocumentPublicReducer from './searchDocumentPublicReducer';
 import databasesReducer from './databasesReducer';
+import documentReducer from './documentReducer';
 
 const reducers = combineReducers({
   user: userReducer,
@@ -24,7 +25,8 @@ const reducers = combineReducers({
   databases: databasesReducer,
   filterOption: filterOptionReducer,
   searchDocument: searchDocumentReducer,
-  searchDocumentPublic : searchDocumentPublicReducer
+  searchDocumentPublic : searchDocumentPublicReducer,
+  document : documentReducer
 })
 
 export default reducers;
