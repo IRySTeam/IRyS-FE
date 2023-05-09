@@ -16,9 +16,9 @@ import AddIcon from '@mui/icons-material/Add';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Dropdown from '@/component/dropdown';
-import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import DocumentCard from '@/component/document-card';
 import { sortOption } from '@/constants/option';
+import { getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
 import { removeEmptyFilters } from '@/utils/array';
@@ -119,29 +119,29 @@ export default function Repository() {
         }
       }
 
-      const fetchDocument = async () =>  {
-        const token =  Cookies.get('access_token');
-        try {
-          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          })
-          dispatch(getSingleRepoSuccess(response.data))
-        } catch (error){
-          // TODO CHANGE TO NEW ENDPOINT
-          // dispatch(getSingleRepoFailed(error.response.data))
-          dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
-          setAlertSeverity('error');
-          setAlertLabel(`Network Error, Please try again`);
-          setShowAlert(true);
-        }
-      }
+      // const fetchDocument = async () =>  {
+      //   const token =  Cookies.get('access_token');
+      //   try {
+      //     const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents`, {
+      //       headers: {
+      //         Authorization: `Bearer ${token}`
+      //       }
+      //     })
+      //     dispatch(getSingleRepoSuccess(response.data))
+      //   } catch (error){
+      //     // TODO CHANGE TO NEW ENDPOINT
+      //     // dispatch(getSingleRepoFailed(error.response.data))
+      //     dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
+      //     setAlertSeverity('error');
+      //     setAlertLabel(`Network Error, Please try again`);
+      //     setShowAlert(true);
+      //   }
+      // }
       
       if(!repositoryData.id || repositoryData.id !== id){
         fetchDetailRepo()
         fetchRepoCollaborator()
-        fetchDocument()
+        // fetchDocument()
       }
 
       setIsLoading(false);
@@ -170,6 +170,7 @@ export default function Repository() {
             }
           })
           dispatch(getSearchDocumentSuccess(response.data))
+          dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
           setIsLoadingDocs(false);
         } catch (error){
           console.log(error)
