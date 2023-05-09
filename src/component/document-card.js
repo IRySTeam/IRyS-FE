@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
+import { useRouter } from 'next/router';
 import { Button, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -9,10 +10,11 @@ import { formatDate } from '@/utils/date';
 
 export default function DocumentCard(props) {
   const theme = useTheme();
+  const router = useRouter();
   const repositoryData = useSelector(state => state.repository);
   
   const handleClickBox = (id) => {
-    console.log(`Open Document with Index ${id}`)
+    router.push({ pathname: '/detail-document', query: { id: id} })
   };
 
   const handleClickDownload = (event) => {
