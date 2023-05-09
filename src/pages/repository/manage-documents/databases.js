@@ -14,8 +14,6 @@ import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
 import ManageDocumentsTabs from '@/component/tabs/manage-documents';
-import Dropdown from '@/component/dropdown';
-import { statusOption } from '@/constants/option';
 import { getDatabasesDataSuccess } from '@/state/actions/databasesActions';
 
 export default function ManageDocumentsDatabases() {
@@ -36,81 +34,6 @@ export default function ManageDocumentsDatabases() {
   const CustomNoRowsOverlay = () => (
     <div style={{ width: '100%', padding: '20px' }} />
   );
-
-  const rows = [
-    {
-      id: 1,
-      title: "document 1",
-      category: "Scientific",
-      is_public: true,
-    },
-    {
-      id: 2,
-      title: "document 2",
-      category: "General",
-      is_public: true,
-    },
-    {
-      id: 3,
-      title: "document 3",
-      category: "Recruitment",
-      is_public: true,
-    },
-    {
-      id: 4,
-      title: "document 4",
-      category: "Scientific",
-      is_public: false,
-    },
-    {
-      id: 5,
-      title: "document 5",
-      category: "General",
-      is_public: false,
-    },
-    {
-      id: 6,
-      title: "document 6",
-      category: "Recruitment",
-      is_public: true,
-    },
-    {
-      id: 7,
-      title: "document 7",
-      category: "Scientific",
-      is_public: true,
-    },
-    {
-      id: 8,
-      title: "document 8",
-      category: "General",
-      is_public: true,
-    },
-    {
-      id: 9,
-      title: "document 9",
-      category: "Recruitment",
-      is_public: true,
-    },
-    {
-      id: 10,
-      title: "document 10",
-      category: "Scientific",
-      is_public: false,
-    },
-    {
-      id: 11,
-      title: "document 11",
-      category: "General",
-      is_public: false,
-    },
-    {
-      id: 12,
-      title: "document 12",
-      category: "Recruitment",
-      is_public: true,
-    }
-  ]
 
   const columns = [
     { 
@@ -210,6 +133,11 @@ export default function ManageDocumentsDatabases() {
       ),
     }
   ];
+
+  const goToUploadDocuments = () => {
+    const { id } = router.query;
+    router.push({ pathname: '/repository/manage-documents/upload', query: { id: id} })
+  }
   
   useEffect(() => {
     setIsLoading(true);
@@ -359,7 +287,7 @@ export default function ManageDocumentsDatabases() {
                         marginLeft: '16px', 
                       }}
                     >
-                      Monitor Documents
+                      Databases
                     </Typography>
                     <Button 
                       color='primary' 
@@ -370,9 +298,9 @@ export default function ManageDocumentsDatabases() {
                         width: '150px',
                         typography: theme.typography.heading_h6,
                       }}
-                      onClick={()=> reindexAll()}
+                      onClick={()=> goToUploadDocuments()}
                     >
-                      Reindex All
+                      New Document                    
                     </Button> 
                   </Box>
                   <Box sx={{ backgroundColor: 'light_gray.main', width: '100%', height: '1px',}}/>
