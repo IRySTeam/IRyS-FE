@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
@@ -7,14 +8,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
-import { Container, Box, Typography, Button, OutlinedInput} from '@mui/material';
+import { Container, Box, Typography, Button, OutlinedInput, Dialog, DialogTitle, IconButton, DialogContent} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
 import ManageDocumentsTabs from '@/component/tabs/manage-documents';
 import { getDatabasesDataSuccess } from '@/state/actions/databasesActions';
+import { deleteDocumentValidation } from '@/schema/delete-document';
+import { refresh } from '@/utils/token';
+import FormInputDialog from '@/component/form-input-dialog';
 
 export default function ManageDocumentsDatabases() {
   const theme = useTheme();
@@ -25,8 +31,11 @@ export default function ManageDocumentsDatabases() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
+  const [isUpdateDatabase, setIsUpdateDatabase] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Your documents has been successfully uploaded');
+  const [selectedDoc, setSelectedDoc] = useState({});
   const repositoryData = useSelector(state => state.repository);
   const databasesData = useSelector(state => state.databases);
   const [search, setSearch] = useState('')
@@ -118,7 +127,7 @@ export default function ManageDocumentsDatabases() {
               justifyContent: 'center',
               alignItems: 'center',
             }}
-            onClick={() => console.log('delete', params.row.id, params.row.title)}
+            onClick={() => handleClickOpenDelete(params.row)}
           >
             <DeleteIcon
               sx={{
@@ -161,13 +170,73 @@ export default function ManageDocumentsDatabases() {
         setAlertLabel(`Network Error, Please try again`);
         setShowAlert(true);
       }
+      if(isUpdateDatabase) setIsUpdateDatabase(false)
     }
     fetchDatabases()
     setIsLoading(false);
-  }, [dispatch, id, search]);
+  }, [dispatch, id, isUpdateDatabase, search]);
 
+  const formikDialog = useFormik({
+    initialValues: {
+      name: '',
+      real_name: '',
+    },
+    validationSchema: deleteDocumentValidation,
+    onSubmit: async (values) => {
+      setIsLoading(true)
+      try {
+        const token = Cookies.get('access_token');
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/documents/${selectedDoc.id}/delete`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setIsUpdateDatabase(true)
+        setAlertSeverity('success')
+        setAlertLabel(`${values.name} has been successfully deleted.`);
+        setShowAlert(true);
+        setIsLoading(false);
+      } catch (error) {
+        setAlertSeverity('error')
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 401:
+              refresh('access_token', 'refresh_token', router)
+              setAlertLabel('Your session has been restored. Please Try Again.');
+              setShowAlert(true);
+              break;
+            case 'USER__NOT_ALLOWED':
+              setAlertLabel('You are not allowed to perform this action');
+              setShowAlert(true);
+              break;
+            case 'DOCUMENT__NOT_FOUND':
+              setAlertLabel('Document not found');
+              setShowAlert(true);
+              break;
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
+        } else{
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
+        }
+        setIsLoading(false);
+      }
+    } ,
+  });
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
+  const handleClickOpenDelete = (doc) => {
+    setSelectedDoc(doc);
+    formikDialog.setFieldValue('real_name', doc.title)
+    setIsDeleteModalOpen(true);
+  };
+  const handleCloseDelete = () => {
+    setSelectedDoc({});
+    setIsDeleteModalOpen(false);
+  };
 
   return (
     <>
@@ -450,6 +519,114 @@ export default function ManageDocumentsDatabases() {
               </Box>
             </Box>
           </Container>
+          <Dialog
+            open={isDeleteModalOpen}
+            onClose={handleCloseDelete}
+            sx={{
+              "& .MuiDialog-container": {
+                "& .MuiPaper-root": {
+                  width: "100%",
+                  maxWidth: "516px",
+                },
+              },
+            }}
+          >
+            <DialogTitle id="alert-dialog-title"
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                padding: '24px 24px 40px 24px'
+              }}
+            >
+              <Typography variant='popup_heading' color='black.main'>Delete this document</Typography>
+              <IconButton sx={{ padding: 0, }} onClick={handleCloseDelete}>
+                <CloseIcon
+                  sx={{
+                    width: '36px',
+                    height: '36px',
+                    color: theme.palette.dark_gray.main,
+                  }}
+                />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                padding: '16px 24px 24px 24px',
+                gap: '12px',
+              }}
+            >
+              <DeleteOutlinedIcon
+                sx={{
+                  width: '64px',
+                  height: '64px',
+                  color: theme.palette.dark_gray.main
+                }}
+              /> 
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Delete ${formikDialog.values.real_name}`}</Typography>
+              <Typography 
+                variant='form_sublabel_small' 
+                color='black.main'
+                textAlign='center'
+                sx={{
+                  "& .bold": {
+                    typography: theme.typography.form_sublabel_small_bold
+                  }
+                }}
+              >
+                This action <span className='bold'>cannot</span> be undone. This will permanently delete this <span className='bold'>document</span> and remove all <span className='bold'>collaborator associations.</span>
+              </Typography>
+              <form 
+                onSubmit={formikDialog.handleSubmit} 
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '100%',
+                  gap: '24px',
+                  marginTop: '12px',
+                }}
+              >
+                <FormInputDialog
+                  id='name'            
+                  name='name'
+                  label={["Please type ", <span key={1} className='bold'>{formikDialog.values.real_name}</span>,  " to confirm."]}
+                  placeholder={formikDialog.values.real_name}
+                  value={formikDialog.values.name}
+                  onChange={formikDialog.handleChange}
+                  onBlur={formikDialog.handleBlur}
+                  error={formikDialog.touched.name && Boolean(formikDialog.errors.name)}
+                  helpertext={formikDialog.touched.name && formikDialog.errors.name}
+                />
+                <Button 
+                  color='danger_button' 
+                  variant='contained' 
+                  sx={{ 
+                    height: '32px', 
+                    padding: '0 12px',
+                    width: '100%',
+                    marginTop: '4px',
+                    typography: theme.typography.heading_h6,
+                    color: theme.palette.white.main,
+                    '&.Mui-disabled': {
+                      backgroundColor: theme.palette.dark_gray.light,
+                      color: theme.palette.white.main,
+                    },
+                  }}
+                  type="submit"
+                  disabled={!formikDialog.touched.name || Boolean(formikDialog.errors.name)}
+                >
+                  I understand, delete this document
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </>
       }
     </>
