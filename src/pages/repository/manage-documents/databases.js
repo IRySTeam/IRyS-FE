@@ -807,14 +807,15 @@ export default function ManageDocumentsDatabases() {
                     sx={{
                       width:'100%',
                       display: 'flex',
-                      flexDirection: 'row', 
-                      alignItems: 'center',
-                      justifyContent:'space-between',
+                      flexDirection: {mobile:'column', tablet:'row'},
+                      alignItems: {mobile:'flex-start', tablet:'center'},
+                      justifyContent: {mobile:'flex-start', tablet:'space-between'},
+                      gap: '8px',
                     }} 
                   >
                     <Box
                       sx={{
-                        width:'calc(100% - 176px)',
+                        width:{mobile: '100%', tablet: 'calc(100% - 176px)'},
                         display: 'flex',
                         flexDirection: 'column', 
                         alignItems: 'flex-start',
@@ -840,15 +841,15 @@ export default function ManageDocumentsDatabases() {
                     sx={{
                       width:'100%',
                       display: 'flex',
-                      flexDirection: 'row', 
-                      alignItems: 'center',
-                      justifyContent:'space-between',
-                      marginBottom: '100px'
+                      flexDirection: {mobile:'column', tablet:'row'},
+                      alignItems: {mobile:'flex-start', tablet:'center'},
+                      justifyContent: {mobile:'flex-start', tablet:'space-between'},
+                      gap: '8px',
                     }} 
                   >
                     <Box
                       sx={{
-                        width:'calc(100% - 176px)',
+                        width:{mobile: '100%', tablet: 'calc(100% - 176px)'},
                         display: 'flex',
                         flexDirection: 'column', 
                         alignItems: 'flex-start',
@@ -865,7 +866,7 @@ export default function ManageDocumentsDatabases() {
                       sx={{ 
                         height: '32px', 
                         padding: '0 10px',
-                        width: '150px',
+                        width: {mobile: '100%', tablet: '150px'},
                         typography: theme.typography.heading_h6,
                         color: theme.palette.white.main,
                       }}
@@ -880,7 +881,7 @@ export default function ManageDocumentsDatabases() {
                     sx={{ 
                       height: '32px', 
                       padding: '0 12px',
-                      width: '150px',
+                      width: {mobile: '100%', tablet: '150px'},
                       typography: theme.typography.heading_h6,
                       alignSelf: 'flex-end',
                       '&.Mui-disabled': {
