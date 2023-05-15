@@ -790,109 +790,108 @@ export default function ManageDocumentsDatabases() {
                     marginTop: '12px',
                   }}
                 >
-                    <FormInput 
-                      id='title'            
-                      name='title'
-                      label='Document Name'
-                      placeholder='Enter a repository name'
-                      value={formik.values.title}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.title && Boolean(formik.errors.title)}
-                      helpertext={formik.touched.title && formik.errors.title}
-                      required={true}
-                      small={true}
+                  <FormInput 
+                    id='title'            
+                    name='title'
+                    label='Document Name'
+                    placeholder='Enter a repository name'
+                    value={formik.values.title}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.title && Boolean(formik.errors.title)}
+                    helpertext={formik.touched.title && formik.errors.title}
+                    required={true}
+                    small={true}
+                  />
+                  <Box
+                    sx={{
+                      width:'100%',
+                      display: 'flex',
+                      flexDirection: 'row', 
+                      alignItems: 'center',
+                      justifyContent:'space-between',
+                    }} 
+                  >
+                    <Box
+                      sx={{
+                        width:'calc(100% - 176px)',
+                        display: 'flex',
+                        flexDirection: 'column', 
+                        alignItems: 'flex-start',
+                        justifyContent:'space-between',
+                        gap: '8px',
+                      }} 
+                    >
+                      <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Change document category</Typography>
+                      <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This document is currently ${formik.values.category} document.`}</Typography>
+                    </Box>
+                    <Dropdown
+                      label={'Category'}
+                      placeholder={'Category'} 
+                      value={formik.values.category}
+                      id={formik.values.category}
+                      handleChange={(event) => formik.setFieldValue('category', event.target.value)}
+                      options={categoryOption}
+                      width={mobile ? '100%' : '150px'}
+                      backgroundColor={theme.palette.white.main}
                     />
+                  </Box>
+                  <Box
+                    sx={{
+                      width:'100%',
+                      display: 'flex',
+                      flexDirection: 'row', 
+                      alignItems: 'center',
+                      justifyContent:'space-between',
+                      marginBottom: '100px'
+                    }} 
+                  >
                     <Box
                       sx={{
-                        width:'100%',
+                        width:'calc(100% - 176px)',
                         display: 'flex',
-                        flexDirection: 'row', 
-                        alignItems: 'center',
+                        flexDirection: 'column', 
+                        alignItems: 'flex-start',
                         justifyContent:'space-between',
+                        gap: '8px',
                       }} 
                     >
-                      <Box
-                        sx={{
-                          width:'calc(100% - 176px)',
-                          display: 'flex',
-                          flexDirection: 'column', 
-                          alignItems: 'flex-start',
-                          justifyContent:'space-between',
-                          gap: '8px',
-                        }} 
-                      >
-                        <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Change document category</Typography>
-                        <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This document is currently ${formik.values.category} document.`}</Typography>
-                      </Box>
-                      <Dropdown
-                        label={'Category'}
-                        placeholder={'Category'} 
-                        value={formik.values.category}
-                        id={formik.values.category}
-                        handleChange={(event) => formik.setFieldValue('category', event.target.value)}
-                        options={categoryOption}
-                        width={mobile ? '100%' : '150px'}
-                        backgroundColor={theme.palette.white.main}
-                      />
+                      <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Change document visibility</Typography>
+                      <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This document is currently ${formik.values.is_public ? 'public' : 'private'}.`}</Typography>
                     </Box>
-                    <Box
-                      sx={{
-                        width:'100%',
-                        display: 'flex',
-                        flexDirection: 'row', 
-                        alignItems: 'center',
-                        justifyContent:'space-between',
-                        marginBottom: '100px'
-                      }} 
-                    >
-                      <Box
-                        sx={{
-                          width:'calc(100% - 176px)',
-                          display: 'flex',
-                          flexDirection: 'column', 
-                          alignItems: 'flex-start',
-                          justifyContent:'space-between',
-                          gap: '8px',
-                        }} 
-                      >
-                        <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Change document visibility</Typography>
-                        <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This document is currently ${formik.values.is_public ? 'public' : 'private'}.`}</Typography>
-                      </Box>
-                      <Button 
-                        color='danger_button' 
-                        variant='contained' 
-                        sx={{ 
-                          height: '32px', 
-                          padding: '0 10px',
-                          width: '150px',
-                          typography: theme.typography.heading_h6,
-                          color: theme.palette.white.main,
-                        }}
-                        onClick={() => formik.setFieldValue('is_public', !formik.values.is_public)}
-                      >
-                        {formik.values.is_public? 'Change to Private' : 'Change to Public'}
-                      </Button> 
-                    </Box>
-
                     <Button 
-                      color='primary' 
+                      color='danger_button' 
                       variant='contained' 
                       sx={{ 
                         height: '32px', 
-                        padding: '0 12px',
+                        padding: '0 10px',
                         width: '150px',
                         typography: theme.typography.heading_h6,
-                        alignSelf: 'flex-end',
-                        '&.Mui-disabled': {
-                          backgroundColor: theme.palette.dark_gray.light,
-                          color: theme.palette.light_gray.light,
-                        },}}
-                      type='submit'
-                      disabled={!(hasFormChanged(formik.values, selectedDoc))}
+                        color: theme.palette.white.main,
+                      }}
+                      onClick={() => formik.setFieldValue('is_public', !formik.values.is_public)}
                     >
-                      Save Changes 
+                      {formik.values.is_public? 'Change to Private' : 'Change to Public'}
                     </Button> 
+                  </Box>
+                  <Button 
+                    color='primary' 
+                    variant='contained' 
+                    sx={{ 
+                      height: '32px', 
+                      padding: '0 12px',
+                      width: '150px',
+                      typography: theme.typography.heading_h6,
+                      alignSelf: 'flex-end',
+                      '&.Mui-disabled': {
+                        backgroundColor: theme.palette.dark_gray.light,
+                        color: theme.palette.light_gray.light,
+                      },}}
+                    type='submit'
+                    disabled={!(hasFormChanged(formik.values, selectedDoc))}
+                  >
+                    Save Changes 
+                  </Button> 
                 </form>
               }
 
