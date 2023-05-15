@@ -86,3 +86,9 @@ export const statusOption = [
   { value: 'SUCCESS', label: 'SUCCESS'},
   { value: 'FAILED', label: 'FAILED'},
 ]
+
+export const categoryOption = [
+  { value: 'General', label: 'General'},
+  { value: 'Recruitment', label: 'Recruitment'},
+  { value: 'Scientific', label: 'Scientific'},
+]

@@ -9,6 +9,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { Container, Box, Typography, Button, OutlinedInput, Dialog, DialogTitle, IconButton, DialogContent} from '@mui/material';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -21,17 +23,24 @@ import { getDatabasesDataSuccess } from '@/state/actions/databasesActions';
 import { deleteDocumentValidation } from '@/schema/delete-document';
 import { refresh } from '@/utils/token';
 import FormInputDialog from '@/component/form-input-dialog';
+import { editDocumentValidation } from '@/schema/edit-document';
+import FormInput from '@/component/form-input';
+import Dropdown from '@/component/dropdown';
+import { categoryOption } from '@/constants/option';
 
 export default function ManageDocumentsDatabases() {
   const theme = useTheme();
   const router = useRouter();
   const small = useMediaQuery(theme.breakpoints.down('laptop'));
+  const mobile = useMediaQuery(theme.breakpoints.down('tablet'));
   const dispatch = useDispatch();
   const { id } = router.query;
 
   const [isLoading, setIsLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [isUpdateDatabase, setIsUpdateDatabase] = useState(false);
+  const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
+  const [settingModalMode, setSettingModalMode] = useState('general');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Your documents has been successfully uploaded');
@@ -91,29 +100,31 @@ export default function ManageDocumentsDatabases() {
             gap: '8px',
           }}
         >
-          <Button 
-            color='warning' 
-            variant='contained' 
-            sx={{ 
-              height: '25px',
-              minWidth: '25px',
-              width: '25px',
-              display: 'flex',
-              padding: 0,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            onClick={() => console.log('edit', params.row.id, params.row.title)}
-          >
-            <EditIcon
-              sx={{
-                width: '16px',
-                height: '16px',
-                color: theme.palette.white.main
+          { params.row.category !== 'Determining....' && 
+            <Button 
+              color='warning' 
+              variant='contained' 
+              sx={{ 
+                height: '25px',
+                minWidth: '25px',
+                width: '25px',
+                display: 'flex',
+                padding: 0,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
-            />
-          </Button>
+              onClick={() => handleClickOpenSetting(params.row)}
+            >
+              <EditIcon
+                sx={{
+                  width: '16px',
+                  height: '16px',
+                  color: theme.palette.white.main
+                }}
+              />
+            </Button>
+          }
           <Button 
             color='error' 
             variant='contained' 
@@ -227,15 +238,92 @@ export default function ManageDocumentsDatabases() {
     } ,
   });
 
+  const formik = useFormik({
+    initialValues: {
+      title: '',
+      category: 'General',
+      is_public: '',
+    },
+    validationSchema: editDocumentValidation,
+    onSubmit: async (values) => {
+      setIsLoading(true)
+      try {
+        const { id } = router.query;
+        const token = Cookies.get('access_token');
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${selectedDoc.id}/id`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setIsUpdateDatabase(true)
+        setAlertSeverity('success')
+        setAlertLabel(`${values.title} has been successfully changed`);
+        setShowAlert(true);
+        setIsLoading(false);
+      } catch (error) {
+        setAlertSeverity('error')
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 401:
+              refresh('access_token', 'refresh_token', router)
+              setAlertLabel('Your session has been restored. Please Try Again.');
+              setShowAlert(true);
+              break;
+            case 'USER__EMAIL_NOT_VERIFIED':
+              setAlertLabel('Email is not verified');
+              setShowAlert(true);
+              break;
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
+        } else{
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
+        }
+        setIsLoading(false);
+      }
+    } ,
+  });
+
+  const hasFormChanged = (currentValues, initialValues ) => {
+    return Object.keys(initialValues).some(fieldName => {
+      if (fieldName === 'id') {
+        return false;
+      }
+      return initialValues[fieldName] !== currentValues[fieldName];
+    });
+  };
+
+  const handleChangeTab = (event, newValue) => {
+    setSettingModalMode(newValue);
+  };
+
   const handleClickShowAlert= () => setShowAlert((show) => !show);
+  
   const handleClickOpenDelete = (doc) => {
     setSelectedDoc(doc);
     formikDialog.setFieldValue('real_name', doc.title)
     setIsDeleteModalOpen(true);
   };
+
   const handleCloseDelete = () => {
     setSelectedDoc({});
     setIsDeleteModalOpen(false);
+  };
+
+  const handleClickOpenSetting = (doc) => {
+    setSelectedDoc(doc);
+    formik.setFieldValue('title', doc.title)
+    formik.setFieldValue('category', doc.category)
+    formik.setFieldValue('is_public', doc.is_public)
+    setIsSettingModalOpen(true);
+  };
+
+  const handleCloseSetting = () => {
+    setSelectedDoc({});
+    setIsSettingModalOpen(false);
   };
 
   return (
@@ -527,6 +615,7 @@ export default function ManageDocumentsDatabases() {
                 "& .MuiPaper-root": {
                   width: "100%",
                   maxWidth: "516px",
+                  borderRadius: "16px"
                 },
               },
             }}
@@ -625,6 +714,188 @@ export default function ManageDocumentsDatabases() {
                   I understand, delete this document
                 </Button>
               </form>
+            </DialogContent>
+          </Dialog>
+          <Dialog
+            open={isSettingModalOpen}
+            onClose={handleCloseSetting}
+            sx={{
+              "& .MuiDialog-container": {
+                "& .MuiPaper-root": {
+                  width: "100%",
+                  maxWidth: "768px",
+                  borderRadius: "16px"
+                },
+              },
+            }}
+          >
+            <DialogTitle id="alert-dialog-title"
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                padding: '24px 24px 40px 24px'
+              }}
+            >
+              <Typography variant='popup_heading' color='black.main'>Edit Documents</Typography>
+              <IconButton sx={{ padding: 0, }} onClick={handleCloseSetting}>
+                <CloseIcon
+                  sx={{
+                    width: '36px',
+                    height: '36px',
+                    color: theme.palette.dark_gray.main,
+                  }}
+                />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                padding: '16px 24px 40px 24px',
+                gap: '12px',
+              }}
+            >
+              <Tabs
+                value={settingModalMode}
+                onChange={handleChangeTab}
+                variant="fullWidth"
+                sx={{
+                  width: "100%"
+                }}
+                orientation={ mobile? "vertical" : "horizontal" }
+              >
+                <Tab
+                  value="general"
+                  label="General"
+                />
+                <Tab 
+                  value="collaborator" 
+                  label="Collaborator" 
+                />
+              </Tabs>
+              { settingModalMode==='general' &&
+                <form
+                  onSubmit={formik.handleSubmit} 
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: '100%',
+                    gap: '24px',
+                    marginTop: '12px',
+                  }}
+                >
+                    <FormInput 
+                      id='title'            
+                      name='title'
+                      label='Document Name'
+                      placeholder='Enter a repository name'
+                      value={formik.values.title}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.title && Boolean(formik.errors.title)}
+                      helpertext={formik.touched.title && formik.errors.title}
+                      required={true}
+                      small={true}
+                    />
+                    <Box
+                      sx={{
+                        width:'100%',
+                        display: 'flex',
+                        flexDirection: 'row', 
+                        alignItems: 'center',
+                        justifyContent:'space-between',
+                      }} 
+                    >
+                      <Box
+                        sx={{
+                          width:'calc(100% - 176px)',
+                          display: 'flex',
+                          flexDirection: 'column', 
+                          alignItems: 'flex-start',
+                          justifyContent:'space-between',
+                          gap: '8px',
+                        }} 
+                      >
+                        <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Change document category</Typography>
+                        <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This document is currently ${formik.values.category} document.`}</Typography>
+                      </Box>
+                      <Dropdown
+                        label={'Category'}
+                        placeholder={'Category'} 
+                        value={formik.values.category}
+                        id={formik.values.category}
+                        handleChange={(event) => formik.setFieldValue('category', event.target.value)}
+                        options={categoryOption}
+                        width={mobile ? '100%' : '150px'}
+                        backgroundColor={theme.palette.white.main}
+                      />
+                    </Box>
+                    <Box
+                      sx={{
+                        width:'100%',
+                        display: 'flex',
+                        flexDirection: 'row', 
+                        alignItems: 'center',
+                        justifyContent:'space-between',
+                        marginBottom: '100px'
+                      }} 
+                    >
+                      <Box
+                        sx={{
+                          width:'calc(100% - 176px)',
+                          display: 'flex',
+                          flexDirection: 'column', 
+                          alignItems: 'flex-start',
+                          justifyContent:'space-between',
+                          gap: '8px',
+                        }} 
+                      >
+                        <Typography sx={{ color: 'black.main', typography: 'form_label_small',}}>Change document visibility</Typography>
+                        <Typography sx={{ color: 'black.main', typography: 'form_sublabel_small',}}>{`This document is currently ${formik.values.is_public ? 'public' : 'private'}.`}</Typography>
+                      </Box>
+                      <Button 
+                        color='danger_button' 
+                        variant='contained' 
+                        sx={{ 
+                          height: '32px', 
+                          padding: '0 10px',
+                          width: '150px',
+                          typography: theme.typography.heading_h6,
+                          color: theme.palette.white.main,
+                        }}
+                        onClick={() => formik.setFieldValue('is_public', !formik.values.is_public)}
+                      >
+                        {formik.values.is_public? 'Change to Private' : 'Change to Public'}
+                      </Button> 
+                    </Box>
+
+                    <Button 
+                      color='primary' 
+                      variant='contained' 
+                      sx={{ 
+                        height: '32px', 
+                        padding: '0 12px',
+                        width: '150px',
+                        typography: theme.typography.heading_h6,
+                        alignSelf: 'flex-end',
+                        '&.Mui-disabled': {
+                          backgroundColor: theme.palette.dark_gray.light,
+                          color: theme.palette.light_gray.light,
+                        },}}
+                      type='submit'
+                      disabled={!(hasFormChanged(formik.values, selectedDoc))}
+                    >
+                      Save Changes 
+                    </Button> 
+                </form>
+              }
+
             </DialogContent>
           </Dialog>
         </>
