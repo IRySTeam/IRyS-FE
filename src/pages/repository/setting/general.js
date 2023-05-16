@@ -90,6 +90,7 @@ export default function GeneralSettingRepository() {
         setAlertLabel('Your changes to the repository settings have been successfully saved');
         setShowAlert(true);
         dispatch(changeRepoDetailSuccess(values));
+        formikDialog.setFieldValue('real_name', values.name);
         setIsLoading(false);
       } catch (error) {
         setAlertSeverity('error')

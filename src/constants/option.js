@@ -11,6 +11,17 @@ export const newRoleOption = [
   { value: 'Viewer', label: 'Viewer'},
 ]
 
+export const docRoleOption = [
+  { value: 'Owner', label: 'Owner'},
+  { value: 'Editor', label: 'Editor'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
+export const newDocRoleOption = [
+  { value: 'Editor', label: 'Editor'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
 export const domainOption = [
   { value: '', label: 'General'},
   { value: 'scientific', label: 'Scientific'},
@@ -85,4 +96,10 @@ export const statusOption = [
   { value: 'INDEXING', label: 'INDEXING'},
   { value: 'SUCCESS', label: 'SUCCESS'},
   { value: 'FAILED', label: 'FAILED'},
+]
+
+export const categoryOption = [
+  { value: 'General', label: 'General'},
+  { value: 'Recruitment', label: 'Recruitment'},
+  { value: 'Scientific', label: 'Scientific'},
 ]
