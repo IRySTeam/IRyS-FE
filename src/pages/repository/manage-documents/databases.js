@@ -8,12 +8,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
-import { Container, Box, Typography, Button, OutlinedInput, Dialog, DialogTitle, IconButton, DialogContent} from '@mui/material';
+import { Container, Box, Typography, Button, OutlinedInput, Dialog, DialogTitle, IconButton, DialogContent, CircularProgress} from '@mui/material';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
@@ -27,6 +28,9 @@ import { editDocumentValidation } from '@/schema/edit-document';
 import FormInput from '@/component/form-input';
 import Dropdown from '@/component/dropdown';
 import { categoryOption } from '@/constants/option';
+import DocCollaboratorCard from '@/component/doc-collaborator-card';
+import SearchableSelect from '@/component/searchable-select';
+import NewDocCollaboratorCard from '@/component/new-doc-collaborator-card';
 
 export default function ManageDocumentsDatabases() {
   const theme = useTheme();
@@ -39,12 +43,27 @@ export default function ManageDocumentsDatabases() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [isUpdateDatabase, setIsUpdateDatabase] = useState(false);
+  const [isRemoveAccessModalOpen, setIsRemoveAccessModalOpen] = useState(false);
+  const [currentRemoveAccessId, setCurrentRemoveAccessId] = useState(0);
   const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
   const [settingModalMode, setSettingModalMode] = useState('general');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Your documents has been successfully uploaded');
   const [selectedDoc, setSelectedDoc] = useState({});
+  const [selectedDocCollaborator, setSelectedDocCollaborator] = useState([
+    {
+      id: -1,
+      first_name: "",
+      last_name: "",
+      email: "",
+      role: "Owner"
+    },
+  ]);
+  const [isLoadingDocCollaborator, setIsLoadingDocCollaborator] = useState(false);
+  const [newCollaborator, setNewCollaborator] = useState(null);
+  const [newCollaboratorRole, setNewCollaboratorRole] = useState('Viewer');
+  const [searchUsers, setSearchUsers] = useState('');
   const repositoryData = useSelector(state => state.repository);
   const databasesData = useSelector(state => state.databases);
   const [search, setSearch] = useState('')
@@ -207,6 +226,7 @@ export default function ManageDocumentsDatabases() {
         setAlertLabel(`${values.name} has been successfully deleted.`);
         setShowAlert(true);
         setIsLoading(false);
+        setIsDeleteModalOpen(false);
       } catch (error) {
         setAlertSeverity('error')
         if(error.response){
@@ -240,7 +260,7 @@ export default function ManageDocumentsDatabases() {
 
   const formik = useFormik({
     initialValues: {
-      title: '',
+      name: '',
       category: 'General',
       is_public: '',
     },
@@ -250,14 +270,15 @@ export default function ManageDocumentsDatabases() {
       try {
         const { id } = router.query;
         const token = Cookies.get('access_token');
-        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${selectedDoc.id}/id`, {}, {
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/documents/${selectedDoc.id}/edit`, values, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         })
         setIsUpdateDatabase(true)
+        setIsSettingModalOpen(false)
         setAlertSeverity('success')
-        setAlertLabel(`${values.title} has been successfully changed`);
+        setAlertLabel(`${values.name} has been successfully changed`);
         setShowAlert(true);
         setIsLoading(false);
       } catch (error) {
@@ -313,17 +334,218 @@ export default function ManageDocumentsDatabases() {
     setIsDeleteModalOpen(false);
   };
 
-  const handleClickOpenSetting = (doc) => {
+  const handleNewCollaboratorRoleChange = (event, id) => {
+    setNewCollaboratorRole(event.target.value)
+  }
+
+  const handleRemoveNewCollaborator = () => {
+    setNewCollaborator(null)
+    setNewCollaboratorRole('viewer')
+  }
+
+  const addToDocs = async () => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : newCollaborator.id,
+        role : newCollaboratorRole
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${selectedDoc.id}/collaborators/add`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setNewCollaborator(null)
+      setNewCollaboratorRole('Viewer')
+      setAlertSeverity('success')
+      setAlertLabel('A new collaborator has been successfully added')
+      setShowAlert(true)
+      
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
+    }
+    setIsLoading(false);
+    handleCloseSetting()
+  }
+
+  const handleClickOpenSetting = async (doc) => {
     setSelectedDoc(doc);
-    formik.setFieldValue('title', doc.title)
+    formik.setFieldValue('name', doc.title)
     formik.setFieldValue('category', doc.category)
     formik.setFieldValue('is_public', doc.is_public)
     setIsSettingModalOpen(true);
+    setIsLoadingDocCollaborator(true);
+    try {
+      const { id } = router.query;
+      const token = Cookies.get('access_token');
+      const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${doc.id}/collaborators`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setSelectedDocCollaborator(response.data)
+      setIsLoadingDocCollaborator(false);
+    } catch (error) {
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
+      setIsLoadingDocCollaborator(true);
+    }
   };
+
+  const handleRoleChanged = async (event, index) => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : selectedDocCollaborator[index].id,
+        role : event.target.value
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${selectedDoc.id}/collaborators/edit`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setAlertSeverity('success')
+      setAlertLabel('Role updated successfully')
+      setShowAlert(true)
+      handleCloseSetting()
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Failed to update role');
+        setShowAlert(true);
+      }
+    }
+    setIsLoading(false);
+  }
+
+  const handleClickOpenRemoveAccess = (index) => {
+    setCurrentRemoveAccessId(index);
+    setIsRemoveAccessModalOpen(true);
+  };
+
+  const handleRemoveAccess = async () => {
+    setIsLoading(true);
+    try {
+      const token = Cookies.get('access_token')
+      const data = {
+        collaborator_id : selectedDocCollaborator[currentRemoveAccessId].id,
+      }
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${selectedDoc.id}/collaborators/remove`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setCurrentRemoveAccessId(0);
+      setAlertSeverity('success')
+      setAlertLabel(`${selectedDocCollaborator[currentRemoveAccessId].first_name} ${selectedDocCollaborator[currentRemoveAccessId].last_name} has been removed`)
+      setShowAlert(true)
+    } catch (error){
+      setAlertSeverity('error')
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router)
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Failed to remove collaborator');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Failed to remove collaborator');
+        setShowAlert(true);
+      }
+    }
+    setIsLoading(false);
+    handleClickOpenSetting(selectedDoc)
+    handleCloseRemoveAccess();
+  }
+
+  const handleCloseRemoveAccess = () => {
+    setIsRemoveAccessModalOpen(false);
+  }
 
   const handleCloseSetting = () => {
     setSelectedDoc({});
     setIsSettingModalOpen(false);
+    setIsLoadingDocCollaborator(false);
+    setSelectedDocCollaborator([
+      {
+        id: -1,
+        first_name: "",
+        last_name: "",
+        email: "",
+        role: "Owner"
+      },
+    ]);
+    setNewCollaborator(null);
+    setNewCollaboratorRole('Viewer');
+    setSettingModalMode('general');
   };
 
   return (
@@ -766,7 +988,16 @@ export default function ManageDocumentsDatabases() {
                 onChange={handleChangeTab}
                 variant="fullWidth"
                 sx={{
-                  width: "100%"
+                  width: "100%",
+                  [theme.breakpoints.up('tablet')]: {
+                    borderBottomColor: 'theme.palette.light_gray.main',
+                    borderBottom: '1px solid'
+                  },
+                  [theme.breakpoints.down('tablet')]: {
+                    borderRightColor: 'theme.palette.main',
+                    borderRight: '1px solid'
+                  },
+
                 }}
                 orientation={ mobile? "vertical" : "horizontal" }
               >
@@ -791,15 +1022,15 @@ export default function ManageDocumentsDatabases() {
                   }}
                 >
                   <FormInput 
-                    id='title'            
-                    name='title'
+                    id='name'            
+                    name='name'
                     label='Document Name'
                     placeholder='Enter a repository name'
-                    value={formik.values.title}
+                    value={formik.values.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.title && Boolean(formik.errors.title)}
-                    helpertext={formik.touched.title && formik.errors.title}
+                    error={formik.touched.name && Boolean(formik.errors.name)}
+                    helpertext={formik.touched.name && formik.errors.name}
                     required={true}
                     small={true}
                   />
@@ -895,7 +1126,178 @@ export default function ManageDocumentsDatabases() {
                   </Button> 
                 </form>
               }
-
+              { settingModalMode==='collaborator' && isLoadingDocCollaborator &&
+                <Box 
+                sx={{
+                    backgroundColor: 'transparent',
+                    width: '100%',
+                    height: '300px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <CircularProgress
+                    size={60}
+                    thickness={4}
+                  />
+                </Box>
+              }
+              { settingModalMode==='collaborator' && !isLoadingDocCollaborator &&
+                <>
+                <SearchableSelect 
+                  repoId={id}
+                  value={newCollaborator}
+                  onChange={(event, newValue) => {
+                    setNewCollaborator(newValue);
+                  }}
+                  inputValue={searchUsers}
+                  onInputChange={(event, newInputValue) => {
+                    setSearchUsers(newInputValue);
+                  }}
+                />
+                { newCollaborator &&
+                  <>
+                    <NewDocCollaboratorCard
+                      item={newCollaborator}
+                      role={newCollaboratorRole}
+                      new={true}
+                      onRoleChange={handleNewCollaboratorRoleChange}
+                      onRemoveNewCollaborator={handleRemoveNewCollaborator}
+                    />
+                    <Button 
+                      color='primary' 
+                      variant='contained' 
+                      sx={{ 
+                        height: '32px', 
+                        padding: '0 12px',
+                        width: '100%',
+                        marginTop: '4px',
+                        typography: theme.typography.heading_h6,
+                        '&.Mui-disabled': {
+                          backgroundColor: theme.palette.dark_gray.light,
+                          color: theme.palette.white.main,
+                        },
+                      }}
+                      onClick={addToDocs}
+                    >
+                      Add to this documents
+                    </Button>
+                  </>
+                }
+                { !newCollaborator && 
+                  <Box
+                    sx={{
+                      width:'100%',
+                      height: '300px',
+                      display: 'flex',
+                      flexDirection: 'column', 
+                      alignItems: 'flex-start',
+                      justifyContent:'flex-start',
+                      gap: '16px',
+                      paddingLeft: '24px',
+                      [theme.breakpoints.down('small')]: {
+                        paddingLeft: '0px',
+                      },
+                      overflowY: 'scroll'
+                    }}
+                  >
+                    {selectedDocCollaborator.map((collaborator, index) => (
+                      <DocCollaboratorCard
+                        key={index}
+                        order={index}
+                        item={collaborator}
+                        onRoleChange={handleRoleChanged}
+                        onRemoveAccess={() => handleClickOpenRemoveAccess(index)}
+                      />
+                    ))}
+                  </Box>
+                }
+                </>
+              }
+            </DialogContent>
+          </Dialog>
+          <Dialog
+            open={isRemoveAccessModalOpen}
+            onClose={handleCloseRemoveAccess}
+            sx={{
+              "& .MuiDialog-container": {
+                "& .MuiPaper-root": {
+                  width: "100%",
+                  maxWidth: "516px",
+                },
+              },
+            }}
+          >
+            <DialogTitle id="alert-dialog-title"
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                padding: '24px 24px 40px 24px'
+              }}
+            >
+                <Typography variant='popup_heading' color='black.main'>Confirm Remove Access</Typography>
+                <IconButton 
+                  sx={{ padding: 0, }} 
+                  onClick={handleCloseRemoveAccess}
+                >
+                  <CloseIcon
+                    sx={{
+                      width: '36px',
+                      height: '36px',
+                      color: theme.palette.dark_gray.main,
+                    }}
+                  />
+                </IconButton>
+            </DialogTitle>
+            <DialogContent
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                padding: '16px 24px 24px 24px',
+                gap: '12px',
+              }}
+            >
+              <RemoveCircleIcon
+                sx={{
+                  width: '64px',
+                  height: '64px',
+                  color: theme.palette.dark_gray.main
+                }}
+              />  
+              <Typography variant='form_label_small' color='black.main' textAlign='center'>Remove {`${selectedDocCollaborator[currentRemoveAccessId].first_name} ${selectedDocCollaborator[currentRemoveAccessId].last_name}`} from <span className='bold'>{selectedDoc.title}</span></Typography>
+              <Typography 
+                variant='form_sublabel_small' 
+                color='black.main'
+                textAlign='center'
+                sx={{
+                  "& .bold": {
+                    typography: theme.typography.form_sublabel_small_bold
+                  }
+                }}
+              >
+                Once removed, <span className='bold'>{`${selectedDocCollaborator[currentRemoveAccessId].first_name} ${selectedDocCollaborator[currentRemoveAccessId].last_name}`}</span> will no longer have direct access to <span className='bold'>{selectedDoc.title}</span>.
+              </Typography>
+              <Button 
+                color='danger_button' 
+                variant='contained' 
+                sx={{ 
+                  height: '32px', 
+                  padding: '0 12px',
+                  width: '100%',
+                  marginTop: '4px',
+                  typography: theme.typography.heading_h6,
+                  color: theme.palette.white.main,
+                }}
+                onClick={handleRemoveAccess}
+              >
+                Remove Access
+              </Button> 
             </DialogContent>
           </Dialog>
         </>

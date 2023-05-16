@@ -11,6 +11,17 @@ export const newRoleOption = [
   { value: 'Viewer', label: 'Viewer'},
 ]
 
+export const docRoleOption = [
+  { value: 'Owner', label: 'Owner'},
+  { value: 'Editor', label: 'Editor'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
+export const newDocRoleOption = [
+  { value: 'Editor', label: 'Editor'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
 export const domainOption = [
   { value: '', label: 'General'},
   { value: 'scientific', label: 'Scientific'},
