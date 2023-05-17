@@ -216,7 +216,7 @@ export default function ManageDocumentsDatabases() {
       setIsLoading(true)
       try {
         const token = Cookies.get('access_token');
-        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/documents/${selectedDoc.id}/delete`, {}, {
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${selectedDoc.id}/delete`, {}, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -270,7 +270,7 @@ export default function ManageDocumentsDatabases() {
       try {
         const { id } = router.query;
         const token = Cookies.get('access_token');
-        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/documents/${selectedDoc.id}/edit`, values, {
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${selectedDoc.id}/edit`, values, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -351,7 +351,7 @@ export default function ManageDocumentsDatabases() {
         collaborator_id : newCollaborator.id,
         role : newCollaboratorRole
       }
-      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${selectedDoc.id}/collaborators/add`, data, {
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${selectedDoc.id}/collaborators/add`, data, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -400,7 +400,7 @@ export default function ManageDocumentsDatabases() {
     try {
       const { id } = router.query;
       const token = Cookies.get('access_token');
-      const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${doc.id}/collaborators`, {
+      const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${doc.id}/collaborators`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -441,7 +441,7 @@ export default function ManageDocumentsDatabases() {
         collaborator_id : selectedDocCollaborator[index].id,
         role : event.target.value
       }
-      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${selectedDoc.id}/collaborators/edit`, data, {
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${selectedDoc.id}/collaborators/edit`, data, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -488,7 +488,7 @@ export default function ManageDocumentsDatabases() {
       const data = {
         collaborator_id : selectedDocCollaborator[currentRemoveAccessId].id,
       }
-      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/${selectedDoc.id}/collaborators/remove`, data, {
+      await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${selectedDoc.id}/collaborators/remove`, data, {
         headers: {
           Authorization: `Bearer ${token}`
         }

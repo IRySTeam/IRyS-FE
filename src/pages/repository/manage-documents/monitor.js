@@ -254,7 +254,7 @@ export default function ManageDocumentsMonitor() {
   const reindexDocument = async (docId) =>  {
     const token =  Cookies.get('access_token');
     try {
-      await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/documents/${docId}/reindex`, {
+      await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${docId}/reindex`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

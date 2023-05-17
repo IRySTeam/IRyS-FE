@@ -47,7 +47,7 @@ export default function Repository() {
       const fetchDocumentDetail = async () =>  {
         const token =  Cookies.get('access_token');
         try {
-          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/documents/${id}`, {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -57,7 +57,6 @@ export default function Repository() {
             fileType: response.data.doc_detail.doc_metadata.mimetype || 'application/pdf'
           }
           setDocs([doc])
-          console.log(response.data)
           dispatch(getDocumentDetailSuccess(response.data))
         } catch (error){
           dispatch(getDocumentDetailFailed(error.response.data))
