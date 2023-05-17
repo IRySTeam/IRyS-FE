@@ -187,6 +187,7 @@ export default function ManageDocumentsDatabases() {
         page_size: 100,
         find_document: search,
       }
+      if(!id) return
       try {
         const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/database`, {
           params : data,
@@ -195,15 +196,16 @@ export default function ManageDocumentsDatabases() {
           }
         })
         dispatch(getDatabasesDataSuccess(response.data))
+        setIsLoading(false);
       } catch (error){
         setAlertSeverity('error');
         setAlertLabel(`Network Error, Please try again`);
         setShowAlert(true);
+        setIsLoading(false);
       }
       if(isUpdateDatabase) setIsUpdateDatabase(false)
     }
     fetchDatabases()
-    setIsLoading(false);
   }, [dispatch, id, isUpdateDatabase, search]);
 
   const formikDialog = useFormik({
@@ -268,7 +270,6 @@ export default function ManageDocumentsDatabases() {
     onSubmit: async (values) => {
       setIsLoading(true)
       try {
-        const { id } = router.query;
         const token = Cookies.get('access_token');
         await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${selectedDoc.id}/edit`, values, {
           headers: {
@@ -282,6 +283,7 @@ export default function ManageDocumentsDatabases() {
         setShowAlert(true);
         setIsLoading(false);
       } catch (error) {
+        console.log(error)
         setAlertSeverity('error')
         if(error.response){
           switch (error.response.data.error_code){
@@ -312,6 +314,8 @@ export default function ManageDocumentsDatabases() {
     return Object.keys(initialValues).some(fieldName => {
       if (fieldName === 'id') {
         return false;
+      } else if (fieldName === 'title') {
+        return initialValues[fieldName] !== currentValues['name'];
       }
       return initialValues[fieldName] !== currentValues[fieldName];
     });
@@ -376,6 +380,10 @@ export default function ManageDocumentsDatabases() {
             setAlertLabel('You are not allowed to perform this action');
             setShowAlert(true);
             break;
+          case 'DOCUMENT__COLLABORATOR_ALREADY_EXIST':
+            setAlertLabel('Document collaborator already exist. Please try to add other collaborator');
+            setShowAlert(true);
+            break;  
           default :
             setAlertLabel('Network Error, Please Try Again.');
             setShowAlert(true);
@@ -398,7 +406,6 @@ export default function ManageDocumentsDatabases() {
     setIsSettingModalOpen(true);
     setIsLoadingDocCollaborator(true);
     try {
-      const { id } = router.query;
       const token = Cookies.get('access_token');
       const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${doc.id}/collaborators`, {
         headers: {
@@ -1025,7 +1032,7 @@ export default function ManageDocumentsDatabases() {
                     id='name'            
                     name='name'
                     label='Document Name'
-                    placeholder='Enter a repository name'
+                    placeholder='Enter a document name'
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
@@ -1145,7 +1152,7 @@ export default function ManageDocumentsDatabases() {
               { settingModalMode==='collaborator' && !isLoadingDocCollaborator &&
                 <>
                 <SearchableSelect 
-                  repoId={id}
+                  docId={selectedDoc.id}
                   value={newCollaborator}
                   onChange={(event, newValue) => {
                     setNewCollaborator(newValue);
@@ -1203,7 +1210,7 @@ export default function ManageDocumentsDatabases() {
                   >
                     {selectedDocCollaborator.map((collaborator, index) => (
                       <DocCollaboratorCard
-                        key={index}
+                        key={collaborator.id}
                         order={index}
                         item={collaborator}
                         onRoleChange={handleRoleChanged}

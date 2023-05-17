@@ -9,11 +9,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 
-function sleep(delay = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay);
-  });
-}
 
 export default function SearchableSelect(props) {
   const [open, setOpen] = useState(false);
@@ -25,7 +20,7 @@ export default function SearchableSelect(props) {
     let abortController = new AbortController();
 
     setLoading(true);
-    const fetchUsers = async () =>  {
+    const fetchUsersRepo = async () =>  {
       const token =  Cookies.get('access_token');
       const data = {
         query: props.inputValue,
@@ -45,10 +40,35 @@ export default function SearchableSelect(props) {
         if(error.code !== 'ERR_CANCELED')console.log(error)
       }
     }
-    fetchUsers()
+
+    const fetchUsersDocs = async () =>  {
+      const token =  Cookies.get('access_token');
+      const data = {
+        query: props.inputValue,
+        page_no: 1,
+        page_size: 100,
+      }
+      try {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${props.docId}/collaborators/add/search`, {
+          params : data,
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          signal: abortController.signal
+        })
+        setOptions(response.data.results)
+      } catch (error){
+        if(error.code !== 'ERR_CANCELED')console.log(error)
+      }
+    }
+    if(props.repoId){
+      fetchUsersRepo()
+    }else if (props.docId){
+      fetchUsersDocs()
+    }
     setLoading(false)
     return () => abortController.abort();
-  }, [props.inputValue, props.repoId]);
+  }, [props.docId, props.inputValue, props.repoId]);
 
   return (
     <Autocomplete
