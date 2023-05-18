@@ -23,7 +23,7 @@ import { deleteRepositoryValidation } from '@/schema/delete-repository';
 import FormInputDialog from '@/component/form-input-dialog';
 import CustomAlert from '@/component/custom-alert';
 import { changeRepoDetailSuccess, changeRepoVisibilitySuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
-import { isAdmin, isNotAdmin, isUserAdmin } from '@/utils/roles';
+import { isAdmin, isNotAdmin, isOwner, isUserAdmin } from '@/utils/roles';
 
 export default function GeneralSettingRepository() {
   const theme = useTheme();
@@ -485,7 +485,7 @@ export default function GeneralSettingRepository() {
                         }
                       }}
                       onClick={handleClickOpenDelete}
-                      disabled={!isUserAdmin()}
+                      disabled={!isOwner(repositoryData.current_user_role)}
                     >
                       Delete
                     </Button> 
