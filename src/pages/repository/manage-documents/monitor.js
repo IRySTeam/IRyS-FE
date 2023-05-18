@@ -18,6 +18,7 @@ import { formatDateTable } from '@/utils/date';
 import Dropdown from '@/component/dropdown';
 import { statusOption } from '@/constants/option';
 import { refresh } from '@/utils/token';
+import { isUploader } from '@/utils/roles';
 
 export default function ManageDocumentsMonitor() {
   const theme = useTheme();
@@ -178,9 +179,22 @@ export default function ManageDocumentsMonitor() {
         })
         dispatch(getMonitorDataSuccess(response.data))
       } catch (error){
-        setAlertSeverity('error');
-        setAlertLabel(`Network Error, Please try again`);
-        setShowAlert(true);
+        setAlertSeverity('error')
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 'USER__NOT_ALLOWED':
+              setAlertLabel('You are not allowed to perform this action');
+              setShowAlert(true);
+              break;
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
+        } else{
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
+        }
       }
     }
     fetchMonitor()
@@ -371,6 +385,7 @@ export default function ManageDocumentsMonitor() {
                   type={'monitor'}
                 />
               </Box>
+              { isUploader(repositoryData.current_user_role) &&
               <Box
                 sx={{
                   width:{ mobile: '100%', small:'calc(100% - 350px)'},
@@ -581,6 +596,21 @@ export default function ManageDocumentsMonitor() {
                   </Box>
                 </Box>
               </Box>
+              }
+              { !isUploader(repositoryData.current_user_role) &&
+              <Box
+                sx={{
+                  width: '100%', 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItem: 'center'
+                }}
+              >
+                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>Access Denied</Typography>
+                <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>You are not <span style={{fontWeight: 700}}>Owner or Admin</span> of this repository</Typography>
+              </Box>
+              }
             </Box>
           </Container>
         </>

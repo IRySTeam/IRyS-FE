@@ -23,6 +23,7 @@ import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoD
 import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
 import { removeEmptyFilters } from '@/utils/array';
 import { saveAdvancedSearchBasic } from '@/state/actions/filterAction';
+import { isAdmin, isUploader } from '@/utils/roles';
 
 export default function Repository() {
   const theme = useTheme();
@@ -142,17 +143,10 @@ export default function Repository() {
           setShowAlert(true);
         }
       }
-      
-      // if(!repositoryData.id || repositoryData.id !== id){
-      //   fetchDetailRepo()
-      //   fetchRepoCollaborator()
-      //   fetchDocumentCount()
-      // }
 
       fetchDetailRepo()
       fetchRepoCollaborator()
       fetchDocumentCount()
-
       setIsLoading(false);
     }
   }, [dispatch, router, repositoryData.id]);
@@ -478,7 +472,10 @@ export default function Repository() {
                     <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>
                       {singleRepositoryData.isEmpty ? 
                       <>
-                      This repository is empty. Please&nbsp;
+                      This repository is empty.&nbsp;
+                      { isUploader(repositoryData.current_user_role) ? 
+                      <>
+                      Please&nbsp;
                       <Link
                         variant='paragraph_h4'
                         underline='none'
@@ -487,7 +484,7 @@ export default function Repository() {
                       >
                         upload a document&nbsp;
                       </Link>
-                      to continue
+                      to continue</> : <></>} 
                       </>
                       : 
                       'Please check for typos, or use fewer terms or fields.'}
@@ -523,7 +520,7 @@ export default function Repository() {
             >
               <Box
                 sx={{
-                  display: 'flex',
+                  display: isAdmin(repositoryData.current_user_role) ? 'flex' : 'none',
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -557,14 +554,14 @@ export default function Repository() {
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   justifyContent: 'flex-start',
-                  padding: '24px 0',
+                  padding: isAdmin(repositoryData.current_user_role) ? '24px 0' : '0 0 24px 0',
                   gap: '16px',
                   borderBottom: '1px solid',
                   borderBottomColor: theme.palette.light_gray.main,
                 }}
               >
                 <Typography sx={{ color: 'black.main', typography: 'heading_h4' }}>About</Typography>
-                <Typography sx={{ color: 'dark_gray.main', typography: 'paragraph_h6' }}>{repositoryData.description ?? 'No description provided.'}</Typography>
+                <Typography sx={{ color: 'dark_gray.main', typography: 'paragraph_h6' }}>{repositoryData.description === '' ? 'No description provided.' : repositoryData.description}</Typography>
               </Box>
               <Box
                 sx={{
@@ -590,7 +587,10 @@ export default function Repository() {
                 >
                   <Typography sx={{ color: 'black.main', typography: 'heading_h4' }}>Documents</Typography>
                   <IconButton 
-                    sx={{ padding: 0 }}
+                    sx={{ 
+                      padding: 0,
+                      display: isUploader(repositoryData.current_user_role) ? 'flex' : 'none' 
+                    }}
                     onClick={() => goToUploadDocuments()}
                   >
                     <AddIcon
@@ -629,6 +629,7 @@ export default function Repository() {
                     height: '32px',
                     width: '100%',
                     typography: theme.typography.heading_h6,
+                    display: isUploader(repositoryData.current_user_role) ? 'flex' : 'none',
                   }}
                   onClick={() => goToManageDocuments()}
                 >
@@ -688,6 +689,7 @@ export default function Repository() {
                     height: '32px',
                     width: '100%',
                     typography: theme.typography.heading_h6,
+                    display: isAdmin(repositoryData.current_user_role) ? 'flex' : 'none'
                   }}
                   onClick={() => goToCollaboratorSetting()}
                 >

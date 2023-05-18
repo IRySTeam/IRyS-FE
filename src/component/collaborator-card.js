@@ -2,10 +2,27 @@ import { useTheme } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import Dropdown from './dropdown';
-import { newRoleOption, roleOption } from '@/constants/option';
+import { adminRoleOption, ownerRoleOption, roleOption } from '@/constants/option';
+import { useSelector } from 'react-redux';
 
 export default function CollaboratorCard(props) {
   const theme = useTheme();
+  const repositoryData = useSelector(state => state.repository);
+  
+  const allowedRole = () => {
+    if (repositoryData.current_user_role === 'Owner' || repositoryData.current_user_role === 'Admin'){
+      if ( props.item.role === 'Owner' ) return false
+
+      if (repositoryData.current_user_role === 'Owner'){
+        return true
+      } else {
+        return ( props.item.role === 'Uploader' ||  props.item.role === 'Viewer' )
+      }
+    } else {
+      return false
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -85,11 +102,11 @@ export default function CollaboratorCard(props) {
         <Dropdown
           label={'Role'}
           placeholder={'Role'}
-          disableOwner={true} 
+          disable={!allowedRole()}
           value={props.item.role}
           id={props.order}
           handleChange={props.onRoleChange}
-          options={props.item.role === 'Owner' ? roleOption : newRoleOption}
+          options={props.item.role === 'Owner' ? roleOption : props.item.role === 'Admin' ? ownerRoleOption : adminRoleOption }
           width='150px'
           backgroundColor={theme.palette.white.main}
         />
@@ -107,7 +124,7 @@ export default function CollaboratorCard(props) {
               color: theme.palette.white.main,
             },
           }}
-          disabled={props.item.role === 'Owner'}
+          disabled={!allowedRole()}
           onClick={props.onRemoveAccess}
         >
           Remove Access

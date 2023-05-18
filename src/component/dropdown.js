@@ -17,7 +17,7 @@ export default function Dropdown(props) {
         onClose={() => setOpen(false)}
         value={props.value}
         onChange={(event) => props.handleChange(event, props.id)}
-        disabled={props.disableOwner && props.value === 'Owner'}
+        disabled={props.disable}
         displayEmpty
         renderValue={(selected) => {
           return <Typography variant='heading_h6' color='black.main'>{selected === props.defaultValue ? props.placeholder : props.options.find(x => x.value === selected).label}</Typography>

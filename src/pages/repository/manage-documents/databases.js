@@ -31,6 +31,7 @@ import { categoryOption } from '@/constants/option';
 import DocCollaboratorCard from '@/component/doc-collaborator-card';
 import SearchableSelect from '@/component/searchable-select';
 import NewDocCollaboratorCard from '@/component/new-doc-collaborator-card';
+import { isUploader } from '@/utils/roles';
 
 export default function ManageDocumentsDatabases() {
   const theme = useTheme();
@@ -198,9 +199,22 @@ export default function ManageDocumentsDatabases() {
         dispatch(getDatabasesDataSuccess(response.data))
         setIsLoading(false);
       } catch (error){
-        setAlertSeverity('error');
-        setAlertLabel(`Network Error, Please try again`);
-        setShowAlert(true);
+        setAlertSeverity('error')
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 'USER__NOT_ALLOWED':
+              setAlertLabel('You are not allowed to perform this action');
+              setShowAlert(true);
+              break;
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
+        } else{
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
+        }
         setIsLoading(false);
       }
       if(isUpdateDatabase) setIsUpdateDatabase(false)
@@ -632,6 +646,7 @@ export default function ManageDocumentsDatabases() {
                   type={'databases'}
                 />
               </Box>
+              { isUploader(repositoryData.current_user_role) &&
               <Box
                 sx={{
                   width:{ mobile: '100%', small:'calc(100% - 350px)'},
@@ -834,6 +849,21 @@ export default function ManageDocumentsDatabases() {
                   </Box>
                 </Box>
               </Box>
+              }
+              { !isUploader(repositoryData.current_user_role) &&
+              <Box
+                sx={{
+                  width: '100%', 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItem: 'center'
+                }}
+              >
+                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>Access Denied</Typography>
+                <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>You are not <span style={{fontWeight: 700}}>Owner or Admin</span> of this repository</Typography>
+              </Box>
+              }
             </Box>
           </Container>
           <Dialog

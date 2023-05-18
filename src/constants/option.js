@@ -5,6 +5,17 @@ export const roleOption = [
   { value: 'Viewer', label: 'Viewer'},
 ]
 
+export const ownerRoleOption = [
+  { value: 'Admin', label: 'Admin'},
+  { value: 'Uploader', label: 'Uploader'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
+export const adminRoleOption = [
+  { value: 'Uploader', label: 'Uploader'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
 export const newRoleOption = [
   { value: 'Admin', label: 'Admin'},
   { value: 'Uploader', label: 'Uploader'},
