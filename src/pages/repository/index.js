@@ -18,7 +18,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Dropdown from '@/component/dropdown';
 import DocumentCard from '@/component/document-card';
 import { sortOption } from '@/constants/option';
-import { getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
+import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
 import { removeEmptyFilters } from '@/utils/array';
@@ -26,7 +26,7 @@ import { removeEmptyFilters } from '@/utils/array';
 export default function Repository() {
   const theme = useTheme();
   const router = useRouter();
-  const { id, search, sort } = router.query;
+  const { search, sort } = router.query;
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -119,29 +119,27 @@ export default function Repository() {
         }
       }
 
-      // const fetchDocument = async () =>  {
-      //   const token =  Cookies.get('access_token');
-      //   try {
-      //     const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents`, {
-      //       headers: {
-      //         Authorization: `Bearer ${token}`
-      //       }
-      //     })
-      //     dispatch(getSingleRepoSuccess(response.data))
-      //   } catch (error){
-      //     // TODO CHANGE TO NEW ENDPOINT
-      //     // dispatch(getSingleRepoFailed(error.response.data))
-      //     dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
-      //     setAlertSeverity('error');
-      //     setAlertLabel(`Network Error, Please try again`);
-      //     setShowAlert(true);
-      //   }
-      // }
+      const fetchDocumentCount = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getSingleRepoSuccess(response.data))
+        } catch (error){
+          dispatch(getSingleRepoFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+        }
+      }
       
       if(!repositoryData.id || repositoryData.id !== id){
         fetchDetailRepo()
         fetchRepoCollaborator()
-        // fetchDocument()
+        fetchDocumentCount()
       }
 
       setIsLoading(false);
@@ -457,7 +455,7 @@ export default function Repository() {
                 { isLoadingDocs &&
                   <Loading transparent={true} centered={false}/>
                 }
-                { !isLoadingDocs && (singleRepositoryData.isEmpty || singleRepositoryData.documents.length === 0 || (searchDocumentData.count === 0) ) &&
+                { !isLoadingDocs && (singleRepositoryData.isEmpty || singleRepositoryData.count === 0 || (searchDocumentData.count === 0) ) &&
                   <Box
                     sx={{
                       width: '100%', 
@@ -487,7 +485,7 @@ export default function Repository() {
                     </Typography>
                   </Box>
                 }
-                { !isLoadingDocs && !singleRepositoryData.isEmpty && singleRepositoryData.documents.length > 0 && searchDocumentData.count > 0 && 
+                { !isLoadingDocs && !singleRepositoryData.isEmpty && singleRepositoryData.count > 0 && searchDocumentData.count > 0 && 
                   <Box
                     sx={{
                       display: 'flex',
@@ -612,8 +610,8 @@ export default function Repository() {
                       color: theme.palette.primary.main,
                     }}
                   />
-                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6_bold', marginLeft: '12px' }}>{singleRepositoryData.documents.length}</Typography>
-                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6' }}>Document{singleRepositoryData.documents.length > 1? 's':''}</Typography>
+                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6_bold', marginLeft: '12px' }}>{singleRepositoryData.count}</Typography>
+                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6' }}>Document{singleRepositoryData.count > 1? 's':''}</Typography>
                 </Box>
                 <Button 
                   color='primary' 

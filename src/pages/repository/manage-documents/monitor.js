@@ -264,8 +264,8 @@ export default function ManageDocumentsMonitor() {
       setShowAlert(true);
       fetchMonitor()
     } catch (error){
+      setAlertSeverity('error');
       if(error.response){
-        setAlertSeverity('error');
         switch (error.response.data.error_code){
           case 401:
             refresh('access_token', 'refresh_token', router);
