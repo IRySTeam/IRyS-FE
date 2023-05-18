@@ -14,7 +14,7 @@ import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
 import NavBar from '@/component/navbar';
 import { getDocumentDetailFailed, getDocumentDetailSuccess } from '@/state/actions/documentActions';
-import DocViewer, { DocViewerRenderers } from 'react-doc-viewer';
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import DownloadIcon from '@mui/icons-material/Download';
 import MetadataItem from '@/component/metadata-item';
 
@@ -46,17 +46,17 @@ export default function Repository() {
     }else{
       const fetchDocumentDetail = async () =>  {
         const token =  Cookies.get('access_token');
+        if(!id) return
         try {
           const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
           })
-          const doc = { 
+          const doc = [{ 
             uri: formatUrl(response.data.file_url),
-            fileType: response.data.doc_detail.doc_metadata.mimetype || 'application/pdf'
-          }
-          setDocs([doc])
+          }]
+          setDocs(doc)
           dispatch(getDocumentDetailSuccess(response.data))
         } catch (error){
           dispatch(getDocumentDetailFailed(error.response.data))
@@ -137,11 +137,14 @@ export default function Repository() {
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
                 width: {mobile: '100%', laptop: 'calc(50% - 20px)'},
+                border: '1px solid',
+                borderColor: theme.palette.light_gray.main,
               }}
             >
               <DocViewer
                 pluginRenderers={DocViewerRenderers}
                 documents={docs}
+                config={{ header: { disableHeader: true } }}
               />
             </Box>
             <Box
