@@ -17,6 +17,7 @@ import { getDocumentDetailFailed, getDocumentDetailSuccess } from '@/state/actio
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import DownloadIcon from '@mui/icons-material/Download';
 import MetadataItem from '@/component/metadata-item';
+import { downloadFile } from '@/utils/download';
 
 export default function Repository() {
   const theme = useTheme();
@@ -192,6 +193,7 @@ export default function Repository() {
                     marginLeft: {mobile: 0, small:'16px'},
                     marginTop: {mobile: 0, small:'6px'},
                   }}
+                  onClick={()=> downloadFile(documentData.file_url)}
                 >
                   <Typography
                     sx={{ 
@@ -233,7 +235,7 @@ export default function Repository() {
                     padding:'0 16px'
                   }}
                 >
-                  <Typography variant='heading_h4' color='black.main'>Metadata Information</Typography>
+                  <Typography variant='heading_h4' color='black.main'>Extracted Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails
                   sx={{
@@ -277,7 +279,7 @@ export default function Repository() {
                     padding:'0 16px'
                   }}
                 >
-                  <Typography variant='heading_h4' color='black.main'>Entity Information</Typography>
+                  <Typography variant='heading_h4' color='black.main'>Extracted Entities</Typography>
                 </AccordionSummary>
                 <AccordionDetails
                   sx={{
