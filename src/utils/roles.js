@@ -2,6 +2,10 @@ export const isNotAdmin = (role) => {
   return role === 'Uploader'|| role === 'Viewer'
 }
 
+export const isOwner = (role) => {
+  return role === 'Owner'
+}
+
 export const isAdmin = (role) => {
   return role === 'Owner'|| role === 'Admin'
 }
