@@ -18,28 +18,31 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Dropdown from '@/component/dropdown';
 import DocumentCard from '@/component/document-card';
 import { sortOption } from '@/constants/option';
-import { getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
+import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
 import { removeEmptyFilters } from '@/utils/array';
+import { saveAdvancedSearchBasic } from '@/state/actions/filterAction';
+import { isAdmin, isUploader } from '@/utils/roles';
 
 export default function Repository() {
   const theme = useTheme();
   const router = useRouter();
-  const { id, search, sort } = router.query;
+  const { search, sort } = router.query;
   const dispatch = useDispatch();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(search? search : '');
-  const [sortQuery, setSortQuery] = useState(sort? sort : '');
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertSeverity, setAlertSeverity] = useState('success');
-  const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
   const singleRepositoryData = useSelector(state => state.singleRepository);
   const searchDocumentData = useSelector(state => state.searchDocument);
   const repositoryData = useSelector(state => state.repository);
   const filterDocument = useSelector(state => state.filter);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(filterDocument.keyword? filterDocument.keyword : '');
+  const [sortQuery, setSortQuery] = useState(sort? sort : '');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState('success');
+  const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
 
   const handleChangeSortQuery = (event) => {
     setSortQuery(event.target.value);
@@ -48,7 +51,12 @@ export default function Repository() {
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      handleSearch();
+      const data = {
+        keyword: searchQuery,
+        domain: filterDocument.domain,
+        filters: filterDocument.filters,
+      }
+      dispatch(saveAdvancedSearchBasic(data))
     }
   };
 
@@ -119,31 +127,26 @@ export default function Repository() {
         }
       }
 
-      // const fetchDocument = async () =>  {
-      //   const token =  Cookies.get('access_token');
-      //   try {
-      //     const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents`, {
-      //       headers: {
-      //         Authorization: `Bearer ${token}`
-      //       }
-      //     })
-      //     dispatch(getSingleRepoSuccess(response.data))
-      //   } catch (error){
-      //     // TODO CHANGE TO NEW ENDPOINT
-      //     // dispatch(getSingleRepoFailed(error.response.data))
-      //     dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
-      //     setAlertSeverity('error');
-      //     setAlertLabel(`Network Error, Please try again`);
-      //     setShowAlert(true);
-      //   }
-      // }
-      
-      if(!repositoryData.id || repositoryData.id !== id){
-        fetchDetailRepo()
-        fetchRepoCollaborator()
-        // fetchDocument()
+      const fetchDocumentCount = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getSingleRepoSuccess(response.data))
+        } catch (error){
+          dispatch(getSingleRepoFailed(error.response.data))
+          setAlertSeverity('error');
+          setAlertLabel(`Network Error, Please try again`);
+          setShowAlert(true);
+        }
       }
 
+      fetchDetailRepo()
+      fetchRepoCollaborator()
+      fetchDocumentCount()
       setIsLoading(false);
     }
   }, [dispatch, router, repositoryData.id]);
@@ -170,7 +173,6 @@ export default function Repository() {
             }
           })
           dispatch(getSearchDocumentSuccess(response.data))
-          dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
           setIsLoadingDocs(false);
         } catch (error){
           if(error.response.data.error_code !== 404){
@@ -192,7 +194,6 @@ export default function Repository() {
             }
           })
           dispatch(getSearchDocumentSuccess(response.data))
-          dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
           setIsLoadingDocs(false);
         } catch (error){
           console.log(error)
@@ -345,7 +346,7 @@ export default function Repository() {
                       placeholder='Find a document...'
                       value={searchQuery}
                       onChange={(e)=>setSearchQuery(e.target.value)}
-                      onKeyPress={handleKeyPress}
+                      onKeyUp={handleKeyPress}
                       sx={{
                         width: '720px',
                         '& .MuiInputBase-input': {
@@ -457,7 +458,7 @@ export default function Repository() {
                 { isLoadingDocs &&
                   <Loading transparent={true} centered={false}/>
                 }
-                { !isLoadingDocs && (singleRepositoryData.isEmpty || singleRepositoryData.documents.length === 0 || (searchDocumentData.count === 0) ) &&
+                { !isLoadingDocs && (singleRepositoryData.isEmpty || singleRepositoryData.count === 0 || (searchDocumentData.count === 0) ) &&
                   <Box
                     sx={{
                       width: '100%', 
@@ -471,7 +472,10 @@ export default function Repository() {
                     <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>
                       {singleRepositoryData.isEmpty ? 
                       <>
-                      This repository is empty. Please&nbsp;
+                      This repository is empty.&nbsp;
+                      { isUploader(repositoryData.current_user_role) ? 
+                      <>
+                      Please&nbsp;
                       <Link
                         variant='paragraph_h4'
                         underline='none'
@@ -480,14 +484,14 @@ export default function Repository() {
                       >
                         upload a document&nbsp;
                       </Link>
-                      to continue
+                      to continue</> : <></>} 
                       </>
                       : 
                       'Please check for typos, or use fewer terms or fields.'}
                     </Typography>
                   </Box>
                 }
-                { !isLoadingDocs && !singleRepositoryData.isEmpty && singleRepositoryData.documents.length > 0 && searchDocumentData.count > 0 && 
+                { !isLoadingDocs && !singleRepositoryData.isEmpty && singleRepositoryData.count > 0 && searchDocumentData.count > 0 && 
                   <Box
                     sx={{
                       display: 'flex',
@@ -516,7 +520,7 @@ export default function Repository() {
             >
               <Box
                 sx={{
-                  display: 'flex',
+                  display: isAdmin(repositoryData.current_user_role) ? 'flex' : 'none',
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -550,14 +554,14 @@ export default function Repository() {
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   justifyContent: 'flex-start',
-                  padding: '24px 0',
+                  padding: isAdmin(repositoryData.current_user_role) ? '24px 0' : '0 0 24px 0',
                   gap: '16px',
                   borderBottom: '1px solid',
                   borderBottomColor: theme.palette.light_gray.main,
                 }}
               >
                 <Typography sx={{ color: 'black.main', typography: 'heading_h4' }}>About</Typography>
-                <Typography sx={{ color: 'dark_gray.main', typography: 'paragraph_h6' }}>{repositoryData.description ?? 'No description provided.'}</Typography>
+                <Typography sx={{ color: 'dark_gray.main', typography: 'paragraph_h6' }}>{repositoryData.description === '' ? 'No description provided.' : repositoryData.description}</Typography>
               </Box>
               <Box
                 sx={{
@@ -583,7 +587,10 @@ export default function Repository() {
                 >
                   <Typography sx={{ color: 'black.main', typography: 'heading_h4' }}>Documents</Typography>
                   <IconButton 
-                    sx={{ padding: 0 }}
+                    sx={{ 
+                      padding: 0,
+                      display: isUploader(repositoryData.current_user_role) ? 'flex' : 'none' 
+                    }}
                     onClick={() => goToUploadDocuments()}
                   >
                     <AddIcon
@@ -612,8 +619,8 @@ export default function Repository() {
                       color: theme.palette.primary.main,
                     }}
                   />
-                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6_bold', marginLeft: '12px' }}>{singleRepositoryData.documents.length}</Typography>
-                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6' }}>Document{singleRepositoryData.documents.length > 1? 's':''}</Typography>
+                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6_bold', marginLeft: '12px' }}>{singleRepositoryData.count}</Typography>
+                  <Typography sx={{ color: 'black.main', typography: 'paragraph_h6' }}>Document{singleRepositoryData.count > 1? 's':''}</Typography>
                 </Box>
                 <Button 
                   color='primary' 
@@ -622,6 +629,7 @@ export default function Repository() {
                     height: '32px',
                     width: '100%',
                     typography: theme.typography.heading_h6,
+                    display: isUploader(repositoryData.current_user_role) ? 'flex' : 'none',
                   }}
                   onClick={() => goToManageDocuments()}
                 >
@@ -681,6 +689,7 @@ export default function Repository() {
                     height: '32px',
                     width: '100%',
                     typography: theme.typography.heading_h6,
+                    display: isAdmin(repositoryData.current_user_role) ? 'flex' : 'none'
                   }}
                   onClick={() => goToCollaboratorSetting()}
                 >

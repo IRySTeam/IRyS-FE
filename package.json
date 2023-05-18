@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@cyntler/react-doc-viewer": "^1.13.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@mui/base": "^5.0.0-alpha.124",
@@ -26,7 +27,6 @@
     "moment": "^2.29.4",
     "next": "13.2.4",
     "react": "18.2.0",
-    "react-doc-viewer": "^0.1.5",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
     "react-otp-input": "^3.0.0",

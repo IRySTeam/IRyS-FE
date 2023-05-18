@@ -4,14 +4,19 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { Container, Button, Typography, Box, } from '@mui/material';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
 import NavBar from '@/component/navbar';
 import { getDocumentDetailFailed, getDocumentDetailSuccess } from '@/state/actions/documentActions';
-import DocViewer, { DocViewerRenderers } from 'react-doc-viewer';
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import DownloadIcon from '@mui/icons-material/Download';
+import MetadataItem from '@/component/metadata-item';
 
 export default function Repository() {
   const theme = useTheme();
@@ -41,17 +46,17 @@ export default function Repository() {
     }else{
       const fetchDocumentDetail = async () =>  {
         const token =  Cookies.get('access_token');
+        if(!id) return
         try {
-          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/documents/${id}`, {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/documents/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
           })
-          const doc = { 
+          const doc = [{ 
             uri: formatUrl(response.data.file_url),
-            fileType: response.data.doc_detail.doc_metadata.mimetype || 'application/pdf'
-          }
-          setDocs([doc])
+          }]
+          setDocs(doc)
           dispatch(getDocumentDetailSuccess(response.data))
         } catch (error){
           dispatch(getDocumentDetailFailed(error.response.data))
@@ -132,11 +137,14 @@ export default function Repository() {
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
                 width: {mobile: '100%', laptop: 'calc(50% - 20px)'},
+                border: '1px solid',
+                borderColor: theme.palette.light_gray.main,
               }}
             >
               <DocViewer
                 pluginRenderers={DocViewerRenderers}
                 documents={docs}
+                config={{ header: { disableHeader: true } }}
               />
             </Box>
             <Box
@@ -204,6 +212,94 @@ export default function Repository() {
                 </Button>
               </Box>
               <Box sx={{ backgroundColor: 'light_gray.main', width: '100%', height: '1px',}}/>
+              <Accordion
+                sx={{
+                  border: '1px solid',
+                  borderColor: theme.palette.light_gray.main,
+                  borderRadius: '5px',
+                  width: '100%'
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={
+                  <ExpandMoreIcon 
+                    sx={{
+                      width: '32px',
+                      height: '32px',
+                      color: theme.palette.black.main,
+                    }}
+                  />}
+                  sx={{
+                    padding:'0 16px'
+                  }}
+                >
+                  <Typography variant='heading_h4' color='black.main'>Metadata Information</Typography>
+                </AccordionSummary>
+                <AccordionDetails
+                  sx={{
+                    borderTop: '1px solid',
+                    borderTopColor: theme.palette.light_gray.main,
+                    padding: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
+                  }}
+                >
+                  { documentData.doc_detail.doc_metadata && 
+                  Object.entries(documentData.doc_detail.doc_metadata).map(([key, value]) => (
+                      <MetadataItem
+                        key={key} 
+                        label={key}
+                        value={value}
+                      />
+                    ))
+                  }
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                sx={{
+                  border: '1px solid',
+                  borderColor: theme.palette.light_gray.main,
+                  borderRadius: '5px',
+                  width: '100%'
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={
+                  <ExpandMoreIcon 
+                    sx={{
+                      width: '32px',
+                      height: '32px',
+                      color: theme.palette.black.main,
+                    }}
+                  />}
+                  sx={{
+                    padding:'0 16px'
+                  }}
+                >
+                  <Typography variant='heading_h4' color='black.main'>Entity Information</Typography>
+                </AccordionSummary>
+                <AccordionDetails
+                  sx={{
+                    borderTop: '1px solid',
+                    borderTopColor: theme.palette.light_gray.main,
+                    padding: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
+                  }}
+                >
+                  { documentData.doc_detail.doc_entities && 
+                  Object.entries(documentData.doc_detail.doc_entities).map(([key, value]) => (
+                      <MetadataItem
+                        key={key} 
+                        label={key}
+                        value={value}
+                      />
+                    ))
+                  }
+                </AccordionDetails>
+              </Accordion>
             </Box>
           </Box>
           </Container>

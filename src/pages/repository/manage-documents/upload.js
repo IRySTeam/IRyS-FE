@@ -1,22 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
-import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { NEXT_PUBLIC_API_URL } from '@/constants/api';
-import { Container, Box, Typography, Button } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { Container, Box, Typography } from '@mui/material';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
 import ManageDocumentsTabs from '@/component/tabs/manage-documents';
 import Uploader from '@/component/uploader';
+import { isUploader } from '@/utils/roles';
 
 export default function ManageDocumentsUpload() {
   const theme = useTheme();
   const router = useRouter();
-  const dispatch = useDispatch();
   const { id } = router.query;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -29,17 +25,6 @@ export default function ManageDocumentsUpload() {
     setIsLoading(true);
     setIsLoading(false);
   }, []);
-
-  const formik = useFormik({
-    initialValues: {
-      name: repositoryData.name,
-      description: repositoryData.description,
-    },
-    onSubmit: () => {
-      setIsLoading(true);
-      setIsLoading(false);
-    } ,
-  });
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
@@ -120,6 +105,7 @@ export default function ManageDocumentsUpload() {
                   type={'upload'}
                 />
               </Box>
+              { isUploader(repositoryData.current_user_role) &&
               <Box
                 sx={{
                   width:{ mobile: '100%', small:'calc(100% - 350px)'},
@@ -165,6 +151,21 @@ export default function ManageDocumentsUpload() {
                   />
                 </Box>
               </Box>
+              }
+              { !isUploader(repositoryData.current_user_role) &&
+              <Box
+                sx={{
+                  width: '100%', 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItem: 'center'
+                }}
+              >
+                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>Access Denied</Typography>
+                <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>You are not <span style={{fontWeight: 700}}>Owner or Admin</span> of this repository</Typography>
+              </Box>
+              }
             </Box>
           </Container>
         </>

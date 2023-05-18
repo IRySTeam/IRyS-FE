@@ -20,6 +20,7 @@ import SearchableSelect from '@/component/searchable-select';
 import NewCollaboratorCard from '@/component/new-collaborator-card';
 import Cookies from 'js-cookie';
 import { addNewCollaboratorToRepo, changeCollaboratorRoleInRepo, removeCollaboratorInRepo } from '@/state/actions/repositoryActions';
+import { isAdmin, isNotAdmin } from '@/utils/roles';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
@@ -312,6 +313,7 @@ export default function CollaboratorsSettingRepository() {
                   type={'collaborators'}
                 />
               </Box>
+              { isAdmin(repositoryData.current_user_role) &&
               <Box
                 sx={{
                   width:{ mobile: '100%', small:'calc(100% - 350px)'},
@@ -369,6 +371,7 @@ export default function CollaboratorsSettingRepository() {
                         width: '150px',
                         typography: theme.typography.heading_h6,
                         alignSelf: 'flex-end',
+                        display: isNotAdmin(repositoryData.current_user_role) ? 'none' : 'flex'
                       }}
                       onClick={handleClickOpenAddCollaborator}
                     >
@@ -402,6 +405,21 @@ export default function CollaboratorsSettingRepository() {
                   </Box>
                 </Box>
               </Box>
+              }
+              { isNotAdmin(repositoryData.current_user_role) &&
+              <Box
+                sx={{
+                  width: '100%', 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItem: 'center'
+                }}
+              >
+                <Typography variant='paragraph_h2' color='dark_gray.main' sx={{textAlign: 'center'}}>Access Denied</Typography>
+                <Typography variant='paragraph_h4' color='dark_gray.main' sx={{textAlign: 'center'}}>You are not <span style={{fontWeight: 700}}>Owner or Admin</span> of this repository</Typography>
+              </Box>
+              }
             </Box>
           </Container>
           <Dialog

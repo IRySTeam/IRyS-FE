@@ -1,5 +1,5 @@
 const initialState = {
-  documents: [],
+  count: 0,
   isEmpty: false,
   error: null,
 }
@@ -9,14 +9,14 @@ const singleRepositoryReducer = (state = initialState, action) => {
     case 'singleRepoSuccess':
       return {
         ...state,
-        documents: action.payload ,
-        isEmpty: action.payload.length === 0,
+        count: action.payload.count,
+        isEmpty: action.payload.count === 0,
         error: null, 
       }; 
     case 'singleRepoFailed': 
       return { 
         ...state, 
-        documents: [],
+        count: 0,
         isEmpty: false,
         error: action.payload.error, 
       };

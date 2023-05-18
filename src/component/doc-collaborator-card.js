@@ -2,44 +2,27 @@ import { useTheme } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import Dropdown from './dropdown';
-import { adminRoleOption, ownerRoleOption, roleOption } from '@/constants/option';
-import { useSelector } from 'react-redux';
+import { docRoleOption, newDocRoleOption } from '@/constants/option';
 
-export default function CollaboratorCard(props) {
+export default function DocCollaboratorCard(props) {
   const theme = useTheme();
-  const repositoryData = useSelector(state => state.repository);
-  
-  const allowedRole = () => {
-    if (repositoryData.current_user_role === 'Owner' || repositoryData.current_user_role === 'Admin'){
-      if ( props.item.role === 'Owner' ) return false
-
-      if (repositoryData.current_user_role === 'Owner'){
-        return true
-      } else {
-        return ( props.item.role === 'Uploader' ||  props.item.role === 'Viewer' )
-      }
-    } else {
-      return false
-    }
-  }
-
   return (
     <Box
       sx={{
         width:'100%',
         display: 'flex',
-        flexDirection: 'row', 
-        alignItems: 'center',
+        flexDirection: {mobile: 'column', mobile_l: 'row'}, 
+        alignItems: {mobile: 'flex-start', mobile_l: 'center'},
         justifyContent:'space-between',
         gap: '16px'
       }}
     >
       <Box
         sx={{
-          width:{mobile: 'calc(100% - 166px)', tablet: 'calc(100% - 180px)', small: 'calc(100% - 332px)'},
+          width:{mobile: '100%', mobile_l: 'calc(100% - 166px)', tablet: 'calc(100% - 180px)', small: 'calc(100% - 332px)'},
           display: 'flex',
           flexDirection: {mobile:'column', tablet: 'row'}, 
-          alignItems: 'center',
+          alignItems: {mobile: 'flex-start', mobile_l: 'center'},
           justifyContent:'flex-start',
           gap: '16px'
         }}
@@ -102,11 +85,11 @@ export default function CollaboratorCard(props) {
         <Dropdown
           label={'Role'}
           placeholder={'Role'}
-          disable={!allowedRole()}
+          disableOwner={true} 
           value={props.item.role}
           id={props.order}
           handleChange={props.onRoleChange}
-          options={props.item.role === 'Owner' ? roleOption : props.item.role === 'Admin' ? ownerRoleOption : adminRoleOption }
+          options={props.item.role === 'Owner' ? docRoleOption : newDocRoleOption}
           width='150px'
           backgroundColor={theme.palette.white.main}
         />
@@ -124,7 +107,7 @@ export default function CollaboratorCard(props) {
               color: theme.palette.white.main,
             },
           }}
-          disabled={!allowedRole()}
+          disabled={props.item.role === 'Owner'}
           onClick={props.onRemoveAccess}
         >
           Remove Access
