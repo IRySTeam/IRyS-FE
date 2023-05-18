@@ -7,6 +7,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { formatDate } from '@/utils/date';
+import { downloadFile } from '@/utils/download';
 
 export default function DocumentCard(props) {
   const theme = useTheme();
@@ -19,7 +20,7 @@ export default function DocumentCard(props) {
 
   const handleClickDownload = (event) => {
     event.stopPropagation();
-    console.log(`Download Document with Index ${props.item.details.id}`)
+    downloadFile(props.item.details.file_url)
   };
 
   const boldHighlightedText = (preview, highlighted) => {
@@ -228,7 +229,7 @@ export default function DocumentCard(props) {
               justifyContent: 'center',
               alignItems: 'center',
             }}
-            onClick={() => handleClickDownload(props.item.details.id)}
+            onClick={handleClickDownload}
           >
             <Typography
               sx={{ 
