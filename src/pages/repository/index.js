@@ -22,6 +22,7 @@ import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singl
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
 import { removeEmptyFilters } from '@/utils/array';
+import { saveAdvancedSearchBasic } from '@/state/actions/filterAction';
 
 export default function Repository() {
   const theme = useTheme();
@@ -29,17 +30,18 @@ export default function Repository() {
   const { search, sort } = router.query;
   const dispatch = useDispatch();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(search? search : '');
-  const [sortQuery, setSortQuery] = useState(sort? sort : '');
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertSeverity, setAlertSeverity] = useState('success');
-  const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
   const singleRepositoryData = useSelector(state => state.singleRepository);
   const searchDocumentData = useSelector(state => state.searchDocument);
   const repositoryData = useSelector(state => state.repository);
   const filterDocument = useSelector(state => state.filter);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(filterDocument.keyword? filterDocument.keyword : '');
+  const [sortQuery, setSortQuery] = useState(sort? sort : '');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState('success');
+  const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
 
   const handleChangeSortQuery = (event) => {
     setSortQuery(event.target.value);
@@ -48,7 +50,12 @@ export default function Repository() {
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      handleSearch();
+      const data = {
+        keyword: searchQuery,
+        domain: filterDocument.domain,
+        filters: filterDocument.filters,
+      }
+      dispatch(saveAdvancedSearchBasic(data))
     }
   };
 
@@ -136,11 +143,15 @@ export default function Repository() {
         }
       }
       
-      if(!repositoryData.id || repositoryData.id !== id){
-        fetchDetailRepo()
-        fetchRepoCollaborator()
-        fetchDocumentCount()
-      }
+      // if(!repositoryData.id || repositoryData.id !== id){
+      //   fetchDetailRepo()
+      //   fetchRepoCollaborator()
+      //   fetchDocumentCount()
+      // }
+
+      fetchDetailRepo()
+      fetchRepoCollaborator()
+      fetchDocumentCount()
 
       setIsLoading(false);
     }
@@ -168,7 +179,6 @@ export default function Repository() {
             }
           })
           dispatch(getSearchDocumentSuccess(response.data))
-          dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
           setIsLoadingDocs(false);
         } catch (error){
           if(error.response.data.error_code !== 404){
@@ -190,7 +200,6 @@ export default function Repository() {
             }
           })
           dispatch(getSearchDocumentSuccess(response.data))
-          dispatch(getSingleRepoSuccess([{file: 1}, {file:2}, {file:3}]))
           setIsLoadingDocs(false);
         } catch (error){
           console.log(error)
@@ -343,7 +352,7 @@ export default function Repository() {
                       placeholder='Find a document...'
                       value={searchQuery}
                       onChange={(e)=>setSearchQuery(e.target.value)}
-                      onKeyPress={handleKeyPress}
+                      onKeyUp={handleKeyPress}
                       sx={{
                         width: '720px',
                         '& .MuiInputBase-input': {
