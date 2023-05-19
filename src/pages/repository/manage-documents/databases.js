@@ -596,7 +596,8 @@ export default function ManageDocumentsDatabases() {
               justifyContent: 'flex-start',
               [theme.breakpoints.down('small')]: {
                 padding: '40px 16px',
-              }, 
+              },
+              marginTop: '64px',
             }} 
           >
             <Typography 

@@ -141,7 +141,8 @@ export default function Home() {
               },
               [theme.breakpoints.down('tablet')]: {
                 gap: '16px'
-              },  
+              },
+              marginTop: '64px',
             }} 
           >
           <Typography 

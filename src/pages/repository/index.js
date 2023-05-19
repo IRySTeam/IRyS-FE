@@ -275,6 +275,7 @@ export default function Repository() {
               [theme.breakpoints.down('tablet')]: {
                 gap: '16px'
               },  
+              marginTop: '64px',
             }} 
           >
           <Typography 

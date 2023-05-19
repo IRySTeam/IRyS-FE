@@ -19,7 +19,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import MetadataItem from '@/component/metadata-item';
 import { downloadFile } from '@/utils/download';
 
-export default function Repository() {
+export default function DetailDocument() {
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -107,7 +107,8 @@ export default function Repository() {
               },
               [theme.breakpoints.down('tablet')]: {
                 gap: '16px'
-              },  
+              },
+              marginTop: '64px',
             }} 
           >
           <Typography 

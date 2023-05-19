@@ -101,7 +101,7 @@ function NavBar(props) {
   }
 
   return (
-    <AppBar position='static' maxheight='64px'>
+    <AppBar position='fixed' maxheight='64px'>
       <Container 
         maxWidth='large'
         sx={{
@@ -149,7 +149,7 @@ function NavBar(props) {
               sx={{ display: 'block',}}
             >
               {pages.map((page) => (
-                <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                <MenuItem key={page.label} onClick={() => router.push({ pathname: page.url })}>
                   <Typography variant='paragraph_h5' color='black.main'>{page.label}</Typography>
                 </MenuItem>
               ))}
@@ -299,7 +299,7 @@ function NavBar(props) {
               placeholder='Find public repositories or documents...'
               value={search}
               onChange={(e)=>setSearch(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyUp={handleKeyPress}
               sx={{
                 width: '480px',
                 '& .MuiInputBase-input': {
@@ -330,7 +330,7 @@ function NavBar(props) {
                 variant='text'
                 color='white'
                 sx={{typography: theme.typography.heading_h5, padding: '0'}}
-                onClick={handleCloseNavMenu}
+                onClick={() => router.push({ pathname: page.url })}
               >
                 {page.label} 
               </Button>
