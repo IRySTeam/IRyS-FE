@@ -17,6 +17,7 @@ export default function Logo(props) {
         justifyContent: 'center',
         alignItems: 'center',
         cursor: props.withText ? 'default' : 'pointer',
+        ...props.sx,
       }}
       onClick={() => props.withText ? {} : handleClickLogo()}
     >
