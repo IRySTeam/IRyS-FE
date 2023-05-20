@@ -3,7 +3,6 @@ import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import Cookies from 'js-cookie'
 import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { Container, Button, Typography, Box, OutlinedInput } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
