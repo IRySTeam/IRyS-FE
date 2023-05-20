@@ -28,7 +28,7 @@ import { isAdmin, isUploader } from '@/utils/roles';
 export default function Repository() {
   const theme = useTheme();
   const router = useRouter();
-  const { search, sort } = router.query;
+  const { id, search, sort } = router.query;
   const dispatch = useDispatch();
 
   const singleRepositoryData = useSelector(state => state.singleRepository);
@@ -480,7 +480,7 @@ export default function Repository() {
                       <Link
                         variant='paragraph_h4'
                         underline='none'
-                        href={'/manage-documents/upload'}
+                        onClick={() => router.push({ pathname: '/repository/manage-documents/upload', query: { id: id} })}
                         color={'primary.main'}
                       >
                         upload a document&nbsp;
