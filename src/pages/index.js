@@ -17,6 +17,7 @@ import Dropdown from '@/component/dropdown';
 import RepositoryCard from '@/component/repository-card';
 import { getJoinedRepoListSuccess } from '@/state/actions/joinedRepositoryActions';
 import { typeOption, sortOption } from '@/constants/option';
+import { resetFilterAdvancedSearch } from '@/state/actions/filterAction';
 
 export default function Home() {
   const theme = useTheme();
@@ -110,6 +111,11 @@ export default function Home() {
       setShowAlert(true);
     }
   }, [deleteRepository]);
+
+  useEffect(() => {
+    const data = { path: '' }
+    dispatch(resetFilterAdvancedSearch(data))
+  }, [dispatch]);
 
   return (
     <>
