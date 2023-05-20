@@ -56,8 +56,7 @@ export default function Repository() {
   };
 
   const handleSearch = () => {
-    const { id } = router.query;
-    router.push({ pathname: '/repository', query: { id: id,} })
+    dispatch(saveAdvancedSearchSearchBar(searchQuery))
   }
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
