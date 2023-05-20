@@ -28,7 +28,7 @@ export default function FormInputDialog(props) {
         value={props.value}
         onChange={props.onChange}
         onBlur={props.onBlur}
-        onKeyPress={props.onKeyPress}
+        onKeyUp={props.onKeyUp}
         error={props.error}
         sx={{ 
           width: '100%',

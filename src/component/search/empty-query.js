@@ -66,7 +66,7 @@ export default function EmptyQuery(props) {
           placeholder='Find public repositories or documents...'
           value={props.query}
           onChange={(e) => props.setQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyUp={handleKeyPress}
           small={true}
           sx={{
             width: 'calc(100% - 56px)'

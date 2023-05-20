@@ -196,7 +196,7 @@ export default function Home() {
                   placeholder='Find a repository...'
                   value={searchQuery}
                   onChange={(e)=>setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyUp={handleKeyPress}
                   sx={{
                     width: '720px',
                     '& .MuiInputBase-input': {

@@ -28,7 +28,7 @@ export default function FormInput(props) {
           value={props.value}
           onChange={props.onChange}
           onBlur={props.onBlur}
-          onKeyPress={props.onKeyPress}
+          onKeyUp={props.onKeyUp}
           error={props.error}
           sx={{ marginBottom: '8px', width: '100%'}}
           type={props.showPassword ? 'text' : 'password'}
@@ -52,7 +52,7 @@ export default function FormInput(props) {
           value={props.value}
           onChange={props.onChange}
           onBlur={props.onBlur}
-          onKeyPress={props.onKeyPress}
+          onKeyUp={props.onKeyUp}
           error={props.error}
           sx={{ width: '100%'}}
           size={props.small? 'small' : 'medium'}

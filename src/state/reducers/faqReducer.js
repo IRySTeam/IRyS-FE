@@ -1,5 +1,5 @@
 const initialState = {
-  questions: '',
+  questions: [],
   error: null,
 }
 
