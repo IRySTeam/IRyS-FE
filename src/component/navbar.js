@@ -12,7 +12,6 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
-import SettingsIcon from '@mui/icons-material/Settings';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
@@ -160,7 +159,7 @@ function NavBar(props) {
             placeholder='Find public repositories or documents...'
             value={search}
             onChange={(e)=>setSearch(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyUp={handleKeyPress}
             sx={{
               width: '480px',
               '& .MuiInputBase-input': {
