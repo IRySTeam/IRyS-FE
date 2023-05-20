@@ -22,7 +22,7 @@ import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singl
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
 import { removeEmptyFilters } from '@/utils/array';
-import { saveAdvancedSearchBasic, saveAdvancedSearchSearchBar } from '@/state/actions/filterAction';
+import { saveAdvancedSearchSearchBar } from '@/state/actions/filterAction';
 import { isAdmin, isUploader } from '@/utils/roles';
 
 export default function Repository() {
