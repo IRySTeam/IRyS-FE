@@ -13,6 +13,7 @@ import searchDocumentReducer from './searchDocumentReducer';
 import searchDocumentPublicReducer from './searchDocumentPublicReducer';
 import databasesReducer from './databasesReducer';
 import documentReducer from './documentReducer';
+import faqReducer from './faqReducer';
 
 const reducers = combineReducers({
   user: userReducer,
@@ -26,7 +27,8 @@ const reducers = combineReducers({
   filterOption: filterOptionReducer,
   searchDocument: searchDocumentReducer,
   searchDocumentPublic : searchDocumentPublicReducer,
-  document : documentReducer
+  document : documentReducer,
+  faq: faqReducer,
 })
 
 export default reducers;

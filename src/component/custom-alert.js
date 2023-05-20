@@ -16,7 +16,7 @@ export default function CustomAlert(props) {
         typography: theme.typography.heading_h6 ,
         zIndex: 2,
         position: 'fixed',
-        top: '10%',
+        top: '15%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
         [theme.breakpoints.down('tablet')]: {

@@ -59,7 +59,7 @@ export default function Search() {
         })
         dispatch(getPublicRepoListSuccess(response.data))
       } catch (error){
-        console.log(error)
+        // console.log(error)
       }
     }
 
@@ -80,11 +80,7 @@ export default function Search() {
         dispatch(getSearchDocumentPublicSuccess(response.data))
         setIsLoading(false);
       } catch (error){
-        console.log(error)
         dispatch(getSearchDocumentPublicFailed(error.response.data))
-        setAlertSeverity('error');
-        setAlertLabel(`Network Error, Please try again`);
-        setShowAlert(true);
         setIsLoading(false);
       }
     }
@@ -106,11 +102,7 @@ export default function Search() {
         dispatch(getSearchDocumentPublicSuccess(response.data))
         setIsLoading(false);
       } catch (error){
-        console.log(error)
         dispatch(getSearchDocumentPublicFailed(error.response.data))
-        setAlertSeverity('error');
-        setAlertLabel(`Network Error, Please try again`);
-        setShowAlert(true);
         setIsLoading(false);
       }
     }
