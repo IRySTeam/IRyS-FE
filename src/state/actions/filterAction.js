@@ -5,6 +5,13 @@ export const saveAdvancedSearchNavbar = (data) => {
   }
 }
 
+export const saveAdvancedSearchSearchBar = (data) => {
+  return {
+    type: 'searchbar',
+    payload: data,
+  }
+}
+
 export const saveAdvancedSearchBasic = (data) => {
   return {
     type: 'basic',

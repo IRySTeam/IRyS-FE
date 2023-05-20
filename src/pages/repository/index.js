@@ -22,7 +22,7 @@ import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singl
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
 import { removeEmptyFilters } from '@/utils/array';
-import { saveAdvancedSearchBasic } from '@/state/actions/filterAction';
+import { saveAdvancedSearchBasic, saveAdvancedSearchSearchBar } from '@/state/actions/filterAction';
 import { isAdmin, isUploader } from '@/utils/roles';
 
 export default function Repository() {
@@ -51,12 +51,7 @@ export default function Repository() {
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      const data = {
-        keyword: searchQuery,
-        domain: filterDocument.domain,
-        filters: filterDocument.filters,
-      }
-      dispatch(saveAdvancedSearchBasic(data))
+      dispatch(saveAdvancedSearchSearchBar(searchQuery))
     }
   };
 
@@ -163,7 +158,7 @@ export default function Repository() {
           query: filterDocument.keyword,
           domain: filterDocument.domain === '' ? 'general' : filterDocument.domain,
           advanced_filter: {
-            match: removeEmptyFilters(filterDocument.filters)
+            match: filterDocument.mode==='basic' ? removeEmptyFilters(filterDocument.filters) : []
           }
         }
         try {
@@ -234,7 +229,7 @@ export default function Repository() {
         }
       }
 
-      if(filterDocument.mode === 'basic' ){
+      if(filterDocument.mode === 'basic'  || filterDocument.mode === 'searchbar'){
         fetchSearchDocumentBasic()
       } else if (filterDocument.mode === 'cli' ){
         fetchSearchDocumentCli()
