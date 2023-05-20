@@ -27,7 +27,7 @@ export default function AdvancedSearch() {
   const filterOption = useSelector(state => state.filterOption);
   const repositoryData = useSelector(state => state.repository);
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState(advancedSearch.mode ?? 'basic');
+  const [mode, setMode] = useState(advancedSearch.mode && !(advancedSearch.mode === 'searchbar') ? advancedSearch.mode : 'basic');
   const [path, setPath] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('error');

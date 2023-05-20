@@ -36,6 +36,12 @@ const filterReducer = (state = initialState, action) => {
         mode: 'basic',
         keyword: action.payload,
       }; 
+    case 'searchbar':
+      return {
+        ...state,
+        mode: 'searchbar',
+        keyword: action.payload,
+      }; 
     case 'reset': 
       return { 
         ...state,
