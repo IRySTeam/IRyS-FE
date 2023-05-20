@@ -6,6 +6,10 @@ export const refresh = async (token_name, refresh_token_name, router) => {
   const token = Cookies.get(token_name);
   const refresh_token = Cookies.get(refresh_token_name);
 
+  if(!token || !refresh_token) {
+    router.replace({ pathname: '/login' });
+  }
+
   const refreshData = {
     token: token,
     refresh_token: refresh_token
