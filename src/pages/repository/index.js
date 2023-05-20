@@ -480,7 +480,7 @@ export default function Repository() {
                       <Link
                         variant='paragraph_h4'
                         underline='none'
-                        href={'/repository/upload'}
+                        href={'/manage-documents/upload'}
                         color={'primary.main'}
                       >
                         upload a document&nbsp;

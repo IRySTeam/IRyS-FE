@@ -35,6 +35,7 @@ export default function EmptyQuery(props) {
         [theme.breakpoints.down('tablet')]: {
           padding: '40px 16px',
         },
+        marginTop: '64px',
       }} 
     >
       <Typography 

@@ -26,6 +26,7 @@ export default function SuccessSearch(props) {
         [theme.breakpoints.down('small')]: {
           padding: '40px 16px',
         }, 
+        marginTop: '64px',
       }} 
     >
       <Typography 

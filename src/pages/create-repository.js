@@ -105,7 +105,8 @@ export default function CreateRepository() {
               justifyContent: 'flex-start',
               [theme.breakpoints.down('tablet')]: {
                 padding: '40px 16px',
-              }, 
+              },
+              marginTop: '64px',
             }} 
           >
             <Box
