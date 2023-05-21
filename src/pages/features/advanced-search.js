@@ -15,7 +15,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { topLevelQueryParams } from '@/data/top_level';
-import { borderLeft } from '@mui/system';
 import { filterRecruitment, filterScientific, generalFilter } from '@/data/filter';
 
 export default function FeaturesAdvancedSearch() {
