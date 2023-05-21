@@ -11,7 +11,6 @@ export const getUserDetail = async (token, dispatch, router) => {
         Authorization: `Bearer ${token}`
       }
     })
-    console.log(response)
     dispatch(getUserDetailSuccess(response.data))
   } catch (error) {
     if(error.response && error.response.status === 401){
