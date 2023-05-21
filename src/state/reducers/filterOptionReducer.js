@@ -1,7 +1,7 @@
 import { convertExtractionDomainArray, convertFilterKeyArray, convertFilterKeyOperatorArray, convertFilterKeyTypeArray } from "@/utils/array";
 
 const initialState = {
-  domain_option: [],
+  domain_option: [{value: 'general', label: 'General'}],
   filter_key_option: [],
   filter_type_option: [],
   filter_operator_option: [],
@@ -19,7 +19,7 @@ const filterOptionReducer = (state = initialState, action) => {
     case 'domainOptionFailed': 
       return { 
         ...state, 
-        domain_option: [],
+        domain_option: [{value: 'general', label: 'General'}],
         error: action.payload.error,
       };
     case 'filterOptionSuccess':

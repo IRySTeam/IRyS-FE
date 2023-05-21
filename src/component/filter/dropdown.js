@@ -39,7 +39,7 @@ export default function FilterDropdown(props) {
           onChange={props.onChange}
           displayEmpty
           renderValue={(selected) => {
-            return <Typography variant='paragraph_h6' color={selected === props.defaultValue && props.placeholder ? 'light_gray.main' : 'black.main'}>{ selected !== props.defaultValue ? props.options.find(x => x.value === selected).label : props.placeholder ? props.placeholder : props.options.find(x => x.value === selected).label }</Typography>
+            return <Typography variant='paragraph_h6' color={selected === props.defaultValue && props.placeholder ? 'light_gray.main' : 'black.main'}>{ selected !== props.defaultValue ? props.options.find(x => x.value === selected).label : (props.placeholder ? props.placeholder : props.options.find(x => x.value === selected).label) }</Typography>
           }}
           sx={{
             '&& .MuiSelect-select' : {
