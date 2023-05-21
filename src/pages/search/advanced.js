@@ -167,7 +167,7 @@ export default function AdvancedSearch() {
     setIsLoading(true);
     const fetchDomainFilter = async () =>  {
       try {
-        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/information/${domain === ''? 'general' : domain}`,)
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/${domain === ''? 'general' : domain}/information`,)
         dispatch(getFilterOptionSuccess(response.data))
       } catch (error){
         setAlertSeverity('error');
