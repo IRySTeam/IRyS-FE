@@ -11,3 +11,9 @@ export const getUserDetailFailed = (data) => {
     payload: data,
   }
 }
+
+export const logoutUser = () => {
+  return {
+    type: 'logout',
+  }
+}
