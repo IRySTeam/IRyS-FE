@@ -39,6 +39,8 @@ export default function MetadataItem(props) {
           } else {
             return <Typography variant='paragraph_h6' color='black.main' sx={{minHeight:'21px'}} />
           }
+        } else if (props.value.text_vector) {
+          return <Typography variant='paragraph_h6' color='black.main' sx={{minHeight:'21px'}}>{props.value.text}</Typography>
         } else {
           return <></>
         }
