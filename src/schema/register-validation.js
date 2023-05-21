@@ -17,7 +17,7 @@ export const registerValidation = yup.object({
   password: yup
     .string('Enter your password')
     .matches(
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()\-=+{};:,<.>.])(?=.*\d).{8,}$/,
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()\-=+{};:,<.>._.])(?=.*\d).{8,}$/,
       'Your password must be at least 8 characters that contain at least one uppercase letter, one lowercase letter, one special character (! @ $ % ^ & * ( ) \ - _ = + { } ; : , < . >), and one number.'
     )
     .required('Please fill in the required field')
@@ -26,7 +26,7 @@ export const registerValidation = yup.object({
     .string('Enter your password confirmation')
     .oneOf([yup.ref('password'), null], `The password you entered doesn't match`)
     .matches(
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()\-=+{};:,<.>.])(?=.*\d).{8,}$/,
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()\-=+{};:,<.>._.])(?=.*\d).{8,}$/,
       'Your password must be at least 8 characters that contain at least one uppercase letter, one lowercase letter, one special character (! @ $ % ^ & * ( ) \ - _ = + { } ; : , < . >), and one number.'
     )
     .required('Please fill in the required field')
