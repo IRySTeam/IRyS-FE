@@ -178,12 +178,12 @@ export default function AdvancedSearch() {
   return (
     <>
       { isLoading && <Loading centered={true}/> }
-      {
+      { !isLoading &&
         <>
           <NavBar 
             setIsLoading={setIsLoading}
           />
-          { showAlert &&
+          { !isLoading && showAlert &&
             <CustomAlert
               severity={alertSeverity}
               label={alertLabel}
