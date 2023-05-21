@@ -9,7 +9,7 @@ export const loginValidation = yup.object({
   password: yup
     .string('Enter your password')
     .matches(
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()\-=+{};:,<.>.])(?=.*\d).{8,}$/,
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()\-=+{};:,<.>._.])(?=.*\d).{8,}$/,
       'Your password must be at least 8 characters that contain at least one uppercase letter, one lowercase letter, one special character (! @ $ % ^ & * ( ) \ - _ = + { } ; : , < . >), and one number.'
     )
     .required('Please fill in the required field')
