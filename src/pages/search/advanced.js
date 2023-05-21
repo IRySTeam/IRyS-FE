@@ -162,7 +162,7 @@ export default function AdvancedSearch() {
 
     const fetchDomainFilter = async () =>  {
       try {
-        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/${domain}/information`,)
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/${domain}/info`,)
         dispatch(getFilterOptionSuccess(response.data))
       } catch (error){
         setAlertSeverity('error');
