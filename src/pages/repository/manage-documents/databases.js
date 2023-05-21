@@ -243,6 +243,7 @@ export default function ManageDocumentsDatabases() {
         setShowAlert(true);
         setIsLoading(false);
         setIsDeleteModalOpen(false);
+        formikDialog.resetForm()
       } catch (error) {
         setAlertSeverity('error')
         if(error.response){
