@@ -66,7 +66,7 @@ export default function Search() {
     const fetchSearchDocumentBasic = async () =>  {
       const data = {
         query: filterDocument.mode === 'basic' ? filterDocument.keyword : filterDocument.cliQuery,
-        domain: filterDocument.domain === '' ? 'general' : filterDocument.domain,
+        domain: filterDocument.domain,
         advanced_filter: {
           match: filterDocument.mode === 'basic' ? removeEmptyFilters(filterDocument.filters) : [],
         }
@@ -89,7 +89,7 @@ export default function Search() {
       const data = new FormData();
       data.append('file', filterDocument.file)
       const params = {
-        domain: filterDocument.domain === '' ? 'general' : filterDocument.domain
+        domain: filterDocument.domain
       }
       try {
         const response = await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/search/public/file`, data, {

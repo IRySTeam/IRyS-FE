@@ -32,7 +32,7 @@ export default function AdvancedSearch() {
   const [alertSeverity, setAlertSeverity] = useState('error');
   const [alertLabel, setAlertLabel] = useState('Upload File Error');
   const [keyword, setKeyword] = useState(advancedSearch.keyword ?? '');
-  const [domain, setDomain] = useState(advancedSearch.domain ?? '');
+  const [domain, setDomain] = useState(advancedSearch.domain ?? 'general');
   const [filters, setFilters] = useState( advancedSearch.filters ?? [
     {
       key: '',
@@ -128,7 +128,7 @@ export default function AdvancedSearch() {
         const data = { path: origin }
         dispatch(resetFilterAdvancedSearch(data))
         setKeyword('')
-        setDomain('')
+        setDomain('general')
         setFilters([{
           key: '',
           data_type: '',
@@ -159,15 +159,10 @@ export default function AdvancedSearch() {
         setShowAlert(true);
       }
     }
-    fetchDomain()
-    setIsLoading(false);
-  }, [dispatch]);
 
-  useEffect(() => {
-    setIsLoading(true);
     const fetchDomainFilter = async () =>  {
       try {
-        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/information/${domain === ''? 'general' : domain}`,)
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/extraction/${domain}/info`,)
         dispatch(getFilterOptionSuccess(response.data))
       } catch (error){
         setAlertSeverity('error');
@@ -175,6 +170,7 @@ export default function AdvancedSearch() {
         setShowAlert(true);
       }
     }
+    fetchDomain()
     fetchDomainFilter()
     setIsLoading(false);
   }, [dispatch, domain]);
@@ -347,9 +343,8 @@ export default function AdvancedSearch() {
                   />
                   <FilterDropdown
                     label="Domain"
-                    placeholder="Select a domain.."
-                    defaultValue=''
                     value={domain}
+                    defaultValue={'general'}
                     options={filterOption.domain_option}
                     onChange={handleChangeDomain}
                   />

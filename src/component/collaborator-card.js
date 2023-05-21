@@ -15,11 +15,33 @@ export default function CollaboratorCard(props) {
 
       if (repositoryData.current_user_role === 'Owner'){
         return true
+      } else if (repositoryData.current_user_role === 'Admin') {
+        return props.item.role !== 'Admin'
       } else {
         return ( props.item.role === 'Uploader' ||  props.item.role === 'Viewer' )
       }
     } else {
       return false
+    }
+  }
+
+  const dropdownOption = () => {
+    if ( repositoryData.current_user_role === 'Owner' ) {
+      if ( props.item.role === 'Owner' ) {
+        return roleOption
+      } else {
+        return ownerRoleOption
+      }
+    } else if (repositoryData.current_user_role = 'Admin' ) {
+      if ( props.item.role  === 'Owner' ) {
+        return roleOption
+      } else if (props.item.role === 'Admin') {
+        return ownerRoleOption
+      } else {
+        return adminRoleOption
+      }
+    } else {
+      return []
     }
   }
 
@@ -106,7 +128,7 @@ export default function CollaboratorCard(props) {
           value={props.item.role}
           id={props.order}
           handleChange={props.onRoleChange}
-          options={props.item.role === 'Owner' ? roleOption : props.item.role === 'Admin' ? ownerRoleOption : adminRoleOption }
+          options={ dropdownOption() }
           width='150px'
           backgroundColor={theme.palette.white.main}
         />

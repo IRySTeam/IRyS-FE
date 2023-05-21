@@ -1,6 +1,6 @@
 export const convertExtractionDomainArray= (arr) => {
   const newArray = arr.map((el) => ({
-    value: el === 'general'? '' : el,
+    value: el,
     label: el.charAt(0).toUpperCase() + el.slice(1),
   }));
   return newArray

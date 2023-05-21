@@ -19,6 +19,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import { useTheme } from '@mui/material/styles';
 import Logo from './logo';
 import { saveAdvancedSearchNavbar } from '@/state/actions/filterAction';
+import { logoutUser } from '@/state/actions/userActions';
 
 const pages = [
   {
@@ -94,6 +95,7 @@ function NavBar(props) {
     props.setIsLoading(true)
     Cookies.remove('access_token');
     Cookies.remove('refresh_token');
+    dispatch(logoutUser())
     router.replace({ pathname: '/login' })
   }
 

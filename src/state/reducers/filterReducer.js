@@ -2,7 +2,7 @@ const initialState = {
   path: '',
   mode: 'basic',
   keyword: '',
-  domain: '',
+  domain: 'general',
   filters: [],
   cliQuery: '',
   file: '',
@@ -48,7 +48,7 @@ const filterReducer = (state = initialState, action) => {
         path: action.payload.path,
         mode: 'basic',
         keyword: '',
-        domain: '',
+        domain: 'general',
         filters: [{
           key: '',
           data_type: '',
