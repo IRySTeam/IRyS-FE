@@ -24,6 +24,7 @@ import FormInputDialog from '@/component/form-input-dialog';
 import CustomAlert from '@/component/custom-alert';
 import { changeRepoDetailSuccess, changeRepoVisibilitySuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { isAdmin, isNotAdmin, isOwner, } from '@/utils/roles';
+import { refresh } from '@/utils/token';
 
 export default function GeneralSettingRepository() {
   const theme = useTheme();

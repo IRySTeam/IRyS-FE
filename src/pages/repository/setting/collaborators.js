@@ -21,6 +21,7 @@ import NewCollaboratorCard from '@/component/new-collaborator-card';
 import Cookies from 'js-cookie';
 import { addNewCollaboratorToRepo, changeCollaboratorRoleInRepo, removeCollaboratorInRepo } from '@/state/actions/repositoryActions';
 import { isAdmin, isNotAdmin } from '@/utils/roles';
+import { refresh } from '@/utils/token';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
