@@ -919,8 +919,18 @@ export default function ManageDocumentsDatabases() {
                   height: '64px',
                   color: theme.palette.dark_gray.main
                 }}
-              /> 
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Delete ${formikDialog.values.real_name}`}</Typography>
+              />
+              <Typography 
+                variant='form_label_small' 
+                color='black.main' 
+                textAlign={'center'}
+                sx={{
+                  maxWidth: '100%',
+                  wordWrap: 'break-word'
+                }}
+              >
+                {`Delete ${formikDialog.values.real_name}`}
+              </Typography> 
               <Typography 
                 variant='form_sublabel_small' 
                 color='black.main'
