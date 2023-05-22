@@ -124,8 +124,8 @@ export default function FeaturesManageRepositorySetting() {
                 <Image 
                   src={'/features/general_settings.png'} 
                   alt='repository general setting page' 
-                  width={mobile? 356.25: 712.5} 
-                  height={mobile? 197.5: 395}
+                  width={mobile? 309: 712.5} 
+                  height={mobile? 172: 395}
                 />
               </Box>
               <Typography 
