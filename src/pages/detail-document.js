@@ -141,15 +141,60 @@ export default function DetailDocument() {
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
                 width: {mobile: '100%', laptop: 'calc(50% - 20px)'},
-                border: '1px solid',
-                borderColor: theme.palette.light_gray.main,
+                gap: '8px',
               }}
             >
-              <DocViewer
-                pluginRenderers={DocViewerRenderers}
-                documents={docs}
-                config={{ header: { disableHeader: true } }}
-              />
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  width: '100%',
+                  border: '1px solid',
+                  borderColor: theme.palette.light_gray.main,
+                }}
+              >
+                <DocViewer
+                  pluginRenderers={DocViewerRenderers}
+                  documents={docs}
+                  config={{ header: { disableHeader: true } }}
+                />
+              </Box>
+              <Button 
+                color='primary' 
+                variant='contained' 
+                sx={{ 
+                  height: '32px',
+                  width: '125px',
+                  typography: theme.typography.heading_h6,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '8px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginLeft: {mobile: 0, small:'16px'},
+                  marginTop: {mobile: 0, small:'6px'},
+                  alignSelf: 'flex-end'
+                }}
+                onClick={()=> downloadFile(documentData.file_url)}
+              >
+                <Typography
+                  sx={{ 
+                    color: 'white.main', 
+                    typography: 'heading_h6',
+                  }}
+                >
+                  Download
+                </Typography>
+                <DownloadIcon
+                  sx={{
+                    width: '18px',
+                    height: '18px',
+                    color: theme.palette.white.main
+                  }}
+                />
+              </Button>
             </Box>
             <Box
               sx={{
@@ -167,7 +212,7 @@ export default function DetailDocument() {
                   display: 'flex',
                   flexDirection: 'row', 
                   alignItems: 'center',
-                  justifyContent:'space-between',
+                  justifyContent:'flex-start',
                 }} 
               >
                 <Typography 
@@ -181,40 +226,6 @@ export default function DetailDocument() {
                 >
                   Information
                 </Typography>
-                <Button 
-                  color='primary' 
-                  variant='contained' 
-                  sx={{ 
-                    height: '32px',
-                    width: '125px',
-                    typography: theme.typography.heading_h6,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: '8px',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginLeft: {mobile: 0, small:'16px'},
-                    marginTop: {mobile: 0, small:'6px'},
-                  }}
-                  onClick={()=> downloadFile(documentData.file_url)}
-                >
-                  <Typography
-                    sx={{ 
-                      color: 'white.main', 
-                      typography: 'heading_h6',
-
-                    }}
-                  >
-                    Download
-                  </Typography>
-                  <DownloadIcon
-                    sx={{
-                      width: '18px',
-                      height: '18px',
-                      color: theme.palette.white.main
-                    }}
-                  />
-                </Button>
               </Box>
               <Box sx={{ backgroundColor: 'light_gray.main', width: '100%', height: '1px',}}/>
               <Accordion
