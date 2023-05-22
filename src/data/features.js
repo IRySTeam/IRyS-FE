@@ -52,3 +52,122 @@ export const dslExample = `{
   }
 }
 `
+
+export const repoRoles = [
+  {
+    operation: 'Read the metadata (such as name, description, visibility) of the repository ',
+    owner: true,
+    admin: true,
+    uploader: true,
+    viewer: true,
+  },
+  {
+    operation: 'Read public documents in the repository',
+    owner: true,
+    admin: true,
+    uploader: true,
+    viewer: true,
+  },
+  {
+    operation: 'Accept viewer access to private documents in the repository',
+    owner: true,
+    admin: true,
+    uploader: true,
+    viewer: true,
+  },
+  {
+    operation: 'Accept editor access to private documents in the repository',
+    owner: true,
+    admin: true,
+    uploader: true,
+    viewer: false,
+  },
+  {
+    operation: 'Upload documents to the repository',
+    owner: true,
+    admin: true,
+    uploader: true,
+    viewer: false,
+  },
+  {
+    operation: 'Modify the collaborators of the document',
+    owner: true,
+    admin: true,
+    uploader: false,
+    viewer: false,
+  },
+  {
+    operation: 'Automatically become the owner of all documents in the repository',
+    owner: true,
+    admin: true,
+    uploader: false,
+    viewer: false,
+  },
+  {
+    operation: 'Modify the uploaders and viewers of the repository',
+    owner: true,
+    admin: true,
+    uploader: false,
+    viewer: false,
+  },
+  {
+    operation: 'Modify the metadata (such as name, description, visibility) of the repository',
+    owner: true,
+    admin: true,
+    uploader: false,
+    viewer: false,
+  },
+  {
+    operation: 'Modify the admins of the repository',
+    owner: true,
+    admin: false,
+    uploader: false,
+    viewer: false,
+  },
+  {
+    operation: 'Delete the repository',
+    owner: true,
+    admin: false,
+    uploader: false,
+    viewer: false,
+  },
+]
+
+export const docRoles = [
+  {
+    operation : 'Read the metadata (such as name, description, visibility) of the document ',
+    owner: true,
+    editor: true,
+    viewer: true,
+  },
+  {
+    operation : 'Read the content of the document',
+    owner: true,
+    editor: true,
+    viewer: true,
+  },
+  {
+    operation : 'Modify the metadata (such as name, description, visibility) of the document',
+    owner: true,
+    editor: true,
+    viewer: false,
+  },
+  {
+    operation : 'Modify the viewers of the document',
+    owner: true,
+    editor: true,
+    viewer: false,
+  },
+  {
+    operation : 'Modify the editors of the document',
+    owner: true,
+    editor: false,
+    viewer: false,
+  },
+  {
+    operation : 'Delete the document',
+    owner: true,
+    editor: false,
+    viewer: false,
+  },
+]
