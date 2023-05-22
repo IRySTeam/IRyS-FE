@@ -199,11 +199,22 @@ export default function ManageDocumentsDatabases() {
         dispatch(getDatabasesDataSuccess(response.data))
         setIsLoading(false);
       } catch (error){
-        setAlertSeverity('error')
+        setAlertSeverity('error');
         if(error.response){
           switch (error.response.data.error_code){
+            case 401:
+              refresh('access_token', 'refresh_token', router);
+              setAlertSeverity('success');
+              setAlertLabel('Your session has been restored. Please Try Again.');
+              setShowAlert(true);
+              setIsLoading(false);
+              break;
             case 'USER__NOT_ALLOWED':
               setAlertLabel('You are not allowed to perform this action');
+              setShowAlert(true);
+              break;
+            case 'REPOSITORY__NOT_FOUND':
+              setAlertLabel('Repository not found');
               setShowAlert(true);
               break;
             default :
@@ -220,7 +231,7 @@ export default function ManageDocumentsDatabases() {
       if(isUpdateDatabase) setIsUpdateDatabase(false)
     }
     fetchDatabases()
-  }, [dispatch, id, isUpdateDatabase, search]);
+  }, [dispatch, id, isUpdateDatabase, router, search]);
 
   const formikDialog = useFormik({
     initialValues: {

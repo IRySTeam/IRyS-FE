@@ -59,7 +59,7 @@ export default function Search() {
         })
         dispatch(getPublicRepoListSuccess(response.data))
       } catch (error){
-        // console.log(error)
+        //
       }
     }
 

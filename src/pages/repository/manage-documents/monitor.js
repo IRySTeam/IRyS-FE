@@ -179,11 +179,22 @@ export default function ManageDocumentsMonitor() {
         })
         dispatch(getMonitorDataSuccess(response.data))
       } catch (error){
-        setAlertSeverity('error')
+        setAlertSeverity('error');
         if(error.response){
           switch (error.response.data.error_code){
+            case 401:
+              refresh('access_token', 'refresh_token', router);
+              setAlertSeverity('success');
+              setAlertLabel('Your session has been restored. Please Try Again.');
+              setShowAlert(true);
+              setIsLoading(false);
+              break;
             case 'USER__NOT_ALLOWED':
               setAlertLabel('You are not allowed to perform this action');
+              setShowAlert(true);
+              break;
+            case 'REPOSITORY__NOT_FOUND':
+              setAlertLabel('Repository not found');
               setShowAlert(true);
               break;
             default :
@@ -199,7 +210,7 @@ export default function ManageDocumentsMonitor() {
     }
     fetchMonitor()
     setIsLoading(false);
-  }, [dispatch, id, search, status]);
+  }, [dispatch, id, router, search, status]);
 
   const fetchMonitor = async () =>  {
     const token =  Cookies.get('access_token');
@@ -219,8 +230,32 @@ export default function ManageDocumentsMonitor() {
       dispatch(getMonitorDataSuccess(response.data))
     } catch (error){
       setAlertSeverity('error');
-      setAlertLabel(`Network Error, Please try again`);
-      setShowAlert(true);
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router);
+            setAlertSeverity('success');
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
     }
   }
 
@@ -237,8 +272,8 @@ export default function ManageDocumentsMonitor() {
       setShowAlert(true);
       fetchMonitor()
     } catch (error){
+      setAlertSeverity('error');
       if(error.response){
-        setAlertSeverity('error');
         switch (error.response.data.error_code){
           case 401:
             refresh('access_token', 'refresh_token', router);
