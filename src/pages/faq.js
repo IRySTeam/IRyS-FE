@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { useTheme } from '@mui/material/styles';
-import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Button, Typography, Box, OutlinedInput } from '@mui/material';
 import Accordion from '@mui/material/Accordion';
@@ -22,7 +21,6 @@ import FormInput from '@/component/form-input';
 
 export default function Faq() {
   const theme = useTheme();
-  const router = useRouter();
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -38,8 +36,9 @@ export default function Faq() {
     },
     onSubmit: () => {
       setIsLoading(true);
-      setAlertSeverity('success')
+      setAlertSeverity('success');
       setAlertLabel('Your feedback or question successfully sent')
+      setShowAlert(true);
       formik.setFieldValue('question', '')
       setIsLoading(false);
     },
@@ -215,7 +214,7 @@ export default function Faq() {
                       alignSelf: 'center'
                     }}
                   >
-                    I apologize, but there is no relevant answer to your question.
+                    There is no relevant answer to your question.
                   </Typography>
                   <Typography 
                     sx={{ 
