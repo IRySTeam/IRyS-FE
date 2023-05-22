@@ -16,6 +16,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { topLevelQueryParams } from '@/data/top_level';
 import { filterRecruitment, filterScientific, generalFilter } from '@/data/filter';
+import { dslExample, dslFormat } from '@/data/features';
 
 export default function FeaturesAdvancedSearch() {
   const theme = useTheme();
@@ -49,7 +50,7 @@ export default function FeaturesAdvancedSearch() {
               minHeight:'100vh',
               display: 'flex',
               flexDirection: 'column', 
-              gap: '24px',
+              gap: '56px',
               alignItems: 'flex-start',
               justifyContent: 'flex-start',
               width: 'calc(100% - 362px)',
@@ -58,170 +59,269 @@ export default function FeaturesAdvancedSearch() {
                 width: '100%',
               },
               [theme.breakpoints.down('tablet')]: {
-                gap: '16px'
+                gap: '40px'
               },
               marginTop: '64px',
               marginLeft: {mobile: '0', small: '360px'},
             }} 
           >
-          <Button 
-            color='primary' 
-            variant='contained' 
-            sx={{ 
-              height: '32px',
-              width: {tablet:'200px'},
-              typography: theme.typography.heading_h6,
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              display: {mobile: 'flex', small:'none'},
-            }}
-            onClick={() => toggleDrawer(true)}
-          >
-            <Typography
+            <Button 
+              color='primary' 
+              variant='contained' 
               sx={{ 
-                color: 'white.main', 
-                typography: 'heading_h6',
+                height: '32px',
+                width: {tablet:'200px'},
+                typography: theme.typography.heading_h6,
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '8px',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                display: {mobile: 'flex', small:'none'},
+              }}
+              onClick={() => toggleDrawer(true)}
+            >
+              <Typography
+                sx={{ 
+                  color: 'white.main', 
+                  typography: 'heading_h6',
+                }}
+              >
+                Explore Features
+              </Typography>
+              < ArrowForwardIosIcon color='white' sx={{width: '20px', height: '20px'}}/>
+            </Button>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
               }}
             >
-              Explore Features
-            </Typography>
-            < ArrowForwardIosIcon color='white' sx={{width: '20px', height: '20px'}}/>
-          </Button>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h2',
-              [theme.breakpoints.down('tablet')]: {
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h2',
+                  [theme.breakpoints.down('tablet')]: {
+                    typography: 'heading_h4',
+                  }, 
+                }}
+              >
+                Advanced Search
+              </Typography>
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'paragraph_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                In addition to exploring repositories based on a simple text-based keyword search, IRyS provides the advanced search feature that enables you to further focus your search within a specific document domain. Here, you can define additional parameters for your search, such as the domain itself and also have the choice to pass in advanced filters.
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
+              }}
+            >
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                Top Level Parameters for Query
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableBody>
+                    {topLevelQueryParams.map((row) => (
+                      <TableRow
+                        key={row.name}
+                      >
+                        <TableCell align="center">
+                          <Typography 
+                            sx={{ 
+                              color: 'black.main', 
+                              typography: 'heading_h5',
+                              textAlign: 'justify',
+                            }}
+                          >
+                            {row.label}
+                          </Typography>
+                        </TableCell>
+                        <TableCell 
+                          align="center" 
+                          sx={{
+                            borderLeft: '1px solid',
+                            borderLeftColor: theme.palette.light_gray.main
+                          }}
+                        >
+                          <Typography 
+                            sx={{ 
+                              color: 'black.main', 
+                              typography: 'paragraph_h5',
+                              textAlign: 'justify',
+                            }}
+                          >
+                            {row.desc}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
+              }}
+            >
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                Domains
+              </Typography>
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'paragraph_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                As of right now, all documents will automatically be a part of the GENERAL domain, and can additionally be associated with a more specific domain, that includes the RECRUITMENT and SCIENTIFIC domains.
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
+              }}
+            >
+            <Typography 
+              sx={{ 
+                color: 'black.main', 
                 typography: 'heading_h4',
-              }, 
-            }}
-          >
-            Advanced Search
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'paragraph_h4',
-              textAlign: 'justify',
-            }}
-          >
-            In addition to exploring repositories based on a simple text-based keyword search, IRyS provides the advanced search feature that enables you to further focus your search within a specific document domain. Here, you can define additional parameters for your search, such as the domain itself and also have the choice to pass in advanced filters.
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h4',
-              textAlign: 'justify',
-            }}
-          >
-            Top Level Parameters for Query
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableBody>
-                {topLevelQueryParams.map((row) => (
-                  <TableRow
-                    key={row.name}
-                  >
-                    <TableCell align="center">
-                      <Typography 
-                        sx={{ 
-                          color: 'black.main', 
-                          typography: 'heading_h5',
-                          textAlign: 'justify',
-                        }}
-                      >
-                        {row.label}
-                      </Typography>
-                    </TableCell>
-                    <TableCell 
-                      align="center" 
-                      sx={{
-                        borderLeft: '1px solid',
-                        borderLeftColor: theme.palette.light_gray.main
+                textAlign: 'justify',
+              }}
+            >
+              General Advanced Filters
+            </Typography>
+            <TableContainer component={Paper}>
+              <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">
+                    <Typography 
+                      sx={{ 
+                        color: 'black.main', 
+                        typography: 'heading_h5',
                       }}
                     >
-                      <Typography 
-                        sx={{ 
-                          color: 'black.main', 
-                          typography: 'paragraph_h5',
-                          textAlign: 'justify',
+                      Information
+                    </Typography>
+                  </TableCell>
+                  <TableCell 
+                    align="center" 
+                    sx={{
+                      borderLeft: '1px solid',
+                      borderLeftColor: theme.palette.light_gray.main
+                  }}>
+                    <Typography 
+                      sx={{ 
+                        color: 'black.main', 
+                        typography: 'heading_h5',
+                      }}
+                    >
+                      Description
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+                <TableBody>
+                  {generalFilter.map((row) => (
+                    <TableRow
+                      key={row.name}
+                    >
+                      <TableCell align="center">
+                        <Typography 
+                          sx={{ 
+                            color: 'black.main', 
+                            typography: 'heading_h5',
+                          }}
+                        >
+                          {row.value}
+                        </Typography>
+                      </TableCell>
+                      <TableCell 
+                        align="center" 
+                        sx={{
+                          borderLeft: '1px solid',
+                          borderLeftColor: theme.palette.light_gray.main
                         }}
                       >
-                        {row.desc}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h4',
-              textAlign: 'justify',
-            }}
-          >
-            Domains
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'paragraph_h4',
-              textAlign: 'justify',
-            }}
-          >
-            As of right now, all documents will automatically be a part of the GENERAL domain, and can additionally be associated with a more specific domain, that includes the RECRUITMENT and SCIENTIFIC domains.
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h4',
-              textAlign: 'justify',
-            }}
-          >
-            General Advanced Filters
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">
-                  <Typography 
-                    sx={{ 
-                      color: 'black.main', 
-                      typography: 'heading_h5',
-                    }}
-                  >
-                    Information
-                  </Typography>
-                </TableCell>
-                <TableCell 
-                  align="center" 
-                  sx={{
-                    borderLeft: '1px solid',
-                    borderLeftColor: theme.palette.light_gray.main
-                }}>
-                  <Typography 
-                    sx={{ 
-                      color: 'black.main', 
-                      typography: 'heading_h5',
-                    }}
-                  >
-                    Description
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-              <TableBody>
-                {generalFilter.map((row) => (
-                  <TableRow
-                    key={row.name}
-                  >
+                        <Typography 
+                          sx={{ 
+                            color: 'black.main', 
+                            typography: 'paragraph_h5',
+                            textAlign: 'justify',
+                          }}
+                        >
+                          {row.desc}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
+              }}
+            >
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                Domain Specific Advanced Filters: Recruitment
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                <TableHead>
+                  <TableRow>
                     <TableCell align="center">
                       <Typography 
                         sx={{ 
@@ -229,7 +329,7 @@ export default function FeaturesAdvancedSearch() {
                           typography: 'heading_h5',
                         }}
                       >
-                        {row.value}
+                        Information
                       </Typography>
                     </TableCell>
                     <TableCell 
@@ -237,68 +337,79 @@ export default function FeaturesAdvancedSearch() {
                       sx={{
                         borderLeft: '1px solid',
                         borderLeftColor: theme.palette.light_gray.main
-                      }}
-                    >
+                    }}>
                       <Typography 
                         sx={{ 
                           color: 'black.main', 
-                          typography: 'paragraph_h5',
-                          textAlign: 'justify',
+                          typography: 'heading_h5',
                         }}
                       >
-                        {row.desc}
+                        Description
                       </Typography>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h4',
-              textAlign: 'justify',
-            }}
-          >
-            Domain Specific Advanced Filters: Recruitment
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">
-                  <Typography 
-                    sx={{ 
-                      color: 'black.main', 
-                      typography: 'heading_h5',
-                    }}
-                  >
-                    Information
-                  </Typography>
-                </TableCell>
-                <TableCell 
-                  align="center" 
-                  sx={{
-                    borderLeft: '1px solid',
-                    borderLeftColor: theme.palette.light_gray.main
-                }}>
-                  <Typography 
-                    sx={{ 
-                      color: 'black.main', 
-                      typography: 'heading_h5',
-                    }}
-                  >
-                    Description
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-              <TableBody>
-                {filterRecruitment.map((row) => (
-                  <TableRow
-                    key={row.name}
-                  >
+                </TableHead>
+                  <TableBody>
+                    {filterRecruitment.map((row) => (
+                      <TableRow
+                        key={row.name}
+                      >
+                        <TableCell align="center">
+                          <Typography 
+                            sx={{ 
+                              color: 'black.main', 
+                              typography: 'heading_h5',
+                            }}
+                          >
+                            {row.value}
+                          </Typography>
+                        </TableCell>
+                        <TableCell 
+                          align="center" 
+                          sx={{
+                            borderLeft: '1px solid',
+                            borderLeftColor: theme.palette.light_gray.main
+                          }}
+                        >
+                          <Typography 
+                            sx={{ 
+                              color: 'black.main', 
+                              typography: 'paragraph_h5',
+                              textAlign: 'justify',
+                            }}
+                          >
+                            {row.desc}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
+              }}
+            >
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                Domain Specific Advanced Filters: Scientific
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                <TableHead>
+                  <TableRow>
                     <TableCell align="center">
                       <Typography 
                         sx={{ 
@@ -306,7 +417,7 @@ export default function FeaturesAdvancedSearch() {
                           typography: 'heading_h5',
                         }}
                       >
-                        {row.value}
+                        Information
                       </Typography>
                     </TableCell>
                     <TableCell 
@@ -314,151 +425,195 @@ export default function FeaturesAdvancedSearch() {
                       sx={{
                         borderLeft: '1px solid',
                         borderLeftColor: theme.palette.light_gray.main
-                      }}
-                    >
-                      <Typography 
-                        sx={{ 
-                          color: 'black.main', 
-                          typography: 'paragraph_h5',
-                          textAlign: 'justify',
-                        }}
-                      >
-                        {row.desc}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h4',
-              textAlign: 'justify',
-            }}
-          >
-            Domain Specific Advanced Filters: Scientific
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">
-                  <Typography 
-                    sx={{ 
-                      color: 'black.main', 
-                      typography: 'heading_h5',
-                    }}
-                  >
-                    Information
-                  </Typography>
-                </TableCell>
-                <TableCell 
-                  align="center" 
-                  sx={{
-                    borderLeft: '1px solid',
-                    borderLeftColor: theme.palette.light_gray.main
-                }}>
-                  <Typography 
-                    sx={{ 
-                      color: 'black.main', 
-                      typography: 'heading_h5',
-                    }}
-                  >
-                    Description
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-              <TableBody>
-                {filterScientific.map((row) => (
-                  <TableRow
-                    key={row.name}
-                  >
-                    <TableCell align="center">
+                    }}>
                       <Typography 
                         sx={{ 
                           color: 'black.main', 
                           typography: 'heading_h5',
                         }}
                       >
-                        {row.value}
-                      </Typography>
-                    </TableCell>
-                    <TableCell 
-                      align="center" 
-                      sx={{
-                        borderLeft: '1px solid',
-                        borderLeftColor: theme.palette.light_gray.main
-                      }}
-                    >
-                      <Typography 
-                        sx={{ 
-                          color: 'black.main', 
-                          typography: 'paragraph_h5',
-                          textAlign: 'justify',
-                        }}
-                      >
-                        {row.desc}
+                        Description
                       </Typography>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h4',
-            }}
-          >
-            Basic Search
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'paragraph_h4',
-              textAlign: 'justify',
-            }}
-          >
-            Basic search returns documents based on a query accessible from IRyS`s UI based console. The acceptable parameters are those that are mentioned above and can be directly inputted into each respective field provided in the web UI console. 
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h4',
-            }}
-          >
-            CLI Search
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'paragraph_h4',
-              textAlign: 'justify',
-            }}
-          >
-            CLI search returns documents based on a provided query string defined based on IRyS`s DSL. Below is the structure of IRyS`s DSL.
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h4',
-            }}
-          >
-            File Search
-          </Typography>
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'paragraph_h4',
-              textAlign: 'justify',
-            }}
-          >
-            File search returns documents that are evaluated to have similar content to an uploaded file. The acceptable file formats that can be uploaded include PDF, DOC, DOCX, and TXT documents. 
-          </Typography>
+                </TableHead>
+                  <TableBody>
+                    {filterScientific.map((row) => (
+                      <TableRow
+                        key={row.name}
+                      >
+                        <TableCell align="center">
+                          <Typography 
+                            sx={{ 
+                              color: 'black.main', 
+                              typography: 'heading_h5',
+                            }}
+                          >
+                            {row.value}
+                          </Typography>
+                        </TableCell>
+                        <TableCell 
+                          align="center" 
+                          sx={{
+                            borderLeft: '1px solid',
+                            borderLeftColor: theme.palette.light_gray.main
+                          }}
+                        >
+                          <Typography 
+                            sx={{ 
+                              color: 'black.main', 
+                              typography: 'paragraph_h5',
+                              textAlign: 'justify',
+                            }}
+                          >
+                            {row.desc}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
+              }}
+            >
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h4',
+                }}
+              >
+                Basic Search
+              </Typography>
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'paragraph_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                Basic search returns documents based on a query accessible from IRyS`s UI based console. The acceptable parameters are those that are mentioned above and can be directly inputted into each respective field provided in the web UI console. 
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
+              }}
+            >
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h4',
+                }}
+              >
+                CLI Search
+              </Typography>
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'paragraph_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                CLI search returns documents based on a provided query string defined based on IRyS`s DSL. Below is the structure of IRyS`s DSL. The query components follow the same format as that of the basic search.
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  border: '1px solid',
+                  borderColor: theme.palette.light_gray.main,
+                  padding: '8px',
+                  alignSelf: 'center'
+                }}
+              >
+                <Typography 
+                  sx={{ 
+                    color: 'black.main', 
+                    typography: {mobile: 'advanced_value', tablet: 'paragraph_h5'},
+                    textAlign: 'justify',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {dslFormat}
+                </Typography>
+              </Box>
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'paragraph_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                Below is an example of a complete query with multiple filter conditions
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  border: '1px solid',
+                  borderColor: theme.palette.light_gray.main,
+                  padding: '8px',
+                  alignSelf: 'center'
+                }}
+              >
+                <Typography 
+                  sx={{ 
+                    color: 'black.main', 
+                    typography: {mobile: 'advanced_value', tablet: 'paragraph_h5'},
+                    textAlign: 'justify',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {dslExample}
+                </Typography>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column', 
+                gap: '16px',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%',
+              }}
+            >
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h4',
+                }}
+              >
+                File Search
+              </Typography>
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'paragraph_h4',
+                  textAlign: 'justify',
+                }}
+              >
+                File search returns documents that are evaluated to have similar content to an uploaded file. The acceptable file formats that can be uploaded include PDF, DOC, DOCX, and TXT documents. 
+              </Typography>
+            </Box>
           </Container>
         </> 
       }
