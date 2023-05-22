@@ -18,6 +18,7 @@ import RepositoryCard from '@/component/repository-card';
 import { getJoinedRepoListSuccess } from '@/state/actions/joinedRepositoryActions';
 import { typeOption, sortOption } from '@/constants/option';
 import { resetFilterAdvancedSearch } from '@/state/actions/filterAction';
+import { refresh } from '@/utils/token';
 
 export default function Home() {
   const theme = useTheme();
@@ -86,15 +87,36 @@ export default function Home() {
           }
         })
         dispatch(getJoinedRepoListSuccess(response.data))
-      } catch (error){
+      } catch (error) {
         setAlertSeverity('error');
-        setAlertLabel(`Network Error, Please try again`);
-        setShowAlert(true);
+        if(error.response){
+          switch (error.response.data.error_code){
+            case 401:
+              refresh('access_token', 'refresh_token', router);
+              setAlertSeverity('success');
+              setAlertLabel('Your session has been restored. Please Try Again.');
+              setShowAlert(true);
+              setIsLoading(false);
+              break;
+            case 'USER__EMAIL_NOT_VERIFIED':
+              setAlertLabel('Email is not verified');
+              setShowAlert(true);
+              break;
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
+        } else{
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
+        }
+        setIsLoading(false);
       }
     }
     fetchRepo()
     setIsLoadingRepo(false);
-  }, [dispatch, mobile, page, search, small, sortQuery, tablet, typeQuery]);
+  }, [dispatch, mobile, page, router, search, small, sortQuery, tablet, typeQuery]);
 
   useEffect(() => {
     if(newRepository){

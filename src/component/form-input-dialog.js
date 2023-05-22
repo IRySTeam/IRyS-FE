@@ -15,7 +15,9 @@ export default function FormInputDialog(props) {
           },
           '& .bold': {
             typography: theme.typography.form_sublabel_small_bold
-          } 
+          },
+          maxWidth: '100%',
+          wordWrap: 'break-word'
         }}
       >
         {props.label} 

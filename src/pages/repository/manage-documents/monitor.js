@@ -12,6 +12,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ManageDocumentsTabs from '@/component/tabs/manage-documents';
 import { getMonitorDataSuccess } from '@/state/actions/monitorActions';
 import { formatDateTable } from '@/utils/date';
@@ -179,11 +180,22 @@ export default function ManageDocumentsMonitor() {
         })
         dispatch(getMonitorDataSuccess(response.data))
       } catch (error){
-        setAlertSeverity('error')
+        setAlertSeverity('error');
         if(error.response){
           switch (error.response.data.error_code){
+            case 401:
+              refresh('access_token', 'refresh_token', router);
+              setAlertSeverity('success');
+              setAlertLabel('Your session has been restored. Please Try Again.');
+              setShowAlert(true);
+              setIsLoading(false);
+              break;
             case 'USER__NOT_ALLOWED':
               setAlertLabel('You are not allowed to perform this action');
+              setShowAlert(true);
+              break;
+            case 'REPOSITORY__NOT_FOUND':
+              setAlertLabel('Repository not found');
               setShowAlert(true);
               break;
             default :
@@ -199,7 +211,7 @@ export default function ManageDocumentsMonitor() {
     }
     fetchMonitor()
     setIsLoading(false);
-  }, [dispatch, id, search, status]);
+  }, [dispatch, id, router, search, status]);
 
   const fetchMonitor = async () =>  {
     const token =  Cookies.get('access_token');
@@ -219,8 +231,32 @@ export default function ManageDocumentsMonitor() {
       dispatch(getMonitorDataSuccess(response.data))
     } catch (error){
       setAlertSeverity('error');
-      setAlertLabel(`Network Error, Please try again`);
-      setShowAlert(true);
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router);
+            setAlertSeverity('success');
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
     }
   }
 
@@ -237,8 +273,8 @@ export default function ManageDocumentsMonitor() {
       setShowAlert(true);
       fetchMonitor()
     } catch (error){
+      setAlertSeverity('error');
       if(error.response){
-        setAlertSeverity('error');
         switch (error.response.data.error_code){
           case 401:
             refresh('access_token', 'refresh_token', router);
@@ -339,17 +375,53 @@ export default function ManageDocumentsMonitor() {
               marginTop: '64px',
             }} 
           >
-            <Typography 
-              sx={{ 
-                color: 'black.main', 
-                typography: 'heading_h1',
-                [theme.breakpoints.down('tablet')]: {
-                  typography: 'heading_h3',
-                }, 
+            <Box
+              sx={{
+                display: 'flex',
+                width: '100%',
+                flexDirection: 'row',
+                gap: '16px',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
               }}
             >
-              {repositoryData.name}
-            </Typography>
+              <Button 
+                color='primary' 
+                variant='contained' 
+                sx={{ 
+                  height: '36px',
+                  width: '36px',
+                  typography: theme.typography.heading_h6,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '4px 8px'
+                }}
+                onClick={() => router.push({ pathname: '/repository', query: {id: id} })}
+              >
+                <KeyboardBackspaceIcon 
+                  sx={{
+                    width: '24px',
+                    height: '24px',
+                    color: theme.palette.white.main
+                  }}
+                />
+              </Button>
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h1',
+                  [theme.breakpoints.down('tablet')]: {
+                    typography: 'heading_h3',
+                  },
+                  maxWidth: 'calc(100% - 80px)',
+                  wordWrap: 'break-word'
+                }}
+              >
+                {repositoryData.name}
+              </Typography>
+            </Box>
             <Box
               sx={{
                 width:'100%',

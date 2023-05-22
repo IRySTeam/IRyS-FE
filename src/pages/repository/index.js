@@ -11,6 +11,7 @@ import CustomAlert from '@/component/custom-alert';
 import NavBar from '@/component/navbar';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardDoubleArrowDownOutlinedIcon from '@mui/icons-material/KeyboardDoubleArrowDownOutlined';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddIcon from '@mui/icons-material/Add';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
@@ -24,6 +25,7 @@ import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actio
 import { removeEmptyFilters } from '@/utils/array';
 import { saveAdvancedSearchSearchBar } from '@/state/actions/filterAction';
 import { isAdmin, isUploader } from '@/utils/roles';
+import { refresh } from '@/utils/token';
 
 export default function Repository() {
   const theme = useTheme();
@@ -99,8 +101,32 @@ export default function Repository() {
         } catch (error){
           dispatch(getRepoDetailFailed(error.response.data))
           setAlertSeverity('error');
-          setAlertLabel(`Network Error, Please try again`);
-          setShowAlert(true);
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__EMAIL_NOT_VERIFIED':
+                setAlertLabel('Email is not verified');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
         }
       }
 
@@ -116,8 +142,32 @@ export default function Repository() {
         } catch (error){
           dispatch(getRepoCollaboratorListFailed(error.response.data))
           setAlertSeverity('error');
-          setAlertLabel(`Network Error, Please try again`);
-          setShowAlert(true);
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
         }
       }
 
@@ -133,8 +183,32 @@ export default function Repository() {
         } catch (error){
           dispatch(getSingleRepoFailed(error.response.data))
           setAlertSeverity('error');
-          setAlertLabel(`Network Error, Please try again`);
-          setShowAlert(true);
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
         }
       }
 
@@ -172,8 +246,25 @@ export default function Repository() {
           if(error.response.data.error_code !== 404){
             dispatch(getSearchDocumentFailed(error.response.data))
             setAlertSeverity('error');
-            setAlertLabel(`Network Error, Please try again`);
-            setShowAlert(true);        
+            if(error.response){
+              switch (error.response.data.error_code){
+                case 'USER__NOT_ALLOWED':
+                  setAlertLabel('You are not allowed to perform this action');
+                  setShowAlert(true);
+                  break;
+                case 'REPOSITORY__NOT_FOUND':
+                  setAlertLabel('Repository not found');
+                  setShowAlert(true);
+                  break;
+                default :
+                  setAlertLabel('Network Error, Please Try Again.');
+                  setShowAlert(true);
+                  break;
+              }
+            } else{
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+            }    
           }
           setIsLoadingDocs(false);
         }
@@ -190,13 +281,26 @@ export default function Repository() {
           dispatch(getSearchDocumentSuccess(response.data))
           setIsLoadingDocs(false);
         } catch (error){
-          console.log(error)
-          if(error.response.data.error_code !== 404){
-            dispatch(getSearchDocumentFailed(error.response.data))
-            setAlertSeverity('error');
-            setAlertLabel(`Network Error, Please try again`);
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
             setShowAlert(true);
-          }
+          }    
           setIsLoadingDocs(false);
         }
       }
@@ -218,11 +322,25 @@ export default function Repository() {
           dispatch(getSearchDocumentSuccess(response.data))
           setIsLoadingDocs(false);
         } catch (error){
-          if(error.response.data.error_code !== 404){
-            dispatch(getSearchDocumentFailed(error.response.data))
-            setAlertSeverity('error');
-            setAlertLabel(`Network Error, Please try again`);
-            setShowAlert(true);        
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
           }
           setIsLoadingDocs(false);
         }
@@ -272,17 +390,53 @@ export default function Repository() {
               marginTop: '64px',
             }} 
           >
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h1',
-              [theme.breakpoints.down('tablet')]: {
-                typography: 'heading_h3',
-              }, 
+          <Box
+            sx={{
+              display: 'flex',
+              width: '100%',
+              flexDirection: 'row',
+              gap: '16px',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
             }}
           >
-            {repositoryData.name}
-          </Typography>
+            <Button 
+              color='primary' 
+              variant='contained' 
+              sx={{ 
+                height: '36px',
+                width: '36px',
+                typography: theme.typography.heading_h6,
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '4px 8px'
+              }}
+              onClick={() => router.push({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })}
+            >
+              <KeyboardBackspaceIcon 
+                sx={{
+                  width: '24px',
+                  height: '24px',
+                  color: theme.palette.white.main
+                }}
+              />
+            </Button>
+            <Typography 
+              sx={{ 
+                color: 'black.main', 
+                typography: 'heading_h1',
+                [theme.breakpoints.down('tablet')]: {
+                  typography: 'heading_h3',
+                },
+                maxWidth: 'calc(100% - 80px)',
+                wordWrap: 'break-word'
+              }}
+            >
+              {repositoryData.name}
+            </Typography>
+          </Box>
           <Box
             sx={{
               display: 'flex',

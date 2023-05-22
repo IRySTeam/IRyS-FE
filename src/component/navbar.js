@@ -23,6 +23,10 @@ import { logoutUser } from '@/state/actions/userActions';
 
 const pages = [
   {
+    label: 'Home',
+    url : '/',
+  },
+  {
     label: 'Features',
     url : '/features',
   }, {
@@ -292,17 +296,22 @@ function NavBar(props) {
                 },
               }}
             />
-            {pages.map((page) => (
-              <Button
-                key={page.label} 
-                variant='text'
-                color='white'
-                sx={{typography: theme.typography.heading_h5, padding: '0'}}
-                onClick={() => router.push({ pathname: page.url })}
-              >
-                {page.label} 
-              </Button>
-            ))}
+            {pages.map((page) => {
+              if (page.label !== 'Home') {
+                return (
+                  <Button
+                    key={page.label} 
+                    variant='text'
+                    color='white'
+                    sx={{ typography: theme.typography.heading_h5, padding: '0' }}
+                    onClick={() => router.push({ pathname: page.url })}
+                  >
+                    {page.label} 
+                  </Button>
+                );
+              }
+              return null;
+            })}
           </Box>
 
           <Box

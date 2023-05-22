@@ -11,6 +11,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import GroupsIcon from '@mui/icons-material/Groups';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import SettingRepositoryTabs from '@/component/tabs/setting-repository';
@@ -21,6 +22,7 @@ import NewCollaboratorCard from '@/component/new-collaborator-card';
 import Cookies from 'js-cookie';
 import { addNewCollaboratorToRepo, changeCollaboratorRoleInRepo, removeCollaboratorInRepo } from '@/state/actions/repositoryActions';
 import { isAdmin, isNotAdmin } from '@/utils/roles';
+import { refresh } from '@/utils/token';
 
 export default function CollaboratorsSettingRepository() {
   const theme = useTheme();
@@ -267,17 +269,53 @@ export default function CollaboratorsSettingRepository() {
               marginTop: '64px',
             }} 
           >
-            <Typography 
-              sx={{ 
-                color: 'black.main', 
-                typography: 'heading_h1',
-                [theme.breakpoints.down('tablet')]: {
-                  typography: 'heading_h3',
-                }, 
+            <Box
+              sx={{
+                display: 'flex',
+                width: '100%',
+                flexDirection: 'row',
+                gap: '16px',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
               }}
             >
-              {repositoryData.name}
-            </Typography>
+              <Button 
+                color='primary' 
+                variant='contained' 
+                sx={{ 
+                  height: '36px',
+                  width: '36px',
+                  typography: theme.typography.heading_h6,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '4px 8px'
+                }}
+                onClick={() => router.push({ pathname: '/repository', query: {id: id} })}
+              >
+                <KeyboardBackspaceIcon 
+                  sx={{
+                    width: '24px',
+                    height: '24px',
+                    color: theme.palette.white.main
+                  }}
+                />
+              </Button>
+              <Typography 
+                sx={{ 
+                  color: 'black.main', 
+                  typography: 'heading_h1',
+                  [theme.breakpoints.down('tablet')]: {
+                    typography: 'heading_h3',
+                  },
+                  maxWidth: 'calc(100% - 80px)',
+                  wordWrap: 'break-word'
+                }}
+              >
+                {repositoryData.name}
+              </Typography>
+            </Box>
             <Box
               sx={{
                 width:'100%',
