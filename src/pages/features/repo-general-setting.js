@@ -112,6 +112,7 @@ export default function FeaturesManageRepositorySetting() {
                 }}
               >
                 This feature provides users with the ability to edit various aspects of a repository, including the repository name, description, and visibility settings. Additionally, this feature grants the user the capability to delete the repository if needed. It is important to note that these actions can only be performed by the owner or an administrator of the repository.
+                <br/><br/>
               </Typography>
               <Box
                 sx={{
@@ -134,6 +135,7 @@ export default function FeaturesManageRepositorySetting() {
                   textAlign: 'justify',
                 }}
               >
+                <br/>
                 Users can modify the name of the repository, allowing them to update it based on their requirements or any changes in the project. Users also have the option to edit the repository`s description, enabling them to provide additional information or make necessary updates. Users can adjust the visibility settings of the repository, controlling who can access and view the repository. Visibility options typically include public or private access. Users with the appropriate permissions can delete the repository, permanently removing it from the system. This action should be exercised with caution as it cannot be undone.
                 <br/><br/>
                 The ability to manage repository settings, including editing and deletion, is restricted to the owner of the repository or users with administrator privileges. This ensures that only authorized individuals have control over these critical actions. Users without the necessary permissions will not be able to access the page or perform any modifications. By providing these features empowers repository owners and administrators to maintain and customize their repositories according to their specific needs while preserving the overall security and integrity of the repository.

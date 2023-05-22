@@ -112,6 +112,7 @@ export default function FeaturesManageRepositoryCollaborators() {
                 }}
               >
                 This feature allows repository owners and administrators to efficiently handle the access and roles of collaborators associated with a repository. This feature provides a dedicated page where users can add new collaborators, modify existing collaborator roles, and remove access for specific collaborators. It is important to note that these actions can only be performed by the repository owner or users with administrator privileges.
+                <br/><br/>
               </Typography>
               <Box
                 sx={{
@@ -134,6 +135,7 @@ export default function FeaturesManageRepositoryCollaborators() {
                   textAlign: 'justify',
                 }}
               >
+                <br/>
                 Users can invite new collaborators to join the repository by providing their email addresses or usernames. Once invited, the collaborators will receive notifications and invitations to access the repository. Users also have the ability to change the roles of existing collaborators. Roles include owner, admin, uploader, or viewer, each with varying levels of permissions and access rights. In certain cases, it may be necessary to revoke access for specific collaborators. This feature allows repository owners and administrators to remove access for individual collaborators, effectively revoking their ability to interact with the repository`s content and settings.
                 <br/><br/>
                 This feature is exclusive to repository owners and users with administrator privileges. Only they have the authority to add new collaborators, modify roles, and remove access. By offering these features enables repository owners and administrators to efficiently control and organize the access and roles of collaborators. This ensures smooth collaboration and maintains the security and integrity of the repository by limiting access to authorized individuals.
