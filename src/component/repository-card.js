@@ -11,7 +11,6 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import GroupsIcon from '@mui/icons-material/Groups';
 import SettingsIcon from '@mui/icons-material/Settings';
-import ShareIcon from '@mui/icons-material/Share';
 import { formatDate } from '@/utils/date';
 
 export default function RepositoryCard(props) {
@@ -33,6 +32,15 @@ export default function RepositoryCard(props) {
     setAnchorElOption(null);
   };
 
+  const goToSetting = (id) => (event) => {
+    event.stopPropagation();
+    router.push({ pathname: '/repository/setting/general', query: { id: id} })
+  }
+
+  const goToCollaboratorSetting = (id) => (event) => {
+    event.stopPropagation();
+    router.push({ pathname: '/repository/setting/collaborators', query: { id: id} })
+  }
   return (
     <Box
       sx={{
@@ -101,7 +109,9 @@ export default function RepositoryCard(props) {
             open={Boolean(anchorElOption)}
             onClose={handleCloseElOption}
           >
-            <MenuItem>
+            <MenuItem
+              onClick={goToSetting(props.item.id)}
+            >
               <IconButton
                 sx={{ padding: '0 16px 0 0'}}
               >
@@ -115,7 +125,9 @@ export default function RepositoryCard(props) {
               </IconButton>
               <Typography variant='paragraph_h5' color='black.main'>Settings</Typography>
             </MenuItem>
-            <MenuItem>
+            <MenuItem
+              onClick={goToCollaboratorSetting(props.item.id)}
+            >
               <IconButton
                 sx={{ padding: '0 16px 0 0'}}
               >
@@ -128,20 +140,6 @@ export default function RepositoryCard(props) {
                 />
               </IconButton>
               <Typography variant='paragraph_h5' color='black.main'>Collaborators</Typography>
-            </MenuItem>
-            <MenuItem>
-              <IconButton
-                sx={{ padding: '0 16px 0 0'}}
-              >
-                <ShareIcon
-                  sx={{
-                    width: '24px',
-                    height: '24px',
-                    color: theme.palette.black.main
-                  }}
-                />
-              </IconButton>
-              <Typography variant='paragraph_h5' color='black.main'>Share</Typography>
             </MenuItem>
           </Menu>
         </Box>

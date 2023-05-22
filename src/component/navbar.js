@@ -319,7 +319,8 @@ function NavBar(props) {
               display: 'flex', 
               flexDirection: 'row', 
               justifyContent: 'flex-end', 
-              gap: '24px'
+              position: 'fixed',
+              right: '24px'
             }}
           >                                   
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -332,7 +333,7 @@ function NavBar(props) {
               />
             </IconButton>
             <Menu
-              sx={{ mt: '45px', display:{ mobile: 'none', small:'block' } }}
+              sx={{ mt: '45px', display:{ mobile: 'none', small:'flex' } }}
               id='menu-appbar'
               anchorEl={anchorElUser}
               anchorOrigin={{

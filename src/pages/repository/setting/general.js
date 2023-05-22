@@ -47,7 +47,7 @@ export default function GeneralSettingRepository() {
     setIsLoading(true);
     const { id } = router.query;
     if(!id){
-      router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
+      //
     }else{
       const fetchDetailRepo = async () =>  {
         const token =  Cookies.get('access_token');

@@ -106,7 +106,7 @@ export default function FeaturesIndex() {
           <Typography
             sx={{ 
               color: 'black.main', 
-              typography: 'paragraph_h5',
+              typography: 'paragraph_h4',
               textAlign: 'justify',
             }}
           >
