@@ -278,7 +278,9 @@ export default function Repository() {
               typography: 'heading_h1',
               [theme.breakpoints.down('tablet')]: {
                 typography: 'heading_h3',
-              }, 
+              },
+              maxWidth: '100%',
+              wordWrap: 'break-word'
             }}
           >
             {repositoryData.name}

@@ -117,7 +117,9 @@ export default function DetailDocument() {
               typography: 'heading_h2',
               [theme.breakpoints.down('tablet')]: {
                 typography: 'heading_h4',
-              }, 
+              },
+              maxWidth: '100%',
+              wordWrap: 'break-word'
             }}
           >
             {documentData.title}

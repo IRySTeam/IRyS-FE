@@ -254,7 +254,9 @@ export default function GeneralSettingRepository() {
                 typography: 'heading_h1',
                 [theme.breakpoints.down('tablet')]: {
                   typography: 'heading_h3',
-                }, 
+                },
+                maxWidth: '100%',
+                wordWrap: 'break-word'
               }}
             >
               {repositoryData.name}
@@ -641,12 +643,23 @@ export default function GeneralSettingRepository() {
                   color: theme.palette.dark_gray.main
                 }}
               /> 
-              <Typography variant='form_label_small' color='black.main' textAlign='center'>{`Delete ${repositoryData.name}`}</Typography>
               <Typography 
+                variant='form_label_small' 
+                color='black.main' 
+                textAlign={'center'}
+                sx={{
+                  maxWidth: '100%',
+                  wordWrap: 'break-word'
+                }}
+              >
+                {`Delete ${formikDialog.values.real_name}`}
+              </Typography>               <Typography 
                 variant='form_sublabel_small' 
                 color='black.main'
                 textAlign='center'
                 sx={{
+                  maxWidth: '100%',
+                  wordWrap: 'break-word',
                   "& .bold": {
                     typography: theme.typography.form_sublabel_small_bold
                   }
