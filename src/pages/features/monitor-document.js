@@ -123,8 +123,8 @@ export default function FeaturesMonitorDocument() {
                 <Image 
                   src={'/features/monitor_document.png'} 
                   alt='monitor documents page' 
-                  width={mobile? 356.25: 712.5} 
-                  height={mobile? 197.5: 395}
+                  width={mobile? 309: 712.5} 
+                  height={mobile? 172: 395}
                 />
               </Box>
               <Typography 

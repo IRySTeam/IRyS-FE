@@ -124,8 +124,8 @@ export default function FeaturesUpload() {
                 <Image 
                   src={'/features/upload.png'} 
                   alt='upload documents page' 
-                  width={mobile? 356.25: 712.5} 
-                  height={mobile? 197.5: 395}
+                  width={mobile? 309: 712.5} 
+                  height={mobile? 172: 395}
                 />
               </Box>
             </Box>

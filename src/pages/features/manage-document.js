@@ -125,8 +125,8 @@ export default function FeaturesManageDocument() {
                 <Image 
                   src={'/features/manage_document.png'} 
                   alt='manage documents page' 
-                  width={mobile? 356.25: 712.5} 
-                  height={mobile? 197.5: 395}
+                  width={mobile? 309: 712.5} 
+                  height={mobile? 172: 395}
                 />
               </Box>
             </Box>
