@@ -26,7 +26,7 @@ export default function ManageDocumentsMonitor() {
   const router = useRouter();
   const small = useMediaQuery(theme.breakpoints.down('laptop'));
   const dispatch = useDispatch();
-  const { id } = router.query;
+  const { id, isUploadSuccess } = router.query;
 
   const [isLoading, setIsLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
@@ -153,17 +153,18 @@ export default function ManageDocumentsMonitor() {
           >
             Reindex
           </Typography>
-          <RefreshIcon
-            sx={{
-              width: '20px',
-              height: '20px',
-              color: theme.palette.white.main
-            }}
-          />
         </Button>
       ),
     }
   ];
+
+  useEffect(() => {
+    if(isUploadSuccess){
+      setAlertSeverity('success');
+      setAlertLabel('Upload success');
+      setShowAlert(true);
+    }
+  }, [isUploadSuccess]);
   
   useEffect(() => {
     setIsLoading(true);
@@ -526,9 +527,9 @@ export default function ManageDocumentsMonitor() {
                       display: 'flex',
                       gap: '16px',
                       width:'100%',
-                      flexDirection: {mobile: 'column', laptop: 'row'}, 
-                      alignItems: {mobile: 'flex-start', laptop: 'center'},
-                      justifyContent: {mobile: 'flex-start', laptop: 'space-between'},
+                      flexDirection: {mobile: 'column', tablet: 'row'}, 
+                      alignItems: {mobile: 'flex-start', tablet: 'center'},
+                      justifyContent: {mobile: 'flex-start', tablet: 'space-between'},
                     }}
                   >
                     <Box
@@ -550,7 +551,7 @@ export default function ManageDocumentsMonitor() {
                         value={search}
                         onChange={(e)=>setSearch(e.target.value)}
                         sx={{
-                          width: '480px',
+                          width: '640px',
                           '& .MuiInputBase-input': {
                             height: '30px',
                             maxHeight: '30px',
@@ -573,31 +574,60 @@ export default function ManageDocumentsMonitor() {
                             border: '0 !important',
                           },
                           [theme.breakpoints.down('laptop')]: {
-                            width: 'calc(100% - 48px)',
+                            width: 'calc(100% - 100px)',
                           },
                           [theme.breakpoints.down('tablet')]: {
                             width: '100%',
                           },
                         }}
                       />
-                      <Dropdown
-                        label={'Status'}
-                        placeholder={'Status'} 
-                        value={status}
-                        handleChange={handleChangeStatus}
-                        options={statusOption}
-                        defaultValue={'ALL'}
-                      />
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          width: '100%',
+                          flexDirection: 'row', 
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Dropdown
+                          label={'Status'}
+                          placeholder={'Status'} 
+                          value={status}
+                          handleChange={handleChangeStatus}
+                          options={statusOption}
+                          defaultValue={'ALL'}
+                        />
+                        <RefreshIcon
+                          onClick={() => fetchMonitor()}
+                          sx={{
+                            display: {mobile: 'flex', tablet: 'none'},
+                            width: '32px',
+                            height: '32px',
+                            color: theme.palette.primary.main,
+                            cursor: 'pointer'
+                          }}
+                        />
+                      </Box>
                     </Box>
                     <Box
                       sx={{
-                        display: 'flex',
+                        display: {mobile: 'none', tablet: 'flex'},
                         flexDirection: 'row', 
                         alignItems: 'center',
                         justifyContent: 'flex-start',
                         gap: '16px'
                       }}
                     >
+                      <RefreshIcon
+                        onClick={() => fetchMonitor()}
+                        sx={{
+                          width: '32px',
+                          height: '32px',
+                          color: theme.palette.primary.main,
+                          cursor: 'pointer'
+                        }}
+                      />
                     </Box>
                   </Box>
                   <Box 

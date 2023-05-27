@@ -17,6 +17,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import CloseIcon from '@mui/icons-material/Close';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import NavBar from '@/component/navbar';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
@@ -234,6 +235,55 @@ export default function ManageDocumentsDatabases() {
     }
     fetchDatabases()
   }, [dispatch, id, isUpdateDatabase, router, search]);
+
+  const fetchDatabases = async () =>  {
+    const token =  Cookies.get('access_token');
+    const data = {
+      page_no: 1,
+      page_size: 100,
+      find_document: search,
+    }
+    if(!id) return
+    try {
+      const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/database`, {
+        params : data,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      dispatch(getDatabasesDataSuccess(response.data))
+      setIsLoading(false);
+    } catch (error){
+      setAlertSeverity('error');
+      if(error.response){
+        switch (error.response.data.error_code){
+          case 401:
+            refresh('access_token', 'refresh_token', router);
+            setAlertSeverity('success');
+            setAlertLabel('Your session has been restored. Please Try Again.');
+            setShowAlert(true);
+            setIsLoading(false);
+            break;
+          case 'USER__NOT_ALLOWED':
+            setAlertLabel('You are not allowed to perform this action');
+            setShowAlert(true);
+            break;
+          case 'REPOSITORY__NOT_FOUND':
+            setAlertLabel('Repository not found');
+            setShowAlert(true);
+            break;
+          default :
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+            break;
+        }
+      } else{
+        setAlertLabel('Network Error, Please Try Again.');
+        setShowAlert(true);
+      }
+      setIsLoading(false);
+    }
+  }
 
   const formikDialog = useFormik({
     initialValues: {
@@ -761,9 +811,9 @@ export default function ManageDocumentsDatabases() {
                       display: 'flex',
                       gap: '16px',
                       width:'100%',
-                      flexDirection: {mobile: 'column', laptop: 'row'}, 
-                      alignItems: {mobile: 'flex-start', laptop: 'center'},
-                      justifyContent: {mobile: 'flex-start', laptop: 'space-between'},
+                      flexDirection: {mobile: 'column', tablet: 'row'}, 
+                      alignItems: {mobile: 'flex-start', tablet: 'center'},
+                      justifyContent: {mobile: 'flex-start', tablet: 'space-between'},
                     }}
                   >
                     <Box
@@ -785,7 +835,7 @@ export default function ManageDocumentsDatabases() {
                         value={search}
                         onChange={(e)=>setSearch(e.target.value)}
                         sx={{
-                          width: '480px',
+                          width: '640px',
                           '& .MuiInputBase-input': {
                             height: '30px',
                             maxHeight: '30px',
@@ -808,23 +858,52 @@ export default function ManageDocumentsDatabases() {
                             border: '0 !important',
                           },
                           [theme.breakpoints.down('laptop')]: {
-                            width: 'calc(100% - 48px)',
+                            width: 'calc(100% - 100px)',
                           },
                           [theme.breakpoints.down('tablet')]: {
                             width: '100%',
                           },
                         }}
                       />
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          width: '100%',
+                          flexDirection: 'row', 
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <RefreshIcon
+                          onClick={() => fetchDatabases()}
+                          sx={{
+                            display: {mobile: 'flex', tablet: 'none'},
+                            width: '32px',
+                            height: '32px',
+                            color: theme.palette.primary.main,
+                            cursor: 'pointer'
+                          }}
+                        />
+                      </Box>
                     </Box>
                     <Box
                       sx={{
-                        display: 'flex',
+                        display: {mobile: 'none', tablet: 'flex'},
                         flexDirection: 'row', 
                         alignItems: 'center',
                         justifyContent: 'flex-start',
                         gap: '16px'
                       }}
                     >
+                      <RefreshIcon
+                        onClick={() => fetchDatabases()}
+                        sx={{
+                          width: '32px',
+                          height: '32px',
+                          color: theme.palette.primary.main,
+                          cursor: 'pointer'
+                        }}
+                      />
                     </Box>
                   </Box>
                   <Box 
