@@ -96,9 +96,7 @@ export default function Uploader(props) {
             'Content-Type': 'multipart/form-data',
           }
         })
-        props.setAlertSeverity('success');
-        props.setAlertLabel('Upload success');
-        props.setShowAlert(true);
+        router.push({ pathname: `/repository/manage-documents/monitor`, query: { id : props.repoId, isUploadSuccess: true} })
       } catch (error) {
         props.setAlertSeverity('error');
         if(error.response){
