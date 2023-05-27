@@ -8,6 +8,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { formatDate } from '@/utils/date';
 import { downloadFile } from '@/utils/download';
+import { capitalizeFirstLetter } from '@/utils/document';
 
 export default function DocumentCard(props) {
   const theme = useTheme();
@@ -116,7 +117,7 @@ export default function DocumentCard(props) {
         <Box
           sx={{
             display: {mobile: 'flex', tablet: 'none', laptop: 'flex'},
-            flexDirection: 'row',
+            flexDirection: {mobile: 'row', laptop: 'column'},
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
             gap: '8px'
@@ -125,7 +126,7 @@ export default function DocumentCard(props) {
           { props.item.details.is_public &&
           <Box
             sx={{
-              width: '100px',
+              width: '120px',
               height: '20px',
               display: 'flex',
               alignItems: 'center',
@@ -135,6 +136,20 @@ export default function DocumentCard(props) {
             }}
           >
             <Typography variant='heading_h6' color='white.main'>{props.item.details.is_public ? 'Public' : 'Private' }</Typography>
+          </Box>}
+          { props.item.domain &&
+          <Box
+            sx={{
+              width: '120px',
+              height: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.palette.warning.main,            
+              borderRadius: '10px'
+            }}
+          >
+            <Typography variant='heading_h6' color='white.main'>{capitalizeFirstLetter(props.item.domain)}</Typography>
           </Box>}
           <Box 
             sx={{ height: '20px',
@@ -199,6 +214,20 @@ export default function DocumentCard(props) {
               }}
             >
               <Typography variant='heading_h6' color='white.main'>{props.item.details.is_public ? 'Public' : 'Private' }</Typography>
+            </Box>}
+            { props.item.domain &&
+            <Box
+              sx={{
+                width: '120px',
+                height: '20px',
+                display: {mobile: 'none', tablet: 'flex', laptop: 'none'},
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: theme.palette.warning.main,            
+                borderRadius: '10px'
+              }}
+            >
+              <Typography variant='heading_h6' color='white.main'>{capitalizeFirstLetter(props.item.domain)}</Typography>
             </Box>}
             <Box sx={{ height: '32px' }}>
               { props.item.details.mimetype === 'application/pdf' &&
