@@ -111,8 +111,9 @@ export default function ManageDocumentsDatabases() {
       field: 'button',
       headerName: 'Action', 
       headerClassName: 'super-app-theme--header',
-      headerAlign: 'center', 
+      headerAlign: 'center',
       width: 140, 
+      sortable: false,
       renderCell: (params) => (
         <Box
           sx={{

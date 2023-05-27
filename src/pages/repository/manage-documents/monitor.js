@@ -89,8 +89,11 @@ export default function ManageDocumentsMonitor() {
       },
     },
     {
-      field: 'index',
+      field: 'status',
       headerName: 'Status',
+      valueGetter: (params) => {
+        return params.row.index.status;
+      },
       headerClassName: 'super-app-theme--header',
       headerAlign: 'center', 
       width: 140,
@@ -124,7 +127,8 @@ export default function ManageDocumentsMonitor() {
       headerName: 'Action', 
       headerClassName: 'super-app-theme--header',
       headerAlign: 'center', 
-      width: 140, 
+      width: 140,
+      sortable: false, 
       renderCell: (params) => (
         <Button 
           color='primary' 
