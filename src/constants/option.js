@@ -34,7 +34,6 @@ export const docRoleOptionEditor = [
 ]
 
 export const docRoleOptionViewer = [
-  { value: 'Editor', label: 'Editor'},
   { value: 'Viewer', label: 'Viewer'},
 ]
 

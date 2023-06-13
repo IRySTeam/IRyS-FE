@@ -90,7 +90,7 @@ export default function DocCollaboratorCard(props) {
           value={props.item.role}
           id={props.order}
           handleChange={props.onRoleChange}
-          options={isOwnerDocs(props.item.role) ? docRoleOptionOwner : isOnlyEditorDocs(props.item.role) ? docRoleOptionEditor : docRoleOptionViewer}
+          options={isOwnerDocs(props.item.role) ? docRoleOptionOwner : isOnlyEditorDocs(props.item.role) ? docRoleOptionEditor : isOwnerDocs(props.currentRole) ? docRoleOptionEditor : docRoleOptionViewer}
           width='150px'
           backgroundColor={theme.palette.white.main}
         />
