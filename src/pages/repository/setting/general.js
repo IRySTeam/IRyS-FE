@@ -23,9 +23,10 @@ import { editRepositoryValidation } from '@/schema/edit-repository';
 import { deleteRepositoryValidation } from '@/schema/delete-repository';
 import FormInputDialog from '@/component/form-input-dialog';
 import CustomAlert from '@/component/custom-alert';
-import { changeRepoDetailSuccess, changeRepoVisibilitySuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
+import { changeRepoDetailSuccess, changeRepoVisibilitySuccess, getRepoDetailFailed, getRepoDetailSuccess, getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess} from '@/state/actions/repositoryActions';
 import { isAdmin, isNotAdmin, isOwner, } from '@/utils/roles';
 import { refresh } from '@/utils/token';
+import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 
 export default function GeneralSettingRepository() {
   const theme = useTheme();
@@ -42,12 +43,12 @@ export default function GeneralSettingRepository() {
   const repositoryData = useSelector(state => state.repository);
 
   const hasFormChanged = (currentValues, initialValues) => Object.keys(initialValues).some(fieldName => initialValues[fieldName] !== currentValues[fieldName]);
-  
+
   useEffect(() => {
     setIsLoading(true);
     const { id } = router.query;
     if(!id){
-      //
+        //
     }else{
       const fetchDetailRepo = async () =>  {
         const token =  Cookies.get('access_token');
@@ -90,10 +91,93 @@ export default function GeneralSettingRepository() {
         }
       }
 
-      if(!repositoryData.id || repositoryData.id !== id){
-        fetchDetailRepo()
+      const fetchRepoCollaborator = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getRepoCollaboratorListSuccess(response.data))
+        } catch (error){
+          dispatch(getRepoCollaboratorListFailed(error.response.data))
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+        }
       }
 
+      const fetchDocumentCount = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getSingleRepoSuccess(response.data))
+        } catch (error){
+          dispatch(getSingleRepoFailed(error.response.data))
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+        }
+      }
+
+      if(!repositoryData.id || repositoryData.id !== id){
+        fetchDetailRepo()
+        fetchRepoCollaborator()
+        fetchDocumentCount()
+      }
       setIsLoading(false);
     }
   }, [dispatch, router, repositoryData.id]);

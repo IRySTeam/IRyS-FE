@@ -223,7 +223,7 @@ export default function Repository() {
     setIsLoadingDocs(true);
     const { id } = router.query;
     if(!id){
-      router.replace({ pathname: '/', query: { search : '', type: '', sort:'', page: 1} })
+      //
     }else{
       const token =  Cookies.get('access_token');
       const fetchSearchDocumentBasic = async () =>  {
