@@ -20,6 +20,11 @@ const searchDocumentReducer = (state = initialState, action) => {
         count: 0,
         error: action.payload.error, 
       };
+    case 'updateDocuments': 
+      return { 
+        ...state, 
+        documents: action.payload, 
+      };
     default: 
       return state    
   }

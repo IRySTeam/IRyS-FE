@@ -12,6 +12,7 @@ import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import NavBar from '@/component/navbar';
 import { getDocumentDetailFailed, getDocumentDetailSuccess } from '@/state/actions/documentActions';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
@@ -25,6 +26,7 @@ export default function DetailDocument() {
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
@@ -74,19 +76,28 @@ export default function DetailDocument() {
               case 403:
                 setAlertLabel('Request forbidden -- authorization will not help');
                 setShowAlert(true);
+                setIsError(true);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You don\'t have access to this document');
+                setShowAlert(true);
+                setIsError(true);
                 break;
               case 'DOCUMENT__NOT_FOUND':
                 setAlertLabel('Document not found');
                 setShowAlert(true);
+                setIsError(true);
                 break;
               default :
                 setAlertLabel('Network Error, Please Try Again.');
                 setShowAlert(true);
+                setIsError(true);
                 break;
             }
           } else{
             setAlertLabel('Network Error, Please Try Again.');
             setShowAlert(true);
+            setIsError(true);
           }
         }
         setIsLoading(false)
@@ -135,19 +146,57 @@ export default function DetailDocument() {
               marginTop: '64px',
             }} 
           >
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h2',
-              [theme.breakpoints.down('tablet')]: {
-                typography: 'heading_h4',
-              },
-              maxWidth: '100%',
-              wordWrap: 'break-word'
+          
+          {!isError && 
+          <Box
+            sx={{
+              display: 'flex',
+              width: '100%',
+              flexDirection: 'row',
+              gap: '16px',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
             }}
           >
-            {documentData.title}
-          </Typography>
+            <Button 
+              color='primary' 
+              variant='contained' 
+              sx={{ 
+                height: '36px',
+                width: '36px',
+                typography: theme.typography.heading_h6,
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '4px 8px'
+              }}
+              onClick={() => router.back()}
+            >
+              <KeyboardBackspaceIcon 
+                sx={{
+                  width: '24px',
+                  height: '24px',
+                  color: theme.palette.white.main
+                }}
+              />
+            </Button>
+            <Typography 
+              sx={{ 
+                color: 'black.main', 
+                typography: 'heading_h2',
+                [theme.breakpoints.down('tablet')]: {
+                  typography: 'heading_h4',
+                },
+                maxWidth: '100%',
+                wordWrap: 'break-word'
+              }}
+            >
+              {documentData.title}
+            </Typography>
+          </Box>
+          }
+          {!isError && 
           <Box
             sx={{
               display: 'flex',
@@ -342,6 +391,7 @@ export default function DetailDocument() {
               </Accordion>
             </Box>
           </Box>
+          }
           </Container>
         </> 
       }

@@ -9,11 +9,9 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Loading from '@/component/loading';
 import NavBar from '@/component/navbar';
-// import axios from 'axios';
-// import { createRepositoryValidation } from '@/schema/create-repository';
-// import Cookies from 'js-cookie'
-// import { NEXT_PUBLIC_API_URL } from '@/constants/api';
-// import { refresh } from '@/utils/token';
+import axios from 'axios';
+import Cookies from 'js-cookie'
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import CustomAlert from '@/component/custom-alert';
 import { faq } from '@/data/faq';
 import { getFAQSuccess } from '@/state/actions/faqActions';
@@ -36,11 +34,32 @@ export default function Faq() {
     },
     onSubmit: () => {
       setIsLoading(true);
-      setAlertSeverity('success');
-      setAlertLabel('Your feedback or question successfully sent')
-      setShowAlert(true);
       formik.setFieldValue('question', '')
       setIsLoading(false);
+    },
+    onSubmit: async (values,) => {
+      setIsLoading(true);
+      try {
+        await axios.post(`${NEXT_PUBLIC_API_URL}/api/v1/faq/create`, values);
+        setAlertSeverity('success');
+        setAlertLabel('Your feedback or question successfully sent')
+        setShowAlert(true);
+        setIsLoading(false);
+      } catch (error) {
+        setAlertSeverity('error')
+        if(error.response){
+          switch (error.response.data.error_code){
+            default :
+              setAlertLabel('Network Error, Please Try Again.');
+              setShowAlert(true);
+              break;
+          }
+        } else{
+          setAlertLabel('Network Error, Please Try Again.');
+          setShowAlert(true);
+        }
+        setIsLoading(false);
+      }
     },
   });
 

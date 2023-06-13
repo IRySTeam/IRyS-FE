@@ -19,7 +19,9 @@ import { formatDateTable } from '@/utils/date';
 import Dropdown from '@/component/dropdown';
 import { statusOption } from '@/constants/option';
 import { refresh } from '@/utils/token';
-import { isUploader } from '@/utils/roles';
+import { isAdmin, isEditorDocs, isUploader } from '@/utils/roles';
+import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
+import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 
 export default function ManageDocumentsMonitor() {
   const theme = useTheme();
@@ -137,7 +139,7 @@ export default function ManageDocumentsMonitor() {
             height: '25px',
             width: '120px',
             typography: theme.typography.heading_h6,
-            display: 'flex',
+            display: isEditorDocs(params.row.role) ? 'flex' : 'none',
             flexDirection: 'row',
             gap: '8px',
             justifyContent: 'center',
@@ -165,6 +167,142 @@ export default function ManageDocumentsMonitor() {
       setShowAlert(true);
     }
   }, [isUploadSuccess]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const { id } = router.query;
+    if(!id){
+        //
+    }else{
+      const fetchDetailRepo = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getRepoDetailSuccess(response.data))
+        } catch (error){
+          dispatch(getRepoDetailFailed(error.response.data))
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__EMAIL_NOT_VERIFIED':
+                setAlertLabel('Email is not verified');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+        }
+      }
+
+      const fetchRepoCollaborator = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getRepoCollaboratorListSuccess(response.data))
+        } catch (error){
+          dispatch(getRepoCollaboratorListFailed(error.response.data))
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+        }
+      }
+
+      const fetchDocumentCount = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getSingleRepoSuccess(response.data))
+        } catch (error){
+          dispatch(getSingleRepoFailed(error.response.data))
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+        }
+      }
+
+      fetchDetailRepo()
+      fetchRepoCollaborator()
+      fetchDocumentCount()
+      setIsLoading(false);
+    }
+  }, [dispatch, router, repositoryData.id]);
   
   useEffect(() => {
     setIsLoading(true);
@@ -176,6 +314,7 @@ export default function ManageDocumentsMonitor() {
         page_size: 100,
         find_document: search
       }
+      if(!id) return
       try {
         const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/monitor`, {
           params : data,
@@ -515,6 +654,7 @@ export default function ManageDocumentsMonitor() {
                         padding: '0 12px',
                         width: '150px',
                         typography: theme.typography.heading_h6,
+                        display: isAdmin(repositoryData.current_user_role) ? 'flex' : 'none',
                       }}
                       onClick={()=> reindexAll()}
                     >

@@ -3,6 +3,7 @@ import { Box, Typography, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import Dropdown from './dropdown';
 import { docRoleOption, newDocRoleOption } from '@/constants/option';
+import { isEditorDocs, isOwnerDocs } from '@/utils/roles';
 
 export default function DocCollaboratorCard(props) {
   const theme = useTheme();
@@ -85,11 +86,11 @@ export default function DocCollaboratorCard(props) {
         <Dropdown
           label={'Role'}
           placeholder={'Role'}
-          disableOwner={true} 
+          disableOwner={isOwnerDocs(props.item.role) || (isEditorDocs(props.item.role) && isEditorDocs(props.currentRole))} 
           value={props.item.role}
           id={props.order}
           handleChange={props.onRoleChange}
-          options={props.item.role === 'Owner' ? docRoleOption : newDocRoleOption}
+          options={isOwnerDocs(props.item.role) ? docRoleOption : newDocRoleOption}
           width='150px'
           backgroundColor={theme.palette.white.main}
         />
@@ -107,7 +108,7 @@ export default function DocCollaboratorCard(props) {
               color: theme.palette.white.main,
             },
           }}
-          disabled={props.item.role === 'Owner'}
+          disabled={isOwnerDocs(props.item.role) || (isEditorDocs(props.item.role) && isEditorDocs(props.currentRole))} 
           onClick={props.onRemoveAccess}
         >
           Remove Access

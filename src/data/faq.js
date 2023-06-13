@@ -8,7 +8,7 @@ export const faq = [
     answer: 'IRyS works by providing users with a secure online platform where they can upload and store their documents. The system utilizes intelligent search capabilities to make it easy for users to find and retrieve their documents based on keywords and metadata.',
   },
   {
-    question: 'What types of documents can I store in IRyS',
+    question: 'What types of documents can I store in IRyS?',
     answer: 'For early release, IRyS can handle 4 types of document such as TXT, PDF, DOC, and DOCX.',
   },
   {

@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { NEXT_PUBLIC_API_URL } from '@/constants/api';
 import { Container, Box, Typography, Button } from '@mui/material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import NavBar from '@/component/navbar';
@@ -10,11 +13,14 @@ import CustomAlert from '@/component/custom-alert';
 import ManageDocumentsTabs from '@/component/tabs/manage-documents';
 import Uploader from '@/component/uploader';
 import { isUploader } from '@/utils/roles';
+import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
+import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 
 export default function ManageDocumentsUpload() {
   const theme = useTheme();
   const router = useRouter();
   const { id } = router.query;
+  const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
@@ -26,6 +32,142 @@ export default function ManageDocumentsUpload() {
     setIsLoading(true);
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const { id } = router.query;
+    if(!id){
+        //
+    }else{
+      const fetchDetailRepo = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getRepoDetailSuccess(response.data))
+        } catch (error){
+          dispatch(getRepoDetailFailed(error.response.data))
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__EMAIL_NOT_VERIFIED':
+                setAlertLabel('Email is not verified');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+        }
+      }
+
+      const fetchRepoCollaborator = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/members`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getRepoCollaboratorListSuccess(response.data))
+        } catch (error){
+          dispatch(getRepoCollaboratorListFailed(error.response.data))
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+        }
+      }
+
+      const fetchDocumentCount = async () =>  {
+        const token =  Cookies.get('access_token');
+        try {
+          const response = await axios.get(`${NEXT_PUBLIC_API_URL}/api/v1/repositories/${id}/documents/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          dispatch(getSingleRepoSuccess(response.data))
+        } catch (error){
+          dispatch(getSingleRepoFailed(error.response.data))
+          setAlertSeverity('error');
+          if(error.response){
+            switch (error.response.data.error_code){
+              case 401:
+                refresh('access_token', 'refresh_token', router);
+                setAlertSeverity('success');
+                setAlertLabel('Your session has been restored. Please Try Again.');
+                setShowAlert(true);
+                setIsLoading(false);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You are not allowed to perform this action');
+                setShowAlert(true);
+                break;
+              case 'REPOSITORY__NOT_FOUND':
+                setAlertLabel('Repository not found');
+                setShowAlert(true);
+                break;
+              default :
+                setAlertLabel('Network Error, Please Try Again.');
+                setShowAlert(true);
+                break;
+            }
+          } else{
+            setAlertLabel('Network Error, Please Try Again.');
+            setShowAlert(true);
+          }
+        }
+      }
+
+      fetchDetailRepo()
+      fetchRepoCollaborator()
+      fetchDocumentCount()
+      setIsLoading(false);
+    }
+  }, [dispatch, router, repositoryData.id]);
 
   const handleClickShowAlert= () => setShowAlert((show) => !show);
 
