@@ -1475,6 +1475,7 @@ export default function ManageDocumentsDatabases() {
                     <NewDocCollaboratorCard
                       item={newCollaborator}
                       role={newCollaboratorRole}
+                      currentRole={selectedDoc.role}
                       new={true}
                       onRoleChange={handleNewCollaboratorRoleChange}
                       onRemoveNewCollaborator={handleRemoveNewCollaborator}

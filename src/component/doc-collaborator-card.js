@@ -2,8 +2,8 @@ import { useTheme } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import Dropdown from './dropdown';
-import { docRoleOption, newDocRoleOption } from '@/constants/option';
-import { isEditorDocs, isOwnerDocs } from '@/utils/roles';
+import { isOnlyEditorDocs, isOwnerDocs } from '@/utils/roles';
+import { docRoleOptionEditor, docRoleOptionOwner, docRoleOptionViewer } from '@/constants/option';
 
 export default function DocCollaboratorCard(props) {
   const theme = useTheme();
@@ -86,11 +86,11 @@ export default function DocCollaboratorCard(props) {
         <Dropdown
           label={'Role'}
           placeholder={'Role'}
-          disableOwner={isOwnerDocs(props.item.role) || (isEditorDocs(props.item.role) && isEditorDocs(props.currentRole))} 
+          disableOwner={isOwnerDocs(props.item.role) || (isOnlyEditorDocs(props.item.role) && isOnlyEditorDocs(props.currentRole))} 
           value={props.item.role}
           id={props.order}
           handleChange={props.onRoleChange}
-          options={isOwnerDocs(props.item.role) ? docRoleOption : newDocRoleOption}
+          options={isOwnerDocs(props.item.role) ? docRoleOptionOwner : isOnlyEditorDocs(props.item.role) ? docRoleOptionEditor : docRoleOptionViewer}
           width='150px'
           backgroundColor={theme.palette.white.main}
         />
@@ -108,7 +108,7 @@ export default function DocCollaboratorCard(props) {
               color: theme.palette.white.main,
             },
           }}
-          disabled={isOwnerDocs(props.item.role) || (isEditorDocs(props.item.role) && isEditorDocs(props.currentRole))} 
+          disabled={isOwnerDocs(props.item.role) || (isOnlyEditorDocs(props.item.role) && isOnlyEditorDocs(props.currentRole))} 
           onClick={props.onRemoveAccess}
         >
           Remove Access
