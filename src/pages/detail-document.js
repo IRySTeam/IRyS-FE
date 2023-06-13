@@ -12,6 +12,7 @@ import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import Loading from '@/component/loading';
 import CustomAlert from '@/component/custom-alert';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import NavBar from '@/component/navbar';
 import { getDocumentDetailFailed, getDocumentDetailSuccess } from '@/state/actions/documentActions';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
@@ -135,19 +136,53 @@ export default function DetailDocument() {
               marginTop: '64px',
             }} 
           >
-          <Typography 
-            sx={{ 
-              color: 'black.main', 
-              typography: 'heading_h2',
-              [theme.breakpoints.down('tablet')]: {
-                typography: 'heading_h4',
-              },
-              maxWidth: '100%',
-              wordWrap: 'break-word'
+          <Box
+            sx={{
+              display: 'flex',
+              width: '100%',
+              flexDirection: 'row',
+              gap: '16px',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
             }}
           >
-            {documentData.title}
-          </Typography>
+            <Button 
+              color='primary' 
+              variant='contained' 
+              sx={{ 
+                height: '36px',
+                width: '36px',
+                typography: theme.typography.heading_h6,
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '4px 8px'
+              }}
+              onClick={() => router.back()}
+            >
+              <KeyboardBackspaceIcon 
+                sx={{
+                  width: '24px',
+                  height: '24px',
+                  color: theme.palette.white.main
+                }}
+              />
+            </Button>
+            <Typography 
+              sx={{ 
+                color: 'black.main', 
+                typography: 'heading_h2',
+                [theme.breakpoints.down('tablet')]: {
+                  typography: 'heading_h4',
+                },
+                maxWidth: '100%',
+                wordWrap: 'break-word'
+              }}
+            >
+              {documentData.title}
+            </Typography>
+          </Box>
           <Box
             sx={{
               display: 'flex',
