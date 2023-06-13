@@ -22,10 +22,18 @@ export const isOwnerDocs = (role) => {
   return role === 'Owner'
 }
 
+export const isOnlyEditorDocs = (role) => {
+  return role === 'Editor'
+}
+
 export const isEditorDocs = (role) => {
   return role === 'Editor' || role === 'Owner'
 }
 
 export const isViewerDocs = (role) => {
   return role === 'Viewer' || role === 'Editor' || role === 'Owner'
+}
+
+export const isOnlyViewerDocs = (role) => {
+  return role === 'Editor'
 }

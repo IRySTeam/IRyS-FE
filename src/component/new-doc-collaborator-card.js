@@ -4,7 +4,8 @@ import { Box, Typography, IconButton } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import CloseIcon from '@mui/icons-material/Close';
 import Dropdown from './dropdown';
-import { newDocRoleOption } from '@/constants/option';
+import { isOwnerDocs } from '@/utils/roles';
+import { newDocRoleOptionEditor, newDocRoleOptionOwner } from '@/constants/option';
 
 export default function NewDocCollaboratorCard(props) {
   const theme = useTheme();
@@ -97,7 +98,7 @@ export default function NewDocCollaboratorCard(props) {
           value={props.role}
           id={props.item.id}
           handleChange={props.onRoleChange}
-          options={newDocRoleOption}
+          options={isOwnerDocs(props.currentRole) ? newDocRoleOptionOwner : newDocRoleOptionEditor}
           width={mobile ? '100%' : '150px'}
           backgroundColor={theme.palette.white.main}
           sx={{
@@ -120,7 +121,7 @@ export default function NewDocCollaboratorCard(props) {
           value={props.role}
           id={props.item.id}
           handleChange={props.onRoleChange}
-          options={newDocRoleOption}
+          options={isOwnerDocs(props.currentRole) ? newDocRoleOptionOwner : newDocRoleOptionEditor}
           width='150px'
           backgroundColor={theme.palette.white.main}
           sx={{

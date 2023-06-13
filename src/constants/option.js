@@ -22,14 +22,28 @@ export const newRoleOption = [
   { value: 'Viewer', label: 'Viewer'},
 ]
 
-export const docRoleOption = [
+export const docRoleOptionOwner = [
   { value: 'Owner', label: 'Owner'},
   { value: 'Editor', label: 'Editor'},
   { value: 'Viewer', label: 'Viewer'},
 ]
 
-export const newDocRoleOption = [
+export const docRoleOptionEditor = [
   { value: 'Editor', label: 'Editor'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
+export const docRoleOptionViewer = [
+  { value: 'Editor', label: 'Editor'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
+export const newDocRoleOptionOwner = [
+  { value: 'Editor', label: 'Editor'},
+  { value: 'Viewer', label: 'Viewer'},
+]
+
+export const newDocRoleOptionEditor = [
   { value: 'Viewer', label: 'Viewer'},
 ]
 
