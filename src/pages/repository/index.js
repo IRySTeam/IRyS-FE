@@ -21,8 +21,8 @@ import DocumentCard from '@/component/document-card';
 import { sortOption } from '@/constants/option';
 import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
-import { getSearchDocumentFailed, getSearchDocumentSuccess } from '@/state/actions/searchDocumentActions';
-import { removeEmptyFilters } from '@/utils/array';
+import { getSearchDocumentFailed, getSearchDocumentSuccess, updateDocuments } from '@/state/actions/searchDocumentActions';
+import { removeEmptyFilters, sortByTitle, sortByUpdatedAt } from '@/utils/array';
 import { saveAdvancedSearchSearchBar } from '@/state/actions/filterAction';
 import { isAdmin, isUploader } from '@/utils/roles';
 import { refresh } from '@/utils/token';
@@ -40,6 +40,7 @@ export default function Repository() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [isReFetch, setIsReFetch] = useState(false);
   const [searchQuery, setSearchQuery] = useState(filterDocument.keyword? filterDocument.keyword : '');
   const [sortQuery, setSortQuery] = useState(sort? sort : '');
   const [showAlert, setShowAlert] = useState(false);
@@ -47,7 +48,18 @@ export default function Repository() {
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
 
   const handleChangeSortQuery = (event) => {
-    setSortQuery(event.target.value);
+    if(sortQuery !== event.target.value){
+      if(event.target.value === ''){
+        setIsReFetch(true)
+      }else if(event.target.value === 'updated_at'){
+        const newArray = sortByUpdatedAt(searchDocumentData.documents)
+        dispatch(updateDocuments(newArray))
+      }else{
+        const newArray = sortByTitle(searchDocumentData.documents)
+        dispatch(updateDocuments(newArray))
+      }
+      setSortQuery(event.target.value);
+    }
   };
 
   const handleKeyPress = (event) => {
@@ -353,8 +365,13 @@ export default function Repository() {
       } else if (filterDocument.mode === 'file' ) {
         fetchSearchDocumentFile()
       }
+
+      if(isReFetch){
+        setIsReFetch(false)
+      }
+
     }
-  }, [dispatch, router, repositoryData.id, filterDocument]);
+  }, [dispatch, router, repositoryData.id, filterDocument, isReFetch]);
 
   return (
     <>

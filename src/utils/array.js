@@ -49,3 +49,13 @@ export const convertFilterKeyOperatorArray = (arr) => {
 export const removeEmptyFilters = (arr) => {
   return arr.filter(obj => obj.key !== '' && obj.operator !== '');
 }
+
+export const sortByUpdatedAt = (array) => {
+  array.sort((a, b) => new Date(b.details.updated_at) - new Date(a.details.updated_at));
+  return array;
+}
+
+export const sortByTitle = (array) => {
+  array.sort((a, b) => a.details.title.localeCompare(b.details.title));
+  return array;
+}

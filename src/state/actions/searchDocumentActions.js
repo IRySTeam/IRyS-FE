@@ -11,3 +11,10 @@ export const getSearchDocumentFailed = (data) => {
     payload: data,
   }
 }
+
+export const updateDocuments = (data) => {
+  return {
+    type: 'updateDocuments',
+    payload: data,
+  }
+}
