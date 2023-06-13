@@ -26,6 +26,7 @@ export default function DetailDocument() {
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [alertLabel, setAlertLabel] = useState('Repository successfully created!');
@@ -75,19 +76,28 @@ export default function DetailDocument() {
               case 403:
                 setAlertLabel('Request forbidden -- authorization will not help');
                 setShowAlert(true);
+                setIsError(true);
+                break;
+              case 'USER__NOT_ALLOWED':
+                setAlertLabel('You don\'t have access to this document');
+                setShowAlert(true);
+                setIsError(true);
                 break;
               case 'DOCUMENT__NOT_FOUND':
                 setAlertLabel('Document not found');
                 setShowAlert(true);
+                setIsError(true);
                 break;
               default :
                 setAlertLabel('Network Error, Please Try Again.');
                 setShowAlert(true);
+                setIsError(true);
                 break;
             }
           } else{
             setAlertLabel('Network Error, Please Try Again.');
             setShowAlert(true);
+            setIsError(true);
           }
         }
         setIsLoading(false)
@@ -136,6 +146,8 @@ export default function DetailDocument() {
               marginTop: '64px',
             }} 
           >
+          
+          {!isError && 
           <Box
             sx={{
               display: 'flex',
@@ -183,6 +195,8 @@ export default function DetailDocument() {
               {documentData.title}
             </Typography>
           </Box>
+          }
+          {!isError && 
           <Box
             sx={{
               display: 'flex',
@@ -377,6 +391,7 @@ export default function DetailDocument() {
               </Accordion>
             </Box>
           </Box>
+          }
           </Container>
         </> 
       }

@@ -33,7 +33,7 @@ import { categoryOption } from '@/constants/option';
 import DocCollaboratorCard from '@/component/doc-collaborator-card';
 import SearchableSelect from '@/component/searchable-select';
 import NewDocCollaboratorCard from '@/component/new-doc-collaborator-card';
-import { isUploader } from '@/utils/roles';
+import { isEditorDocs, isOwnerDocs, isUploader } from '@/utils/roles';
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 
@@ -133,7 +133,7 @@ export default function ManageDocumentsDatabases() {
                 height: '25px',
                 minWidth: '25px',
                 width: '25px',
-                display: 'flex',
+                display: isEditorDocs(params.row.role) ? 'flex' : 'none',
                 padding: 0,
                 flexDirection: 'row',
                 justifyContent: 'center',
@@ -157,7 +157,7 @@ export default function ManageDocumentsDatabases() {
               height: '25px',
               minWidth: '25px',
               width: '25px',
-              display: 'flex',
+              display: isOwnerDocs(params.row.role) ? 'flex' : 'none',
               padding: 0,
               flexDirection: 'row',
               justifyContent: 'center',
@@ -1521,6 +1521,7 @@ export default function ManageDocumentsDatabases() {
                         key={collaborator.id}
                         order={index}
                         item={collaborator}
+                        currentRole={selectedDoc.role}
                         onRoleChange={handleRoleChanged}
                         onRemoveAccess={() => handleClickOpenRemoveAccess(index)}
                       />

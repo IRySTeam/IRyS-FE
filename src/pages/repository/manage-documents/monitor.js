@@ -19,7 +19,7 @@ import { formatDateTable } from '@/utils/date';
 import Dropdown from '@/component/dropdown';
 import { statusOption } from '@/constants/option';
 import { refresh } from '@/utils/token';
-import { isUploader } from '@/utils/roles';
+import { isAdmin, isEditorDocs, isUploader } from '@/utils/roles';
 import { getRepoCollaboratorListFailed, getRepoCollaboratorListSuccess, getRepoDetailFailed, getRepoDetailSuccess } from '@/state/actions/repositoryActions';
 import { getSingleRepoFailed, getSingleRepoSuccess } from '@/state/actions/singleRepositoryActions';
 
@@ -139,7 +139,7 @@ export default function ManageDocumentsMonitor() {
             height: '25px',
             width: '120px',
             typography: theme.typography.heading_h6,
-            display: 'flex',
+            display: isEditorDocs(params.row.role) ? 'flex' : 'none',
             flexDirection: 'row',
             gap: '8px',
             justifyContent: 'center',
@@ -654,6 +654,7 @@ export default function ManageDocumentsMonitor() {
                         padding: '0 12px',
                         width: '150px',
                         typography: theme.typography.heading_h6,
+                        display: isAdmin(repositoryData.current_user_role) ? 'flex' : 'none',
                       }}
                       onClick={()=> reindexAll()}
                     >
