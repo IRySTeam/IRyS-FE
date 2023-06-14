@@ -111,7 +111,7 @@ export default function DocumentCard(props) {
               WebkitBoxOrient: 'vertical',
             }}
           >
-            {props.item.details.uploaded_by ?? ''}
+            {props.item.details.uploader ? `${props.item.details.uploader.first_name} ${props.item.details.uploader.last_name}` : ''}
           </Typography>
         </Box>
         <Box
