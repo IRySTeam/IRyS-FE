@@ -560,7 +560,7 @@ export default function ManageDocumentsDatabases() {
 
   const handleRemoveNewCollaborator = () => {
     setNewCollaborator(null)
-    setNewCollaboratorRole('viewer')
+    setNewCollaboratorRole('Viewer')
   }
 
   const addToDocs = async () => {
@@ -1467,7 +1467,11 @@ export default function ManageDocumentsDatabases() {
                   }}
                   inputValue={searchUsers}
                   onInputChange={(event, newInputValue) => {
-                    setSearchUsers(newInputValue);
+                    if(newInputValue){
+                      setSearchUsers(newInputValue.split('_')[0])
+                    } else {
+                      setSearchUsers('')
+                    };
                   }}
                 />
                 { newCollaborator &&

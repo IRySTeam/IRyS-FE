@@ -9,7 +9,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 
-
 export default function SearchableSelect(props) {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -61,13 +60,14 @@ export default function SearchableSelect(props) {
         if(error.code !== 'ERR_CANCELED')console.log(error)
       }
     }
+
     if(props.repoId){
       fetchUsersRepo()
     }else if (props.docId){
       fetchUsersDocs()
     }
+
     setLoading(false)
-    return () => abortController.abort();
   }, [props.docId, props.inputValue, props.repoId]);
 
   return (
@@ -93,7 +93,7 @@ export default function SearchableSelect(props) {
         if (!option) {
           return '';
         }
-        return `${option.first_name} ${option.last_name}`;
+        return `${option.first_name} ${option.last_name}_${option.id}`;
       }}
       options={options}
       loading={loading}
