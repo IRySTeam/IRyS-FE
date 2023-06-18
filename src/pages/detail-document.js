@@ -19,6 +19,7 @@ import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import DownloadIcon from '@mui/icons-material/Download';
 import MetadataItem from '@/component/metadata-item';
 import { downloadFile } from '@/utils/download';
+import { refresh } from '@/utils/token';
 
 export default function DetailDocument() {
   const theme = useTheme();
