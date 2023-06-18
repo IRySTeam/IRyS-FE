@@ -232,6 +232,7 @@ export default function DetailDocument() {
                   pluginRenderers={DocViewerRenderers}
                   documents={docs}
                   config={{ header: { disableHeader: true } }}
+                  style={{ maxHeight: 700, minHeight: 700}}
                 />
               </Box>
               <Button 
