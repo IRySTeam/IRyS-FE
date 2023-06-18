@@ -203,7 +203,6 @@ export default function SearchableSelect(props) {
         paper:{
           sx:{
             marginTop: '8px',
-            maxHeight: {mobile:'200px', small:'300px'}
           }
         },
       }}
