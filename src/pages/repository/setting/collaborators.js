@@ -307,7 +307,7 @@ export default function CollaboratorsSettingRepository() {
 
   const handleRemoveNewCollaborator = () => {
     setNewCollaborator(null)
-    setNewCollaboratorRole('viewer')
+    setNewCollaboratorRole('Viewer')
   }
 
   const addToRepo = async () => {
@@ -734,7 +734,11 @@ export default function CollaboratorsSettingRepository() {
                 }}
                 inputValue={searchUsers}
                 onInputChange={(event, newInputValue) => {
-                  setSearchUsers(newInputValue);
+                  if(newInputValue){
+                    setSearchUsers(newInputValue.split('_')[0])
+                  } else {
+                    setSearchUsers('')
+                  };
                 }}
               />
               { newCollaborator &&
